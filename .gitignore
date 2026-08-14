@@ -28,6 +28,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+openspec
+node_modules
 # env files
 .env*.local
 
