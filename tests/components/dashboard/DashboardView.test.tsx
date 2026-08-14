@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, act, waitFor } from "@testing-library/react";
 import { DashboardView } from "@/components/dashboard/DashboardView";
 import type { GameState } from "@/lib/game-state";
+
+// Mock server actions
+const mockRegisterPositiveAction = vi.fn();
+vi.mock("@/app/dashboard/actions", () => ({
+  registerPositiveAction: (...args: any[]) => mockRegisterPositiveAction(...args),
+}));
 
 // Mock child components to focus on phase computation
 vi.mock("@/components/dashboard/LivesDisplay", () => ({
@@ -31,7 +37,13 @@ vi.mock("@/components/dashboard/CooldownTimer", () => ({
 }));
 
 vi.mock("@/components/dashboard/ActionButtons", () => ({
-  ActionButtons: () => <div data-testid="action-buttons" />,
+  ActionButtons: ({ onAction }: any) => (
+    <div data-testid="action-buttons">
+      <button data-testid="btn-breathing" onClick={() => onAction("breathing")}>
+        Breathing
+      </button>
+    </div>
+  ),
 }));
 
 vi.mock("@/components/dashboard/BadgesList", () => ({
@@ -58,6 +70,7 @@ describe("DashboardView", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-15T12:00:00Z"));
+    mockRegisterPositiveAction.mockReset();
   });
 
   afterEach(() => {
@@ -122,5 +135,48 @@ describe("DashboardView", () => {
     render(<DashboardView gameState={gameState} />);
     const timer = screen.getByTestId("cooldown-timer");
     expect(timer).toHaveAttribute("data-phase", "4");
+  });
+
+  it("calls registerPositiveAction when handleAction is invoked", async () => {
+    mockRegisterPositiveAction.mockResolvedValue({
+      gameState: { ...baseGameState, remainingLives: 7 },
+      cooldownMinutes: 20,
+      nextActionAvailableAt: "2026-01-15T12:20:00Z",
+    });
+
+    render(<DashboardView gameState={baseGameState} />);
+
+    const btn = screen.getByTestId("btn-breathing");
+
+    await act(async () => {
+      btn.click();
+      await vi.advanceTimersByTimeAsync(100);
+    });
+
+    expect(mockRegisterPositiveAction).toHaveBeenCalledWith(
+      "u-1",
+      "breathing"
+    );
+  });
+
+  it("passes userId and actionType to registerPositiveAction", async () => {
+    mockRegisterPositiveAction.mockResolvedValue({
+      gameState: baseGameState,
+      cooldownMinutes: 20,
+      nextActionAvailableAt: "2026-01-15T12:20:00Z",
+    });
+
+    render(<DashboardView gameState={baseGameState} />);
+
+    const btn = screen.getByTestId("btn-breathing");
+
+    await act(async () => {
+      btn.click();
+    });
+
+    expect(mockRegisterPositiveAction).toHaveBeenCalledWith(
+      "u-1",
+      "breathing"
+    );
   });
 });

@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { type GameState } from "@/lib/game-state";
 import { isCooldownActive, getPhase } from "@/lib/cooldown";
+import { registerPositiveAction } from "@/app/dashboard/actions";
 import { LivesDisplay } from "./LivesDisplay";
 import { StreakDisplay } from "./StreakDisplay";
 import { CigarettesToday } from "./CigarettesToday";
@@ -37,10 +38,16 @@ export function DashboardView({
 
   const handleAction = useCallback(
     async (actionType: "breathing" | "meditation" | "music") => {
-      // Action will be handled by server action in parent
-      console.log(`Action triggered: ${actionType}`);
+      try {
+        const result = await registerPositiveAction(state.userId, actionType);
+        if (!result.error) {
+          setState(result.gameState);
+        }
+      } catch (err) {
+        console.error(`Action failed: ${actionType}`, err);
+      }
     },
-    []
+    [state.userId]
   );
 
   const handleCooldownExpired = useCallback(() => {
