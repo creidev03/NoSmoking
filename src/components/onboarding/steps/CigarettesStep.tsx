@@ -20,7 +20,7 @@ export function CigarettesStep({ onSubmit, disabled }: CigarettesStepProps) {
   return (
     <div className="flex flex-col items-center gap-6 text-center">
       <div className="text-4xl">🚬</div>
-      <h2 className="text-xl font-semibold text-gray-900">
+      <h2 className="text-xl font-semibold text-foreground">
         ¿Cuántos cigarrillos fumas al día en promedio?
       </h2>
       <div className="grid grid-cols-3 gap-3">
@@ -29,7 +29,7 @@ export function CigarettesStep({ onSubmit, disabled }: CigarettesStepProps) {
             key={range.value}
             variant="outline"
             disabled={disabled}
-            className="h-12 rounded-lg border-gray-200 bg-white/80 text-base backdrop-blur transition-all hover:bg-emerald-50 hover:text-emerald-700 active:scale-95"
+            className="h-12 rounded-lg text-base transition-all hover:bg-accent hover:text-accent-foreground active:scale-95"
             onClick={() => onSubmit(range.value)}
           >
             {range.label}

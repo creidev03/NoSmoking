@@ -29,10 +29,10 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
               }
               className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-emerald-500 text-white"
+                  ? "bg-primary text-primary-foreground"
                   : isCompleted
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-gray-200 text-gray-500"
+                    ? "bg-primary/20 text-primary"
+                    : "bg-muted text-muted-foreground"
               }`}
             >
               {isCompleted ? "✓" : step}
