@@ -30,6 +30,9 @@ yarn-error.log*
 
 openspec
 node_modules
+.agents
+.atl
+skills-lock.json
 # env files
 .env*.local
 
