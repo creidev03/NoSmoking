@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { type GameState } from "@/lib/game-state";
 import { isCooldownActive, getPhase } from "@/lib/cooldown";
 import { registerPositiveAction } from "@/app/dashboard/actions";
@@ -10,6 +10,8 @@ import { CigarettesToday } from "./CigarettesToday";
 import { CooldownTimer } from "./CooldownTimer";
 import { ActionButtons } from "./ActionButtons";
 import { BadgesList } from "./BadgesList";
+
+const CACHE_KEY = "dashboard-game-state";
 
 interface Badge {
   key: string;
@@ -23,11 +25,43 @@ interface DashboardViewProps {
 
 const CIGARETTE_THRESHOLD = 5;
 
+function loadCachedState(): GameState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed.gameState ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedState(gameState: GameState) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({ gameState, timestamp: new Date().toISOString() })
+    );
+  } catch {
+    // localStorage unavailable — silently skip
+  }
+}
+
 export function DashboardView({
   gameState,
   badges = [],
 }: DashboardViewProps) {
-  const [state, setState] = useState(gameState);
+  const [state, setState] = useState(() => {
+    const cached = loadCachedState();
+    return cached ?? gameState;
+  });
+
+  // Sync server state to cache on mount
+  useEffect(() => {
+    saveCachedState(gameState);
+  }, [gameState]);
 
   const cooldownActive = isCooldownActive(state.nextActionAvailableAt);
 
@@ -42,6 +76,7 @@ export function DashboardView({
         const result = await registerPositiveAction(state.userId, actionType);
         if (!result.error) {
           setState(result.gameState);
+          saveCachedState(result.gameState);
         }
       } catch (err) {
         console.error(`Action failed: ${actionType}`, err);

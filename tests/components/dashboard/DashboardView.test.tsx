@@ -71,6 +71,7 @@ describe("DashboardView", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-15T12:00:00Z"));
     mockRegisterPositiveAction.mockReset();
+    localStorage.clear();
   });
 
   afterEach(() => {
@@ -178,5 +179,59 @@ describe("DashboardView", () => {
       "u-1",
       "breathing"
     );
+  });
+
+  describe("offline cache", () => {
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    it("saves game state to localStorage after mount", () => {
+      render(<DashboardView gameState={baseGameState} />);
+
+      const cached = localStorage.getItem("dashboard-game-state");
+      expect(cached).not.toBeNull();
+      const parsed = JSON.parse(cached!);
+      expect(parsed.gameState.id).toBe("gs-1");
+      expect(parsed.gameState.remainingLives).toBe(6);
+      expect(parsed.timestamp).toBeDefined();
+    });
+
+    it("loads cached game state on mount", () => {
+      const cachedData = {
+        gameState: { ...baseGameState, remainingLives: 3 },
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem("dashboard-game-state", JSON.stringify(cachedData));
+
+      render(<DashboardView gameState={baseGameState} />);
+
+      // Should use cached data initially
+      expect(screen.getByTestId("lives-display")).toHaveTextContent("3/8");
+    });
+
+    it("updates cache after successful action", async () => {
+      const updatedState = {
+        ...baseGameState,
+        remainingLives: 7,
+      };
+      mockRegisterPositiveAction.mockResolvedValue({
+        gameState: updatedState,
+        cooldownMinutes: 20,
+        nextActionAvailableAt: "2026-01-15T12:20:00Z",
+      });
+
+      render(<DashboardView gameState={baseGameState} />);
+
+      const btn = screen.getByTestId("btn-breathing");
+      await act(async () => {
+        btn.click();
+      });
+
+      const cached = localStorage.getItem("dashboard-game-state");
+      expect(cached).not.toBeNull();
+      const parsed = JSON.parse(cached!);
+      expect(parsed.gameState.remainingLives).toBe(7);
+    });
   });
 });
