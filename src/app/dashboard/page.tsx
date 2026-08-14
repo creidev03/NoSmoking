@@ -32,7 +32,7 @@ export default async function DashboardPage() {
     updatedAt: row.updatedAt,
   };
 
-  const resetState = checkMidnightReset(gameState, new Date());
+  const resetResult = checkMidnightReset(gameState, new Date());
 
-  return <DashboardView gameState={resetState} />;
+  return <DashboardView gameState={resetResult.gameState} />;
 }

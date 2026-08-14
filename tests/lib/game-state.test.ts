@@ -4,6 +4,7 @@ import {
   checkMidnightReset,
   checkRelapseWindowExpired,
   type GameState,
+  type MidnightResetResult,
 } from "@/lib/game-state";
 
 describe("game-state", () => {
@@ -70,9 +71,9 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T00:01:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(4);
-      expect(result.cigarettesToday).toBe(0);
-      expect(result.updatedAt).toContain("2026-01-16T00:01:00");
+      expect(result.gameState.streakDays).toBe(4);
+      expect(result.gameState.cigarettesToday).toBe(0);
+      expect(result.gameState.updatedAt).toContain("2026-01-16T00:01:00");
     });
 
     it("resets streak on relapse day (cigarettes >= 5)", () => {
@@ -95,8 +96,8 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T00:01:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(0);
-      expect(result.cigarettesToday).toBe(0);
+      expect(result.gameState.streakDays).toBe(0);
+      expect(result.gameState.cigarettesToday).toBe(0);
     });
 
     it("does not reset if same day (no midnight passed)", () => {
@@ -119,8 +120,8 @@ describe("game-state", () => {
       const now = new Date("2026-01-15T15:00:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(3);
-      expect(result.cigarettesToday).toBe(2);
+      expect(result.gameState.streakDays).toBe(3);
+      expect(result.gameState.cigarettesToday).toBe(2);
     });
 
     it("resets streak from 0 on clean day (stays 1)", () => {
@@ -143,8 +144,8 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T00:01:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(1);
-      expect(result.cigarettesToday).toBe(0);
+      expect(result.gameState.streakDays).toBe(1);
+      expect(result.gameState.cigarettesToday).toBe(0);
     });
 
     it("increments streak at boundary (4 cigarettes = clean day)", () => {
@@ -167,8 +168,8 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T00:01:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(7);
-      expect(result.cigarettesToday).toBe(0);
+      expect(result.gameState.streakDays).toBe(7);
+      expect(result.gameState.cigarettesToday).toBe(0);
     });
 
     it("resets streak at boundary (5 cigarettes = relapse)", () => {
@@ -191,8 +192,8 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T00:01:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(0);
-      expect(result.cigarettesToday).toBe(0);
+      expect(result.gameState.streakDays).toBe(0);
+      expect(result.gameState.cigarettesToday).toBe(0);
     });
 
     it("does not reset if updatedAt is exactly midnight boundary", () => {
@@ -215,8 +216,8 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T00:00:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.streakDays).toBe(5);
-      expect(result.cigarettesToday).toBe(2);
+      expect(result.gameState.streakDays).toBe(5);
+      expect(result.gameState.cigarettesToday).toBe(2);
     });
 
     it("resets relapse state when 24h window expires", () => {
@@ -240,10 +241,10 @@ describe("game-state", () => {
       const now = new Date("2026-01-17T00:00:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.status).toBe("active");
-      expect(result.relapseStartedAt).toBeNull();
-      expect(result.streakDays).toBe(0);
-      expect(result.cigarettesToday).toBe(0);
+      expect(result.gameState.status).toBe("active");
+      expect(result.gameState.relapseStartedAt).toBeNull();
+      expect(result.gameState.streakDays).toBe(0);
+      expect(result.gameState.cigarettesToday).toBe(0);
     });
 
     it("does not reset relapse state within 24h window", () => {
@@ -267,8 +268,81 @@ describe("game-state", () => {
       const now = new Date("2026-01-16T11:00:00Z");
       const result = checkMidnightReset(gameState, now);
 
-      expect(result.status).toBe("relapse");
-      expect(result.relapseStartedAt).toBe("2026-01-15T23:00:00Z");
+      expect(result.gameState.status).toBe("relapse");
+      expect(result.gameState.relapseStartedAt).toBe("2026-01-15T23:00:00Z");
+    });
+
+    it("returns new badges when streak crosses threshold", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 4,
+        cigarettesToday: 2,
+        streakDays: 6,
+        lastCigaretteAt: "2026-01-15T10:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "active",
+        relapseStartedAt: null,
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      // Streak goes from 6 → 7 (crosses primera_semana threshold)
+      const now = new Date("2026-01-16T00:01:00Z");
+      const result = checkMidnightReset(gameState, now, []);
+
+      expect(result.gameState.streakDays).toBe(7);
+      expect(result.newBadges).toEqual(["primera_semana"]);
+    });
+
+    it("returns no new badges when streak does not cross threshold", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 4,
+        cigarettesToday: 2,
+        streakDays: 3,
+        lastCigaretteAt: "2026-01-15T10:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "active",
+        relapseStartedAt: null,
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      const now = new Date("2026-01-16T00:01:00Z");
+      const result = checkMidnightReset(gameState, now, []);
+
+      expect(result.gameState.streakDays).toBe(4);
+      expect(result.newBadges).toEqual([]);
+    });
+
+    it("does not duplicate already earned badges", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 4,
+        cigarettesToday: 2,
+        streakDays: 6,
+        lastCigaretteAt: "2026-01-15T10:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "active",
+        relapseStartedAt: null,
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      const now = new Date("2026-01-16T00:01:00Z");
+      const result = checkMidnightReset(gameState, now, ["primera_semana"]);
+
+      expect(result.gameState.streakDays).toBe(7);
+      expect(result.newBadges).toEqual([]);
     });
   });
 

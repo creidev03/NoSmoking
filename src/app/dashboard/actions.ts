@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { game_state, events } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { checkMidnightReset, type GameState } from "@/lib/game-state";
+import { checkMidnightReset, type GameState, type MidnightResetResult } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
 import { randomUUID } from "crypto";
 
@@ -59,7 +59,8 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
     let penaltyApplied = false;
     let newCycle = false;
 
-    gameState = checkMidnightReset(gameState, new Date());
+    const resetResult = checkMidnightReset(gameState, new Date());
+    gameState = resetResult.gameState;
 
     const newCigarettesToday = gameState.cigarettesToday + 1;
 
@@ -138,7 +139,8 @@ export async function registerPositiveAction(
     let gameState = mapGameState(row);
     const now = new Date();
 
-    gameState = checkMidnightReset(gameState, now);
+    const resetResult = checkMidnightReset(gameState, now);
+    gameState = resetResult.gameState;
 
     if (isCooldownActive(gameState.nextActionAvailableAt)) {
       return {

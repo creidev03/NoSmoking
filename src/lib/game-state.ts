@@ -1,3 +1,10 @@
+import { evaluateBadges } from "./badges";
+
+export interface MidnightResetResult {
+  gameState: GameState;
+  newBadges: string[];
+}
+
 export interface GameState {
   id: string;
   userId: string;
@@ -26,20 +33,24 @@ export function computeInitialLives(cigarettesPerDay: number): number {
 
 export function checkMidnightReset(
   gameState: GameState,
-  now: Date
-): GameState {
+  now: Date,
+  existingBadges: string[] = []
+): MidnightResetResult {
   // Check relapse window expiration first
   if (
     gameState.status === "relapse" &&
     checkRelapseWindowExpired(gameState, now)
   ) {
     return {
-      ...gameState,
-      status: "active",
-      relapseStartedAt: null,
-      cigarettesToday: 0,
-      streakDays: 0,
-      updatedAt: now.toISOString(),
+      gameState: {
+        ...gameState,
+        status: "active",
+        relapseStartedAt: null,
+        cigarettesToday: 0,
+        streakDays: 0,
+        updatedAt: now.toISOString(),
+      },
+      newBadges: [],
     };
   }
 
@@ -48,7 +59,7 @@ export function checkMidnightReset(
   const nowDate = now.toISOString().split("T")[0];
 
   if (lastUpdateDate === nowDate) {
-    return gameState;
+    return { gameState, newBadges: [] };
   }
 
   const newStreakDays =
@@ -56,12 +67,20 @@ export function checkMidnightReset(
       ? gameState.streakDays + 1
       : 0;
 
-  return {
+  const updatedGameState: GameState = {
     ...gameState,
     streakDays: newStreakDays,
     cigarettesToday: 0,
     updatedAt: now.toISOString(),
   };
+
+  // Evaluate badges on streak increment
+  const newBadges =
+    newStreakDays > gameState.streakDays
+      ? evaluateBadges(newStreakDays, existingBadges)
+      : [];
+
+  return { gameState: updatedGameState, newBadges };
 }
 
 export function checkRelapseWindowExpired(
