@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   computeInitialLives,
   checkMidnightReset,
+  checkRelapseWindowExpired,
   type GameState,
 } from "@/lib/game-state";
 
@@ -216,6 +217,170 @@ describe("game-state", () => {
 
       expect(result.streakDays).toBe(5);
       expect(result.cigarettesToday).toBe(2);
+    });
+
+    it("resets relapse state when 24h window expires", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "relapse",
+        relapseStartedAt: "2026-01-15T23:00:00Z",
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      // 25 hours after relapse — past 24h window
+      const now = new Date("2026-01-17T00:00:00Z");
+      const result = checkMidnightReset(gameState, now);
+
+      expect(result.status).toBe("active");
+      expect(result.relapseStartedAt).toBeNull();
+      expect(result.streakDays).toBe(0);
+      expect(result.cigarettesToday).toBe(0);
+    });
+
+    it("does not reset relapse state within 24h window", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "relapse",
+        relapseStartedAt: "2026-01-15T23:00:00Z",
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      // 12 hours after relapse — within 24h window
+      const now = new Date("2026-01-16T11:00:00Z");
+      const result = checkMidnightReset(gameState, now);
+
+      expect(result.status).toBe("relapse");
+      expect(result.relapseStartedAt).toBe("2026-01-15T23:00:00Z");
+    });
+  });
+
+  describe("checkRelapseWindowExpired", () => {
+    it("returns false when not in relapse (relapseStartedAt is null)", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "active",
+        relapseStartedAt: null,
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      const now = new Date("2026-01-17T00:00:00Z");
+      expect(checkRelapseWindowExpired(gameState, now)).toBe(false);
+    });
+
+    it("returns false when within 24h window", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "relapse",
+        relapseStartedAt: "2026-01-15T23:00:00Z",
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      // 12 hours after relapse — within 24h window
+      const now = new Date("2026-01-16T11:00:00Z");
+      expect(checkRelapseWindowExpired(gameState, now)).toBe(false);
+    });
+
+    it("returns true when 24h window has expired", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "relapse",
+        relapseStartedAt: "2026-01-15T23:00:00Z",
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      // 25 hours after relapse — past 24h window
+      const now = new Date("2026-01-17T00:00:00Z");
+      expect(checkRelapseWindowExpired(gameState, now)).toBe(true);
+    });
+
+    it("returns true exactly at 24h boundary", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "relapse",
+        relapseStartedAt: "2026-01-15T23:00:00Z",
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      // Exactly 24h after relapse
+      const now = new Date("2026-01-16T23:00:00Z");
+      expect(checkRelapseWindowExpired(gameState, now)).toBe(true);
+    });
+
+    it("resets game state when window expires", () => {
+      const gameState: GameState = {
+        id: "gs-1",
+        userId: "u-1",
+        totalLives: 4,
+        remainingLives: 0,
+        cigarettesToday: 5,
+        streakDays: 0,
+        lastCigaretteAt: "2026-01-15T20:00:00Z",
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "relapse",
+        relapseStartedAt: "2026-01-15T23:00:00Z",
+        createdAt: "2026-01-01T00:00:00Z",
+        updatedAt: "2026-01-15T23:59:00Z",
+      };
+
+      const now = new Date("2026-01-17T00:00:00Z");
+      const result = checkRelapseWindowExpired(gameState, now);
+
+      expect(result).toBe(true);
     });
   });
 });
