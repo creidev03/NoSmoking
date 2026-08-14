@@ -12,14 +12,14 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx", "tests/**/*.test.ts", "tests/**/*.test.tsx"],
     projects: [
       {
         resolve: { alias },
         esbuild: { jsx: "automatic" },
         test: {
           environment: "node",
-          include: ["src/**/*.test.ts"],
+          include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
           globals: true,
         },
       },
@@ -28,7 +28,7 @@ export default defineConfig({
         esbuild: { jsx: "automatic" },
         test: {
           environment: "jsdom",
-          include: ["src/**/*.test.tsx"],
+          include: ["src/**/*.test.tsx", "tests/**/*.test.tsx"],
           globals: true,
           setupFiles: ["./vitest-setup.ts"],
         },

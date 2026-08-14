@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeDifficulty } from "./difficulty";
+import { computeDifficulty } from "@/lib/difficulty";
 
 describe("computeDifficulty", () => {
   it("returns easy for 1 year and 0 attempts", () => {

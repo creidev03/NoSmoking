@@ -3,7 +3,7 @@ import {
   clampCigarettesPerDay,
   clampSmokingYears,
   clampQuitAttempts,
-} from "./clamp";
+} from "@/lib/clamp";
 
 describe("clampCigarettesPerDay", () => {
   it("passes through valid value 10", () => {

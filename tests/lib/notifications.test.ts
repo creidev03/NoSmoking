@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { shouldEnableNotifications } from "./notifications";
+import { shouldEnableNotifications } from "@/lib/notifications";
 
 describe("shouldEnableNotifications", () => {
   it("returns true for health motivation", () => {

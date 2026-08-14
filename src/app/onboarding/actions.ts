@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { users, onboardingResponses } from "@/db/schema";
+import { users, onboardingResponses, game_state } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { computeLives } from "@/lib/lives";
 import { computeDifficulty } from "@/lib/difficulty";
@@ -157,15 +157,38 @@ export async function completeOnboarding(
     response.motivation ?? ""
   );
 
+  const now = new Date().toISOString();
+
   await db
     .update(onboardingResponses)
     .set({
       computedLives,
       computedDifficulty,
       notificationEnabled,
-      completedAt: new Date().toISOString(),
+      completedAt: now,
     })
     .where(eq(onboardingResponses.userId, userId));
+
+  // Create game_state for the user (upsert — may exist from previous attempt)
+  const existingGameState = await db
+    .select()
+    .from(game_state)
+    .where(eq(game_state.userId, userId))
+    .get();
+
+  if (!existingGameState) {
+    await db.insert(game_state).values({
+      id: randomUUID(),
+      userId,
+      totalLives: computedLives,
+      remainingLives: computedLives,
+      cigarettesToday: 0,
+      streakDays: 0,
+      status: "active",
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
   redirect("/dashboard");
 }

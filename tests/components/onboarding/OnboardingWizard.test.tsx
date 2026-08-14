@@ -4,6 +4,14 @@ import userEvent from "@testing-library/user-event";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import * as actions from "@/app/onboarding/actions";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+}));
+
 vi.mock("@/app/onboarding/actions", () => ({
   submitStep: vi.fn(),
   completeOnboarding: vi.fn(),
@@ -47,11 +55,11 @@ describe("OnboardingWizard", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows glassmorphism card styling", () => {
+  it("shows card styling", () => {
     render(<OnboardingWizard initialStep={1} />);
-    const nav = screen.getByRole("navigation");
-    const card = nav.closest("div");
-    expect(card).toHaveClass("backdrop-blur");
+    const card = screen.getByRole("navigation").closest("div");
+    expect(card).toHaveClass("rounded-2xl");
+    expect(card).toHaveClass("shadow-lg");
   });
 
   it("shows error message when server action fails", async () => {

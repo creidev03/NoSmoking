@@ -92,28 +92,62 @@ export function DashboardView({
     }));
   }, []);
 
+  const isRelapsed = state.status === "relapse";
+
   return (
-    <div data-testid="dashboard-view">
-      <LivesDisplay
-        total={state.totalLives}
-        remaining={state.remainingLives}
-      />
-      <StreakDisplay streakDays={state.streakDays} />
-      <CigarettesToday
-        count={state.cigarettesToday}
-        threshold={CIGARETTE_THRESHOLD}
-      />
-      <CooldownTimer
-        nextActionAt={state.nextActionAvailableAt}
-        phase={phase}
-        onExpired={handleCooldownExpired}
-      />
-      <ActionButtons
-        onAction={handleAction}
-        isCooldownActive={cooldownActive}
-        gameState={state}
-      />
-      <BadgesList badges={badges} />
+    <div className="min-h-screen bg-[#FFFFFF] dark:bg-[#111827]">
+      <div className="mx-auto max-w-2xl px-4 py-6">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-[32px] font-bold leading-tight text-[#1F2937] dark:text-[#F3F4F6]">
+            {isRelapsed ? "💚 Recuperación" : "Tu Progreso Hoy"}
+          </h1>
+          <p className="text-[16px] text-[#6B7280]">
+            {isRelapsed
+              ? "Estás en ventana de recuperación. ¡No te rindas!"
+              : "Cada día es una oportunidad para ser más fuerte"}
+          </p>
+        </div>
+
+        {/* Relapse banner */}
+        {isRelapsed && (
+          <div className="mb-4 rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] p-3 dark:border-[#991B1B] dark:bg-[#7F1D1D]/30">
+            <p className="text-sm font-medium text-[#991B1B] dark:text-[#FCA5A5]">
+              ⚠️ Has perdido todas tus vidas. Tienes 24 horas para recuperarte
+              completando acciones positivas.
+            </p>
+          </div>
+        )}
+
+        {/* Main content - single column on mobile */}
+        <div className="space-y-3">
+          <LivesDisplay
+            total={state.totalLives}
+            remaining={state.remainingLives}
+          />
+
+          <StreakDisplay streakDays={state.streakDays} />
+
+          <CigarettesToday
+            count={state.cigarettesToday}
+            threshold={CIGARETTE_THRESHOLD}
+          />
+
+          <CooldownTimer
+            nextActionAt={state.nextActionAvailableAt}
+            phase={phase}
+            onExpired={handleCooldownExpired}
+          />
+
+          <ActionButtons
+            onAction={handleAction}
+            isCooldownActive={cooldownActive}
+            gameState={state}
+          />
+
+          <BadgesList badges={badges} />
+        </div>
+      </div>
     </div>
   );
 }

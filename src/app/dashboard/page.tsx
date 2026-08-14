@@ -9,7 +9,7 @@ export default async function DashboardPage() {
   const row = await db
     .select()
     .from(game_state)
-    .where(eq(game_state.userId, "current-user"))
+    .where(eq(game_state.userId, "stub-user-id"))
     .get();
 
   if (!row) {
