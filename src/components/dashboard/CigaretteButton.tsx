@@ -68,20 +68,20 @@ export function CigaretteButton({
   // Inner radius for fill (separate from border)
   const innerRadius = radius - stroke - 10;
 
-  // Color interpolation: grey → red → orange as fill grows
+  // Color interpolation: orange → red as fill grows
   const fillColor =
     fillPercent === 0
-      ? "#9CA3AF"
+      ? "#F97316"
       : fillPercent < 50
-        ? "#EF4444"
-        : "#F97316";
+        ? "#F97316"
+        : "#EF4444";
 
   const borderColor =
     fillPercent === 0
-      ? "#D1D5DB"
+      ? "#FDBA74"
       : fillPercent < 50
-        ? "#FCA5A5"
-        : "#FDBA74";
+        ? "#FDBA74"
+        : "#FCA5A5";
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -145,9 +145,13 @@ export function CigaretteButton({
           />
         </svg>
 
-        {/* ── Emoji ───────────────────────────────────────────────── */}
-        <span
-          className="relative z-10 select-none text-[40px] leading-none"
+        {/* ── Cigarette Icon ────────────────────────────────────────── */}
+        <svg
+          width={40}
+          height={40}
+          viewBox="0 0 24 24"
+          fill="none"
+          className="relative z-10"
           style={{
             filter:
               fillPercent > 0
@@ -156,8 +160,43 @@ export function CigaretteButton({
           }}
           aria-hidden="true"
         >
-          🚬
-        </span>
+          {/* Cigarette body */}
+          <rect
+            x="8"
+            y="4"
+            width="8"
+            height="14"
+            rx="1"
+            fill={fillColor}
+            style={{ transition: "fill 300ms ease" }}
+          />
+          {/* Cigarette filter */}
+          <rect
+            x="8"
+            y="18"
+            width="8"
+            height="3"
+            rx="0.5"
+            fill="#D97706"
+          />
+          {/* Smoke lines */}
+          <path
+            d="M11 2C11 2 12 0 13 2"
+            stroke={fillColor}
+            strokeWidth="1"
+            strokeLinecap="round"
+            opacity="0.6"
+            style={{ transition: "stroke 300ms ease" }}
+          />
+          <path
+            d="M13 1C13 1 14.5 -0.5 15.5 1"
+            stroke={fillColor}
+            strokeWidth="1"
+            strokeLinecap="round"
+            opacity="0.4"
+            style={{ transition: "stroke 300ms ease" }}
+          />
+        </svg>
       </button>
 
       {/* ── Count label ────────────────────────────────────────────── */}
