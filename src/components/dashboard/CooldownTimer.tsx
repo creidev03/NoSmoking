@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface CooldownTimerProps {
   nextActionAt: string | null;
@@ -50,6 +50,7 @@ export function CooldownTimer({
   onExpired,
 }: CooldownTimerProps) {
   const expiredRef = useRef(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
     if (!nextActionAt) return 0;
@@ -57,50 +58,60 @@ export function CooldownTimer({
     return Math.max(0, Math.ceil(diff / 1000));
   });
 
-  // Recalculate when nextActionAt changes (e.g. after a positive action)
+  // Single effect: recalculates on nextActionAt change, runs countdown
   useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    expiredRef.current = false;
+
+    // No cooldown active
     if (!nextActionAt) {
       setRemainingSeconds(0);
       return;
     }
+
+    // Calculate remaining seconds from nextActionAt
     const diff = new Date(nextActionAt).getTime() - Date.now();
-    setRemainingSeconds(Math.max(0, Math.ceil(diff / 1000)));
-    expiredRef.current = false;
-  }, [nextActionAt]);
+    const seconds = Math.max(0, Math.ceil(diff / 1000));
+    setRemainingSeconds(seconds);
 
-  const handleExpired = useCallback(() => {
-    if (!expiredRef.current) {
-      expiredRef.current = true;
+    // If already expired, notify
+    if (seconds <= 0) {
       onExpired();
-    }
-  }, [onExpired]);
-
-  useEffect(() => {
-    expiredRef.current = false;
-
-    if (remainingSeconds <= 0) {
-      if (nextActionAt) handleExpired();
       return;
     }
 
-    const interval = setInterval(() => {
+    // Start countdown interval
+    intervalRef.current = setInterval(() => {
       setRemainingSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
+        const next = prev - 1;
+        if (next <= 0) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          intervalRef.current = null;
           return 0;
         }
-        return prev - 1;
+        return next;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [nextActionAt, handleExpired, remainingSeconds > 0]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [nextActionAt, onExpired]);
 
+  // Notify parent when countdown reaches zero
   useEffect(() => {
-    if (remainingSeconds <= 0 && nextActionAt) {
-      handleExpired();
+    if (remainingSeconds <= 0 && nextActionAt && !expiredRef.current) {
+      expiredRef.current = true;
+      onExpired();
     }
-  }, [remainingSeconds, nextActionAt, handleExpired]);
+  }, [remainingSeconds, nextActionAt, onExpired]);
 
   const isActive = nextActionAt && remainingSeconds > 0;
   const color = getPhaseColor(phase);
