@@ -113,3 +113,31 @@ export const achievementProgress = sqliteTable(
     uniqueAchievementProgress: unique().on(t.userId, t.achievementId),
   })
 );
+
+// --- Settings & Profile tables ---
+
+export const userProfile = sqliteTable("user_profile", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id),
+  avatarUrl: text("avatar_url"),
+  motivations: text("motivations"), // JSON array: ["salud", "dinero", "familia"]
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const preferences = sqliteTable("preferences", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id),
+  notificationsEnabled: integer("notifications_enabled", { mode: "boolean" }).notNull().default(true),
+  reminderInterval: text("reminder_interval").notNull().default("6h"),
+  language: text("language").notNull().default("es"),
+  theme: text("theme").notNull().default("auto"),
+  soundsEnabled: integer("sounds_enabled", { mode: "boolean" }).notNull().default(true),
+  updatedAt: text("updated_at").notNull(),
+});
