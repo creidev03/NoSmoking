@@ -52,6 +52,8 @@ export function CooldownTimer({
   const expiredRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  console.log("CooldownTimer props:", { nextActionAt, phase });
+
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
     if (!nextActionAt) return 0;
     const diff = new Date(nextActionAt).getTime() - Date.now();
@@ -60,6 +62,7 @@ export function CooldownTimer({
 
   // Single effect: recalculates on nextActionAt change, runs countdown
   useEffect(() => {
+    console.log("CooldownTimer effect running, nextActionAt:", nextActionAt);
     // Clear any existing interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -69,6 +72,7 @@ export function CooldownTimer({
 
     // No cooldown active
     if (!nextActionAt) {
+      console.log("CooldownTimer: nextActionAt is null, setting remaining to 0");
       setRemainingSeconds(0);
       return;
     }
@@ -76,21 +80,27 @@ export function CooldownTimer({
     // Calculate remaining seconds from nextActionAt
     const diff = new Date(nextActionAt).getTime() - Date.now();
     const seconds = Math.max(0, Math.ceil(diff / 1000));
+    console.log("CooldownTimer: calculated seconds:", seconds);
     setRemainingSeconds(seconds);
 
     // If already expired, notify
     if (seconds <= 0) {
+      console.log("CooldownTimer: ALREADY EXPIRED, calling onExpired");
       onExpired();
       return;
     }
 
+    console.log("CooldownTimer: starting interval for", seconds, "seconds");
     // Start countdown interval
     intervalRef.current = setInterval(() => {
       setRemainingSeconds((prev) => {
         const next = prev - 1;
         if (next <= 0) {
+          console.log("CooldownTimer: interval reached 0, calling onExpired");
           if (intervalRef.current) clearInterval(intervalRef.current);
           intervalRef.current = null;
+          // Call onExpired after state update
+          setTimeout(() => onExpired(), 0);
           return 0;
         }
         return next;
@@ -104,14 +114,6 @@ export function CooldownTimer({
       }
     };
   }, [nextActionAt, onExpired]);
-
-  // Notify parent when countdown reaches zero
-  useEffect(() => {
-    if (remainingSeconds <= 0 && nextActionAt && !expiredRef.current) {
-      expiredRef.current = true;
-      onExpired();
-    }
-  }, [remainingSeconds, nextActionAt, onExpired]);
 
   const isActive = nextActionAt && remainingSeconds > 0;
   const color = getPhaseColor(phase);
