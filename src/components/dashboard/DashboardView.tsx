@@ -180,6 +180,8 @@ export function DashboardView({
 
         {/* Main content - single column on mobile */}
         <div className="space-y-3">
+          <StreakDisplay streakDays={state.streakDays} />
+
           <LivesDisplay
             total={state.totalLives}
             remaining={state.remainingLives}
@@ -193,8 +195,6 @@ export function DashboardView({
               🎁 Vidas extra ganadas: {state.totalPoints}/3
             </p>
           )}
-
-          <StreakDisplay streakDays={state.streakDays} />
 
           <div className="flex justify-center py-2">
             <CigaretteButton
