@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Geist, Lora, Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -20,14 +21,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable, poppins.variable, lora.variable)} suppressHydrationWarning>
-      <body>
-        <header className="fixed top-4 right-4 z-50">
-          <ThemeToggle />
-        </header>
-        {children}
-        <Toaster richColors position="top-center" />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={cn("font-sans", geist.variable, poppins.variable, lora.variable)} suppressHydrationWarning>
+        <body>
+          <header className="fixed top-4 right-4 z-50">
+            <ThemeToggle />
+          </header>
+          {children}
+          <Toaster richColors position="top-center" />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

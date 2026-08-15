@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+// Mock Clerk auth (server-only module)
+const mockAuth = vi.fn();
+vi.mock("@clerk/nextjs/server", () => ({
+  auth: (...args: any[]) => mockAuth(...args),
+}));
+
 // Mock the db module
 vi.mock("@/lib/db", () => ({
   db: {
@@ -76,6 +82,9 @@ import { redirect } from "next/navigation";
 const mockDb = vi.mocked(db);
 const mockRedirect = vi.mocked(redirect);
 
+// Default: authenticated user
+mockAuth.mockResolvedValue({ userId: "user-1" });
+
 function mockSelectWithGameState(gameState: any) {
   mockDb.select.mockReturnValue({
     from: vi.fn(() => ({
@@ -124,7 +133,15 @@ describe("DashboardPage", () => {
     vi.useRealTimers();
   });
 
+  it("redirects to /sign-in when not authenticated", async () => {
+    mockAuth.mockResolvedValueOnce({ userId: null });
+
+    await expect(DashboardPage()).rejects.toThrow("NEXT_REDIRECT");
+    expect(mockRedirect).toHaveBeenCalledWith("/sign-in");
+  });
+
   it("redirects to /onboarding when no game_state found", async () => {
+    mockAuth.mockResolvedValue({ userId: "user-1" });
     mockDb.select.mockReturnValue({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
