@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -29,8 +29,8 @@ export const game_state = sqliteTable("game_state", {
     .notNull()
     .unique()
     .references(() => users.id),
-  totalLives: integer("total_lives").notNull(),
-  remainingLives: integer("remaining_lives").notNull(),
+  totalLives: real("total_lives").notNull(),
+  remainingLives: real("remaining_lives").notNull(),
   cigarettesToday: integer("cigarettes_today").notNull().default(0),
   streakDays: integer("streak_days").notNull().default(0),
   lastCigaretteAt: text("last_cigarette_at"),
@@ -38,6 +38,7 @@ export const game_state = sqliteTable("game_state", {
   nextActionAvailableAt: text("next_action_available_at"),
   status: text("status").notNull().default("active"),
   relapseStartedAt: text("relapse_started_at"),
+  totalPoints: real("total_points").notNull().default(0),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
