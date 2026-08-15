@@ -1,0 +1,163 @@
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
+
+interface CigaretteButtonProps {
+  currentCount: number;
+  threshold: number;
+  onRegister: () => void;
+}
+
+/**
+ * SVG-based circular button with bottom-to-top fill animation.
+ *
+ * Progress is shown via a clip-path mask: a circle clips a rectangle whose
+ * height animates from 0% (empty) to 100% (full).  The border ring uses
+ * stroke-dasharray to leave a small gap at the bottom.
+ */
+export function CigaretteButton({
+  currentCount,
+  threshold,
+  onRegister,
+}: CigaretteButtonProps) {
+  const [fillPercent, setFillPercent] = useState(0);
+  const [isResetting, setIsResetting] = useState(false);
+  const [isPulsing, setIsPulsing] = useState(false);
+  const prevCountRef = useRef(currentCount);
+
+  // ── Sync fill with server count ──────────────────────────────────────
+  useEffect(() => {
+    const prev = prevCountRef.current;
+    prevCountRef.current = currentCount;
+
+    // Detect penalty reset: was at threshold-1, now back to 0
+    if (prev === threshold - 1 && currentCount === 0) {
+      setIsResetting(true);
+      // Drain the fill downward over 500ms
+      setFillPercent(100); // jump to full so transition down is visible
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setFillPercent(0);
+        });
+      });
+      setTimeout(() => setIsResetting(false), 600);
+    } else {
+      setFillPercent((currentCount / threshold) * 100);
+    }
+  }, [currentCount, threshold]);
+
+  // ── Pulse on click ──────────────────────────────────────────────────
+  const handleClick = useCallback(() => {
+    if (isResetting) return;
+    setIsPulsing(true);
+    setTimeout(() => setIsPulsing(false), 150);
+    onRegister();
+  }, [isResetting, onRegister]);
+
+  // ── SVG constants ───────────────────────────────────────────────────
+  const size = 96;
+  const stroke = 4;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  // Gap at the bottom: ~12% of circumference (360° * 0.12 ≈ 43°)
+  const gapLen = circumference * 0.12;
+  const arcLen = circumference - gapLen;
+
+  // Color interpolation: grey → red → orange as fill grows
+  const fillColor =
+    fillPercent === 0
+      ? "#9CA3AF"
+      : fillPercent < 50
+        ? "#EF4444"
+        : "#F97316";
+
+  const borderColor =
+    fillPercent === 0
+      ? "#D1D5DB"
+      : fillPercent < 50
+        ? "#FCA5A5"
+        : "#FDBA74";
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {/* ── Button ─────────────────────────────────────────────────── */}
+      <button
+        onClick={handleClick}
+        data-testid="cigarette-button"
+        className="group relative flex items-center justify-center rounded-full transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        style={{
+          width: size,
+          height: size,
+          transform: isPulsing ? "scale(0.93)" : "scale(1)",
+        }}
+        aria-label={`Registrar cigarro (${currentCount}/${threshold})`}
+      >
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          className="absolute inset-0"
+        >
+          {/* ── Clip mask for the fill ─────────────────────────────── */}
+          <defs>
+            <clipPath id="cig-circle-clip">
+              <circle cx={size / 2} cy={size / 2} r={radius - 2} />
+            </clipPath>
+          </defs>
+
+          {/* ── Background fill (rises from bottom) ────────────────── */}
+          <g clipPath="url(#cig-circle-clip)">
+            <rect
+              x={0}
+              y={size}
+              width={size}
+              height={size}
+              fill={fillColor}
+              opacity={0.25}
+              style={{
+                transition: isResetting
+                  ? "y 500ms ease-in, height 500ms ease-in"
+                  : "y 300ms ease, height 300ms ease",
+                y: size - (size * fillPercent) / 100,
+                height: (size * fillPercent) / 100,
+              }}
+            />
+          </g>
+
+          {/* ── Border ring with bottom gap ────────────────────────── */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={borderColor}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${arcLen} ${gapLen}`}
+            transform={`rotate(90 ${size / 2} ${size / 2})`}
+            style={{ transition: "stroke 300ms ease" }}
+          />
+        </svg>
+
+        {/* ── Emoji ───────────────────────────────────────────────── */}
+        <span
+          className="relative z-10 select-none text-[32px] leading-none"
+          style={{
+            filter:
+              fillPercent > 0
+                ? "drop-shadow(0 1px 2px rgba(0,0,0,0.15))"
+                : undefined,
+          }}
+          aria-hidden="true"
+        >
+          🚬
+        </span>
+      </button>
+
+      {/* ── Count label ────────────────────────────────────────────── */}
+      <p className="text-xs font-medium text-[#6B7280] dark:text-[#9CA3AF]">
+        {currentCount}/{threshold} cigarros
+      </p>
+    </div>
+  );
+}

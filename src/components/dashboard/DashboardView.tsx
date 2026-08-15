@@ -10,6 +10,7 @@ import { CigarettesToday } from "./CigarettesToday";
 import { CooldownTimer } from "./CooldownTimer";
 import { ActionButtons } from "./ActionButtons";
 import { BadgesList } from "./BadgesList";
+import { CigaretteButton } from "./CigaretteButton";
 
 
 const CACHE_KEY = "dashboard-game-state";
@@ -153,15 +154,6 @@ export function DashboardView({
           </div>
         )}
 
-        {/* Register Cigarette Button */}
-        <button
-          onClick={handleRegisterCigarette}
-          className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-[15px] font-semibold text-[#EF4444] transition-all active:scale-[0.98] hover:bg-[#EF4444]/15 dark:border-[#EF4444]/20 dark:bg-[#EF4444]/10"
-          data-testid="register-cigarette-button"
-        >
-          🚬 Registrar cigarro
-        </button>
-
         {/* Dev Only: Reset Lives */}
         {isDev && (
           <button
@@ -203,6 +195,14 @@ export function DashboardView({
           )}
 
           <StreakDisplay streakDays={state.streakDays} />
+
+          <div className="flex justify-center py-2">
+            <CigaretteButton
+              currentCount={state.cigarettesToday}
+              threshold={CIGARETTE_THRESHOLD}
+              onRegister={handleRegisterCigarette}
+            />
+          </div>
 
           <CigarettesToday
             count={state.cigarettesToday}
