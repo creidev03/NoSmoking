@@ -1,0 +1,116 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import type { TimelineEvent, TimelineFilter } from "@/lib/timeline";
+import { groupEventsByDay } from "@/lib/timeline";
+import { getTimelineEvents } from "@/app/dashboard/actions";
+import { TimelineFilters } from "./TimelineFilters";
+import { TimelineGroup } from "./TimelineGroup";
+
+interface TimelineViewProps {
+  userId: string;
+  initialEvents: TimelineEvent[];
+  initialHasMore: boolean;
+}
+
+export function TimelineView({
+  userId,
+  initialEvents,
+  initialHasMore,
+}: TimelineViewProps) {
+  const [activeFilter, setActiveFilter] = useState<TimelineFilter>("all");
+  const [events, setEvents] = useState<TimelineEvent[]>(initialEvents);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const handleFilterChange = useCallback(
+    async (filter: TimelineFilter) => {
+      setActiveFilter(filter);
+      setLoading(true);
+      try {
+        const result = await getTimelineEvents(userId, filter, 0, 20);
+        setEvents(result.events);
+        setHasMore(result.hasMore);
+        setPage(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userId]
+  );
+
+  const loadMore = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const nextPage = page + 1;
+      const result = await getTimelineEvents(userId, activeFilter, nextPage, 20);
+      setEvents((prev) => [...prev, ...result.events]);
+      setHasMore(result.hasMore);
+      setPage(nextPage);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, activeFilter, page, loading]);
+
+  const grouped = groupEventsByDay(events);
+
+  return (
+    <div>
+      <h1 className="mb-4 text-2xl font-bold text-foreground">Línea de tiempo</h1>
+
+      <TimelineFilters active={activeFilter} onChange={handleFilterChange} />
+
+      <div className="mt-4">
+        {loading && events.length === 0 && (
+          /* Skeleton loading */
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="animate-pulse space-y-3">
+                <div className="h-4 w-32 rounded bg-muted" />
+                {Array.from({ length: 2 }).map((_, j) => (
+                  <div key={j} className="flex items-start gap-3">
+                    <div className="mt-1 h-3 w-3 rounded-full bg-muted" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 w-3/4 rounded bg-muted" />
+                      <div className="h-3 w-1/4 rounded bg-muted" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && events.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="text-lg text-muted-foreground">
+              Aún no hay eventos. ¡Registra tu primer cigarro o actividad positiva!
+            </p>
+          </div>
+        )}
+
+        {events.length > 0 && (
+          <>
+            {[...grouped.entries()].map(([dateKey, dayEvents]) => (
+              <TimelineGroup key={dateKey} dateKey={dateKey} events={dayEvents} />
+            ))}
+
+            {hasMore && (
+              <div className="flex justify-center py-4">
+                <button
+                  onClick={loadMore}
+                  disabled={loading}
+                  className="rounded-full bg-muted px-6 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+                >
+                  {loading ? "Cargando..." : "Cargar más..."}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

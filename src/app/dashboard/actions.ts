@@ -2,11 +2,12 @@
 
 import { db } from "@/lib/db";
 import { game_state, events, badges, userAchievements, achievementProgress } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, gte, and, sql, count } from "drizzle-orm";
 import { checkMidnightReset, type GameState } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
 import { randomUUID } from "crypto";
 import { evaluateAchievements } from "@/lib/achievements";
+import { normalizeEventWithPenalty, type TimelineEvent, type TimelineFilter } from "@/lib/timeline";
 
 type ActionType = "breathing" | "meditation" | "music";
 
@@ -454,5 +455,81 @@ export async function getUserAchievements(userId: string): Promise<UserAchieveme
       achievementId: row.achievementId,
       currentValue: row.currentValue,
     })),
+  };
+}
+
+export async function getTimelineEvents(
+  userId: string,
+  filter: TimelineFilter = "all",
+  page: number = 0,
+  limit: number = 20
+): Promise<{ events: TimelineEvent[]; hasMore: boolean; total: number }> {
+  const gs = await db
+    .select()
+    .from(game_state)
+    .where(eq(game_state.userId, userId))
+    .get();
+
+  if (!gs) {
+    return { events: [], hasMore: false, total: 0 };
+  }
+
+  // Date filter boundaries (ISO strings for SQLite comparison)
+  let sinceDate: string | null = null;
+  const now = new Date();
+  if (filter === "today") {
+    sinceDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  } else if (filter === "week") {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 7);
+    sinceDate = d.toISOString();
+  } else if (filter === "month") {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 30);
+    sinceDate = d.toISOString();
+  }
+
+  // Total count
+  const whereClause = sinceDate
+    ? and(eq(events.gameStateId, gs.id), gte(events.createdAt, sinceDate))
+    : eq(events.gameStateId, gs.id);
+
+  const [totalRow] = await db
+    .select({ cnt: count() })
+    .from(events)
+    .where(whereClause)
+    .all();
+
+  const total = totalRow?.cnt ?? 0;
+
+  // Paginated events
+  const offset = page * limit;
+  const rows = await db
+    .select()
+    .from(events)
+    .where(whereClause)
+    .orderBy(sql`${events.createdAt} DESC`)
+    .limit(limit)
+    .offset(offset)
+    .all();
+
+  const timelineEvents: TimelineEvent[] = [];
+  for (const row of rows) {
+    const normalized = normalizeEventWithPenalty({
+      id: row.id,
+      type: row.type,
+      detail: row.detail,
+      createdAt: row.createdAt,
+    });
+    for (const e of normalized) {
+      e.userId = userId;
+    }
+    timelineEvents.push(...normalized);
+  }
+
+  return {
+    events: timelineEvents,
+    hasMore: offset + limit < total,
+    total,
   };
 }
