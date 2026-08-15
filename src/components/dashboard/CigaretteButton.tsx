@@ -160,48 +160,49 @@ export function CigaretteButton({
           }}
           aria-hidden="true"
         >
-          {/* Smoke pixels - animated upward */}
+          {/* Smoke pixels - animated upward with more detail */}
+          {/* Column 1 - left side */}
           <rect x="2" y="2" width="1" height="1" fill={fillColor} opacity="0.3">
-            <animate
-              attributeName="y"
-              values="4;0;4"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              values="0.4;0;0.4"
-              dur="2s"
-              repeatCount="indefinite"
-            />
+            <animate attributeName="y" values="4;-3;4" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" />
           </rect>
-          <rect x="1" y="1" width="1" height="1" fill={fillColor} opacity="0.25">
-            <animate
-              attributeName="y"
-              values="3;-1;3"
-              dur="2.5s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              values="0.3;0;0.3"
-              dur="2.5s"
-              repeatCount="indefinite"
-            />
+          <rect x="2" y="0" width="1" height="1" fill={fillColor} opacity="0.2">
+            <animate attributeName="y" values="2;-4;2" dur="2.8s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.3;0;0.3" dur="2.8s" repeatCount="indefinite" />
           </rect>
-          <rect x="3" y="0" width="1" height="1" fill={fillColor} opacity="0.2">
-            <animate
-              attributeName="y"
-              values="2;-2;2"
-              dur="3s"
-              repeatCount="indefinite"
-            />
-            <animate
-              attributeName="opacity"
-              values="0.25;0;0.25"
-              dur="3s"
-              repeatCount="indefinite"
-            />
+          
+          {/* Column 2 - center */}
+          <rect x="3" y="1" width="1" height="1" fill={fillColor} opacity="0.35">
+            <animate attributeName="y" values="3;-2;3" dur="2.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.4;0;0.4" dur="2.2s" repeatCount="indefinite" />
+          </rect>
+          <rect x="3" y="-1" width="1" height="1" fill={fillColor} opacity="0.25">
+            <animate attributeName="y" values="1;-5;1" dur="3s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite" />
+          </rect>
+          <rect x="3" y="-2" width="1" height="1" fill={fillColor} opacity="0.15">
+            <animate attributeName="y" values="0;-6;0" dur="3.5s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.2;0;0.2" dur="3.5s" repeatCount="indefinite" />
+          </rect>
+          
+          {/* Column 3 - right side */}
+          <rect x="4" y="2" width="1" height="1" fill={fillColor} opacity="0.3">
+            <animate attributeName="y" values="4;-2;4" dur="2.4s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.35;0;0.35" dur="2.4s" repeatCount="indefinite" />
+          </rect>
+          <rect x="4" y="0" width="1" height="1" fill={fillColor} opacity="0.2">
+            <animate attributeName="y" values="2;-4;2" dur="3.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.25;0;0.25" dur="3.2s" repeatCount="indefinite" />
+          </rect>
+          
+          {/* Wispy trail - very faint, rises high */}
+          <rect x="2" y="-3" width="1" height="1" fill={fillColor} opacity="0.1">
+            <animate attributeName="y" values="-1;-7;-1" dur="4s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.15;0;0.15" dur="4s" repeatCount="indefinite" />
+          </rect>
+          <rect x="4" y="-4" width="1" height="1" fill={fillColor} opacity="0.08">
+            <animate attributeName="y" values="-2;-8;-2" dur="4.5s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.1;0;0.1" dur="4.5s" repeatCount="indefinite" />
           </rect>
           
           {/* Cigarette body - white with orange fill as progress */}
