@@ -160,42 +160,40 @@ export function CigaretteButton({
           }}
           aria-hidden="true"
         >
-          {/* Cigarette body */}
+          {/* Cigarette stick */}
           <rect
-            x="8"
-            y="4"
-            width="8"
-            height="14"
+            x="6"
+            y="8"
+            width="12"
+            height="4"
             rx="1"
             fill={fillColor}
             style={{ transition: "fill 300ms ease" }}
           />
-          {/* Cigarette filter */}
+          {/* Filter */}
           <rect
-            x="8"
-            y="18"
-            width="8"
-            height="3"
+            x="18"
+            y="8"
+            width="4"
+            height="4"
             rx="0.5"
-            fill="#D97706"
+            fill="#92400E"
           />
-          {/* Smoke lines */}
-          <path
-            d="M11 2C11 2 12 0 13 2"
-            stroke={fillColor}
-            strokeWidth="1"
-            strokeLinecap="round"
-            opacity="0.6"
-            style={{ transition: "stroke 300ms ease" }}
-          />
-          <path
-            d="M13 1C13 1 14.5 -0.5 15.5 1"
-            stroke={fillColor}
-            strokeWidth="1"
-            strokeLinecap="round"
-            opacity="0.4"
-            style={{ transition: "stroke 300ms ease" }}
-          />
+          {/* Burning tip */}
+          <circle
+            cx="6"
+            cy="10"
+            r="2"
+            fill="#EF4444"
+            opacity="0.8"
+          >
+            <animate
+              attributeName="opacity"
+              values="0.8;1;0.8"
+              dur="1.5s"
+              repeatCount="indefinite"
+            />
+          </circle>
         </svg>
       </button>
 
