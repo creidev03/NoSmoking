@@ -3,14 +3,14 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { type GameState } from "@/lib/game-state";
 import { isCooldownActive, getPhase } from "@/lib/cooldown";
-import { registerPositiveAction } from "@/app/dashboard/actions";
+import { registerPositiveAction, registerCigarette } from "@/app/dashboard/actions";
 import { LivesDisplay } from "./LivesDisplay";
 import { StreakDisplay } from "./StreakDisplay";
 import { CigarettesToday } from "./CigarettesToday";
 import { CooldownTimer } from "./CooldownTimer";
 import { ActionButtons } from "./ActionButtons";
 import { BadgesList } from "./BadgesList";
-import { RegisterCigaretteModal } from "./RegisterCigaretteModal";
+
 
 const CACHE_KEY = "dashboard-game-state";
 
@@ -93,23 +93,24 @@ export function DashboardView({
     }));
   }, []);
 
-  const [showCigaretteModal, setShowCigaretteModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
 
-  const handleCigaretteSuccess = useCallback(
-    (newGameState: GameState, penalty: boolean) => {
-      setState(newGameState);
-      saveCachedState(newGameState);
+  const handleRegisterCigarette = useCallback(async () => {
+    try {
+      const result = await registerCigarette(state.userId);
+      setState(result.gameState);
+      saveCachedState(result.gameState);
       setToast({
-        message: penalty
+        message: result.penaltyApplied
           ? "⚠️ Penalización: perdiste 1 vida"
           : "Cigarro registrado",
-        type: penalty ? "warning" : "success",
+        type: result.penaltyApplied ? "warning" : "success",
       });
       setTimeout(() => setToast(null), 3000);
-    },
-    []
-  );
+    } catch (err) {
+      console.error("Failed to register cigarette", err);
+    }
+  }, [state.userId]);
 
   const isRelapsed = state.status === "relapse";
 
@@ -140,7 +141,7 @@ export function DashboardView({
 
         {/* Register Cigarette Button */}
         <button
-          onClick={() => setShowCigaretteModal(true)}
+          onClick={handleRegisterCigarette}
           className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-[15px] font-semibold text-[#EF4444] transition-all active:scale-[0.98] hover:bg-[#EF4444]/15 dark:border-[#EF4444]/20 dark:bg-[#EF4444]/10"
           data-testid="register-cigarette-button"
         >
@@ -198,13 +199,6 @@ export function DashboardView({
           <BadgesList badges={badges} />
         </div>
       </div>
-
-      <RegisterCigaretteModal
-        isOpen={showCigaretteModal}
-        onClose={() => setShowCigaretteModal(false)}
-        userId={state.userId}
-        onSuccess={handleCigaretteSuccess}
-      />
     </div>
   );
 }
