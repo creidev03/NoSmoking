@@ -120,7 +120,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         .set({
           cigarettesToday: 0,
           remainingLives: Math.max(0, newRemainingLives),
-          streakDays: gameState.streakDays,
+          streakDays: 0,
           lastCigaretteAt: now,
           status: isRelapse ? "relapse" : gameState.status,
           relapseStartedAt: isRelapse ? now : gameState.relapseStartedAt,
@@ -132,6 +132,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         ...gameState,
         cigarettesToday: 0,
         remainingLives: Math.max(0, newRemainingLives),
+        streakDays: 0,
         lastCigaretteAt: now,
         status: isRelapse ? "relapse" : gameState.status,
         relapseStartedAt: isRelapse ? now : gameState.relapseStartedAt,
