@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { users, onboardingResponses, game_state } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { computeLives } from "@/lib/lives";
+import { computeInitialLives as computeLives } from "@/lib/game-state";
 import { computeDifficulty } from "@/lib/difficulty";
 import { shouldEnableNotifications } from "@/lib/notifications";
 import {

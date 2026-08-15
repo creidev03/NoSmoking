@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { computeLives } from "@/lib/lives";
+import { computeInitialLives as computeLives } from "@/lib/game-state";
 
-describe("computeLives", () => {
+describe("computeInitialLives", () => {
   it("returns 1 for 0 cigarettes per day", () => {
     expect(computeLives(0)).toBe(1);
   });
