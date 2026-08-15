@@ -25,9 +25,18 @@ export async function updateProgress(
   achievementId: string,
   value: number
 ): Promise<void> {
-  const existing = await getProgress(userId, achievementId);
+  const row = await db
+    .select()
+    .from(achievementProgress)
+    .where(
+      and(
+        eq(achievementProgress.userId, userId),
+        eq(achievementProgress.achievementId, achievementId)
+      )
+    )
+    .limit(1);
 
-  if (existing > 0) {
+  if (row.length > 0) {
     await db
       .update(achievementProgress)
       .set({
@@ -54,13 +63,22 @@ export async function incrementProgress(
   userId: string,
   achievementId: string
 ): Promise<void> {
-  const existing = await getProgress(userId, achievementId);
+  const row = await db
+    .select()
+    .from(achievementProgress)
+    .where(
+      and(
+        eq(achievementProgress.userId, userId),
+        eq(achievementProgress.achievementId, achievementId)
+      )
+    )
+    .limit(1);
 
-  if (existing > 0) {
+  if (row.length > 0) {
     await db
       .update(achievementProgress)
       .set({
-        currentValue: existing + 1,
+        currentValue: row[0].currentValue + 1,
         lastUpdated: new Date().toISOString(),
       })
       .where(
