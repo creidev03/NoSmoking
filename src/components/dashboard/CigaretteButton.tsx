@@ -62,6 +62,9 @@ export function CigaretteButton({
   // Gap at the bottom: ~12% of circumference (360° * 0.12 ≈ 43°)
   const gapLen = circumference * 0.12;
   const arcLen = circumference - gapLen;
+  // Dashed pattern: 8px dash, 4px gap (repeating)
+  const dashLen = 8;
+  const dashGap = 4;
 
   // Color interpolation: grey → red → orange as fill grows
   const fillColor =
@@ -124,7 +127,7 @@ export function CigaretteButton({
             />
           </g>
 
-          {/* ── Border ring with bottom gap ────────────────────────── */}
+          {/* ── Border ring with dashed style and bottom gap ──────────── */}
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -133,7 +136,8 @@ export function CigaretteButton({
             stroke={borderColor}
             strokeWidth={stroke}
             strokeLinecap="round"
-            strokeDasharray={`${arcLen} ${gapLen}`}
+            strokeDasharray={`${dashLen} ${dashGap}`}
+            strokeDashoffset={gapLen / 2}
             transform={`rotate(90 ${size / 2} ${size / 2})`}
             style={{ transition: "stroke 300ms ease" }}
           />
