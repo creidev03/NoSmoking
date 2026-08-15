@@ -27,7 +27,7 @@ const ACTIONS = [
     type: "music" as const,
     label: "Música",
     icon: "🎵",
-    description: "+0.25 vidas",
+    description: "+0.5 vidas",
     color: "#3B82F6", // Azul Calma
   },
 ] as const;

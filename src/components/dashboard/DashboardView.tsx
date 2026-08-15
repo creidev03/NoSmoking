@@ -126,6 +126,15 @@ export function DashboardView({
             remaining={state.remainingLives}
           />
 
+          {state.totalPoints > 0 && (
+            <p
+              data-testid="extra-points"
+              className="text-sm text-[#6B7280]"
+            >
+              🎁 Vidas extra ganadas: {state.totalPoints}/3
+            </p>
+          )}
+
           <StreakDisplay streakDays={state.streakDays} />
 
           <CigarettesToday

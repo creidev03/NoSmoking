@@ -6,13 +6,10 @@ interface LivesDisplayProps {
 }
 
 export function LivesDisplay({ total, remaining }: LivesDisplayProps) {
-  const displayTotal = total / 2;
-  const displayRemaining = remaining / 2;
-
   // Ensure at least 1 heart if total > 0
-  const heartsCount = displayTotal > 0 ? Math.max(1, Math.round(displayTotal)) : 0;
-  const fullHearts = Math.floor(displayRemaining);
-  const hasHalfHeart = displayRemaining % 1 >= 0.5;
+  const heartsCount = total > 0 ? Math.max(1, Math.round(total)) : 0;
+  const fullHearts = Math.floor(remaining);
+  const hasHalfHeart = remaining % 1 >= 0.5;
   const grayHearts = heartsCount - fullHearts - (hasHalfHeart ? 1 : 0);
 
   return (
@@ -33,9 +30,9 @@ export function LivesDisplay({ total, remaining }: LivesDisplayProps) {
         ))}
       </div>
       <p className="text-3xl font-bold text-[#1F2937] dark:text-[#F3F4F6]">
-        {displayRemaining}{" "}
+        {remaining}{" "}
         <span className="text-base font-normal text-[#6B7280]">
-          de {displayTotal} vidas
+          de {total} vidas
         </span>
       </p>
     </div>
