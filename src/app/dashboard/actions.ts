@@ -1,15 +1,31 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { game_state, events } from "@/db/schema";
+import { game_state, events, badges } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { checkMidnightReset, type GameState, type MidnightResetResult } from "@/lib/game-state";
+import { checkMidnightReset, type GameState } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
 import { randomUUID } from "crypto";
 
 type ActionType = "breathing" | "meditation" | "music";
 
 const CIGS_PER_LIFE = 5;
+const MAX_EXTRA_POINTS = 3;
+const LIFE_RECOVERY_PER_ACTION = 0.5;
+
+const ACTION_SUBTYPES: Record<ActionType, string> = {
+  breathing: "respiracion",
+  meditation: "meditacion",
+  music: "musica",
+};
+
+// ponytail: nominal session length (spec gives ranges, not a tracked duration); wire to a real
+// stopwatch in ActionButtons if per-session duration ever needs to be exact.
+const ACTION_DURATIONS_SECONDS: Record<ActionType, number> = {
+  breathing: 450, // 5-10 min range midpoint
+  meditation: 750, // 10-15 min range midpoint
+  music: 300,
+};
 
 interface CigaretteResult {
   gameState: GameState;
@@ -22,6 +38,31 @@ interface ActionResult {
   cooldownMinutes: number;
   nextActionAvailableAt: string;
   error?: string;
+}
+
+async function getExistingBadgeKeys(tx: any, gameStateId: string): Promise<string[]> {
+  const rows = await tx
+    .select()
+    .from(badges)
+    .where(eq(badges.gameStateId, gameStateId))
+    .all();
+  return rows.map((r: any) => r.badgeKey);
+}
+
+async function insertNewBadges(
+  tx: any,
+  gameStateId: string,
+  newBadges: string[],
+  now: string
+): Promise<void> {
+  for (const badgeKey of newBadges) {
+    await tx.insert(badges).values({
+      id: randomUUID(),
+      gameStateId,
+      badgeKey,
+      unlockedAt: now,
+    });
+  }
 }
 
 function mapGameState(row: any): GameState {
@@ -37,6 +78,7 @@ function mapGameState(row: any): GameState {
     nextActionAvailableAt: row.nextActionAvailableAt,
     status: row.status,
     relapseStartedAt: row.relapseStartedAt,
+    totalPoints: row.totalPoints,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -59,9 +101,12 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
     let penaltyApplied = false;
     let newCycle = false;
 
-    const resetResult = checkMidnightReset(gameState, new Date());
+    const existingBadgeKeys = await getExistingBadgeKeys(tx, gameState.id);
+    const resetResult = checkMidnightReset(gameState, new Date(), existingBadgeKeys);
     gameState = resetResult.gameState;
+    await insertNewBadges(tx, gameState.id, resetResult.newBadges, now);
 
+    const vidasAntes = gameState.remainingLives;
     const newCigarettesToday = gameState.cigarettesToday + 1;
 
     if (newCigarettesToday >= CIGS_PER_LIFE) {
@@ -75,20 +120,13 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         .set({
           cigarettesToday: 0,
           remainingLives: Math.max(0, newRemainingLives),
+          streakDays: gameState.streakDays,
           lastCigaretteAt: now,
           status: isRelapse ? "relapse" : gameState.status,
           relapseStartedAt: isRelapse ? now : gameState.relapseStartedAt,
           updatedAt: now,
         })
         .where(eq(game_state.id, gameState.id));
-
-      await tx.insert(events).values({
-        id: randomUUID(),
-        gameStateId: gameState.id,
-        type: "penalty",
-        detail: JSON.stringify({ lives_delta: -1 }),
-        createdAt: now,
-      });
 
       gameState = {
         ...gameState,
@@ -104,6 +142,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         .update(game_state)
         .set({
           cigarettesToday: newCigarettesToday,
+          streakDays: gameState.streakDays,
           lastCigaretteAt: now,
           updatedAt: now,
         })
@@ -116,6 +155,20 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         updatedAt: now,
       };
     }
+
+    await tx.insert(events).values({
+      id: randomUUID(),
+      gameStateId: gameState.id,
+      type: "fumar",
+      detail: JSON.stringify({
+        cantidad: 1,
+        cigarrillos_totales_hoy: newCigarettesToday,
+        vidas_antes: vidasAntes,
+        vidas_despues: gameState.remainingLives,
+        penalizacion: penaltyApplied,
+      }),
+      createdAt: now,
+    });
 
     return { gameState, penaltyApplied, newCycle };
   });
@@ -139,8 +192,10 @@ export async function registerPositiveAction(
     let gameState = mapGameState(row);
     const now = new Date();
 
-    const resetResult = checkMidnightReset(gameState, now);
+    const existingBadgeKeys = await getExistingBadgeKeys(tx, gameState.id);
+    const resetResult = checkMidnightReset(gameState, now, existingBadgeKeys);
     gameState = resetResult.gameState;
+    await insertNewBadges(tx, gameState.id, resetResult.newBadges, now.toISOString());
 
     if (isCooldownActive(gameState.nextActionAvailableAt)) {
       return {
@@ -157,13 +212,26 @@ export async function registerPositiveAction(
     const { cooldownMinutes } = getPhase(lastCigaretteAt, now);
     const nextAvailable = getNextActionAvailableAt(now, cooldownMinutes);
     const nowISO = now.toISOString();
+    const livesDelta = LIFE_RECOVERY_PER_ACTION;
+    // Once remainingLives is already at totalLives, further recovery banks as
+    // totalPoints ("vidas extra") instead of overflowing past the cap, up to MAX_EXTRA_POINTS.
+    const rawRemainingLives = gameState.remainingLives + livesDelta;
+    const newRemainingLives = Math.min(gameState.totalLives, rawRemainingLives);
+    const overflow = rawRemainingLives - newRemainingLives;
+    const newTotalPoints = Math.min(MAX_EXTRA_POINTS, gameState.totalPoints + overflow);
+    const exitsRelapse = gameState.status === "relapse" && newRemainingLives > 0;
 
     await tx
       .update(game_state)
       .set({
-        remainingLives: gameState.remainingLives + 1,
+        remainingLives: newRemainingLives,
+        totalPoints: newTotalPoints,
+        cigarettesToday: gameState.cigarettesToday,
+        streakDays: gameState.streakDays,
         lastActionAt: nowISO,
         nextActionAvailableAt: nextAvailable,
+        status: exitsRelapse ? "active" : gameState.status,
+        relapseStartedAt: exitsRelapse ? null : gameState.relapseStartedAt,
         updatedAt: nowISO,
       })
       .where(eq(game_state.id, gameState.id));
@@ -171,16 +239,25 @@ export async function registerPositiveAction(
     await tx.insert(events).values({
       id: randomUUID(),
       gameStateId: gameState.id,
-      type: "action",
-      detail: JSON.stringify({ action_type: actionType, lives_delta: 1 }),
+      type: "accion_positiva",
+      detail: JSON.stringify({
+        subtipos: ACTION_SUBTYPES[actionType],
+        duracion_segundos: ACTION_DURATIONS_SECONDS[actionType],
+        vidas_recuperadas: livesDelta,
+        vidas_totales_despues: newRemainingLives,
+        proxima_accion_disponible: nextAvailable,
+      }),
       createdAt: nowISO,
     });
 
     gameState = {
       ...gameState,
-      remainingLives: gameState.remainingLives + 1,
+      remainingLives: newRemainingLives,
+      totalPoints: newTotalPoints,
       lastActionAt: nowISO,
       nextActionAvailableAt: nextAvailable,
+      status: exitsRelapse ? "active" : gameState.status,
+      relapseStartedAt: exitsRelapse ? null : gameState.relapseStartedAt,
       updatedAt: nowISO,
     };
 

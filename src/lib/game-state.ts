@@ -17,6 +17,7 @@ export interface GameState {
   nextActionAvailableAt: string | null;
   status: string;
   relapseStartedAt: string | null;
+  totalPoints: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,7 +28,7 @@ const CIGS_PER_LIFE = 5;
 const RELAPSE_WINDOW_HOURS = 24;
 
 export function computeInitialLives(cigarettesPerDay: number): number {
-  const lives = Math.floor(cigarettesPerDay / CIGS_PER_LIFE);
+  const lives = Math.ceil(cigarettesPerDay / CIGS_PER_LIFE);
   return Math.max(MIN_LIVES, Math.min(MAX_LIVES, lives));
 }
 

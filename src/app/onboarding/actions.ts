@@ -185,6 +185,7 @@ export async function completeOnboarding(
       cigarettesToday: 0,
       streakDays: 0,
       status: "active",
+      totalPoints: 0,
       createdAt: now,
       updatedAt: now,
     });
