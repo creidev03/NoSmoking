@@ -66,7 +66,7 @@ export function CigaretteButton({
   const dashLen = 10;
   const dashGap = 5;
   // Inner radius for fill (separate from border)
-  const innerRadius = radius - stroke - 4;
+  const innerRadius = radius - stroke - 10;
 
   // Color interpolation: grey → red → orange as fill grows
   const fillColor =
