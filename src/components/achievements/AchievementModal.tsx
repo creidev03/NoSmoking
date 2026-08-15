@@ -63,7 +63,7 @@ export function AchievementModal({
         aria-label={achievement.name}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "relative mx-4 w-full max-w-sm rounded-2xl border p-6 shadow-xl",
+          "relative mx-4 w-full max-w-sm rounded-2xl border p-8 shadow-xl",
           "border-[#D1FAE5] bg-white dark:border-[#065F46] dark:bg-[#1F2937]",
           "animate-in fade-in zoom-in-95 duration-200"
         )}
@@ -78,7 +78,20 @@ export function AchievementModal({
         </button>
 
         {/* Icon (large) */}
-        <div className="mb-4 text-center text-6xl">{achievement.icon}</div>
+        <div className="mb-4 flex justify-center">
+          {achievement.icon.startsWith("/") ? (
+            <img
+              src={achievement.icon}
+              alt={achievement.name}
+              className="h-24 w-24"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/achievements/default.svg";
+              }}
+            />
+          ) : (
+            <span className="text-6xl">{achievement.icon}</span>
+          )}
+        </div>
 
         {/* Name */}
         <h2 className="text-center text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -86,12 +99,12 @@ export function AchievementModal({
         </h2>
 
         {/* Description */}
-        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-3 text-center text-sm leading-relaxed text-gray-600 dark:text-gray-400">
           {achievement.description}
         </p>
 
         {/* Difficulty stars */}
-        <div className="mt-3 flex items-center justify-center gap-1">
+        <div className="mt-4 flex items-center justify-center gap-1">
           <span className="text-xs text-gray-500 dark:text-gray-400">
             {difficultyLabels[achievement.difficulty]}
           </span>
@@ -104,18 +117,27 @@ export function AchievementModal({
 
         {/* Unlocked date */}
         {unlockedAt && (
-          <p className="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
+          <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
             Desbloqueado: {unlockedAt.toLocaleDateString("es-ES")}
           </p>
         )}
 
         {/* Buttons */}
-        <div className="mt-6 flex gap-3">
+        <div className="mt-8 flex gap-3">
           <Button
             variant="outline"
             className="flex-1"
-            onClick={() => {
-              /* share placeholder */
+            onClick={async () => {
+              const text = `🏆 ¡Desbloqueé "${achievement.name}" en No Smoking!\n\n${achievement.description}\n\n#DejarDeFumar #NoSmoking`;
+              if (navigator.share) {
+                try {
+                  await navigator.share({ title: achievement.name, text });
+                } catch {
+                  // user cancelled
+                }
+              } else {
+                await navigator.clipboard.writeText(text);
+              }
             }}
           >
             COMPARTIR
