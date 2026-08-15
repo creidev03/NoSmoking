@@ -57,6 +57,17 @@ export function CooldownTimer({
     return Math.max(0, Math.ceil(diff / 1000));
   });
 
+  // Recalculate when nextActionAt changes (e.g. after a positive action)
+  useEffect(() => {
+    if (!nextActionAt) {
+      setRemainingSeconds(0);
+      return;
+    }
+    const diff = new Date(nextActionAt).getTime() - Date.now();
+    setRemainingSeconds(Math.max(0, Math.ceil(diff / 1000)));
+    expiredRef.current = false;
+  }, [nextActionAt]);
+
   const handleExpired = useCallback(() => {
     if (!expiredRef.current) {
       expiredRef.current = true;
