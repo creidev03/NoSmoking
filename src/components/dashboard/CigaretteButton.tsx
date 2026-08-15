@@ -55,16 +55,18 @@ export function CigaretteButton({
   }, [isResetting, onRegister]);
 
   // ── SVG constants ───────────────────────────────────────────────────
-  const size = 96;
-  const stroke = 4;
+  const size = 120;
+  const stroke = 5;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   // Gap at the bottom: ~12% of circumference (360° * 0.12 ≈ 43°)
   const gapLen = circumference * 0.12;
   const arcLen = circumference - gapLen;
-  // Dashed pattern: 8px dash, 4px gap (repeating)
-  const dashLen = 8;
-  const dashGap = 4;
+  // Dashed pattern: 10px dash, 5px gap (repeating)
+  const dashLen = 10;
+  const dashGap = 5;
+  // Inner radius for fill (separate from border)
+  const innerRadius = radius - stroke - 4;
 
   // Color interpolation: grey → red → orange as fill grows
   const fillColor =
@@ -104,7 +106,7 @@ export function CigaretteButton({
           {/* ── Clip mask for the fill ─────────────────────────────── */}
           <defs>
             <clipPath id="cig-circle-clip">
-              <circle cx={size / 2} cy={size / 2} r={radius - 2} />
+              <circle cx={size / 2} cy={size / 2} r={innerRadius} />
             </clipPath>
           </defs>
 
@@ -145,7 +147,7 @@ export function CigaretteButton({
 
         {/* ── Emoji ───────────────────────────────────────────────── */}
         <span
-          className="relative z-10 select-none text-[32px] leading-none"
+          className="relative z-10 select-none text-[40px] leading-none"
           style={{
             filter:
               fillPercent > 0
