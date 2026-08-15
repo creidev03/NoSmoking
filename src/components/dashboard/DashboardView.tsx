@@ -73,10 +73,12 @@ export function DashboardView({
   }, [state.lastCigaretteAt]);
 
   const handleAction = useCallback(
-    async (actionType: "breathing" | "meditation" | "music") => {
+    async (actionType: "breathing" | "meditation") => {
       try {
         const result = await registerPositiveAction(state.userId, actionType);
+        console.log("ActionResult:", result);
         if (!result.error) {
+          console.log("Updating gameState with nextActionAvailableAt:", result.gameState.nextActionAvailableAt);
           setState(result.gameState);
           saveCachedState(result.gameState);
         }

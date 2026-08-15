@@ -3,7 +3,7 @@
 import type { GameState } from "@/lib/game-state";
 
 interface ActionButtonsProps {
-  onAction: (type: "breathing" | "meditation" | "music") => void;
+  onAction: (type: "breathing" | "meditation") => void;
   isCooldownActive: boolean;
   gameState: GameState;
 }
@@ -23,13 +23,6 @@ const ACTIONS = [
     description: "+0.5 vidas",
     color: "#A78BFA", // Púrpura Suave
   },
-  {
-    type: "music" as const,
-    label: "Música",
-    icon: "🎵",
-    description: "+0.5 vidas",
-    color: "#3B82F6", // Azul Calma
-  },
 ] as const;
 
 export function ActionButtons({
@@ -41,7 +34,7 @@ export function ActionButtons({
       <h2 className="mb-4 text-xs font-medium uppercase tracking-wide text-[#6B7280]">
         🫁 Actividades Positivas
       </h2>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {ACTIONS.map((action) => (
           <button
             key={action.type}
