@@ -145,55 +145,128 @@ export function CigaretteButton({
           />
         </svg>
 
-        {/* ── Cigarette Icon ────────────────────────────────────────── */}
+        {/* ── Pixel Cigarette Icon ──────────────────────────────────── */}
         <svg
           width={40}
           height={40}
-          viewBox="0 0 24 24"
-          fill="none"
+          viewBox="0 0 16 16"
           className="relative z-10"
           style={{
             filter:
               fillPercent > 0
                 ? "drop-shadow(0 1px 2px rgba(0,0,0,0.15))"
                 : undefined,
+            imageRendering: "pixelated",
           }}
           aria-hidden="true"
         >
-          {/* Cigarette stick */}
-          <rect
-            x="6"
-            y="8"
-            width="12"
-            height="4"
-            rx="1"
-            fill={fillColor}
-            style={{ transition: "fill 300ms ease" }}
-          />
-          {/* Filter */}
-          <rect
-            x="18"
-            y="8"
-            width="4"
-            height="4"
-            rx="0.5"
-            fill="#92400E"
-          />
-          {/* Burning tip */}
-          <circle
-            cx="6"
-            cy="10"
-            r="2"
-            fill="#EF4444"
-            opacity="0.8"
-          >
+          {/* Smoke pixels - animated upward */}
+          <rect x="2" y="2" width="1" height="1" fill={fillColor} opacity="0.3">
             <animate
-              attributeName="opacity"
-              values="0.8;1;0.8"
-              dur="1.5s"
+              attributeName="y"
+              values="4;0;4"
+              dur="2s"
               repeatCount="indefinite"
             />
-          </circle>
+            <animate
+              attributeName="opacity"
+              values="0.4;0;0.4"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </rect>
+          <rect x="1" y="1" width="1" height="1" fill={fillColor} opacity="0.25">
+            <animate
+              attributeName="y"
+              values="3;-1;3"
+              dur="2.5s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.3;0;0.3"
+              dur="2.5s"
+              repeatCount="indefinite"
+            />
+          </rect>
+          <rect x="3" y="0" width="1" height="1" fill={fillColor} opacity="0.2">
+            <animate
+              attributeName="y"
+              values="2;-2;2"
+              dur="3s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="0.25;0;0.25"
+              dur="3s"
+              repeatCount="indefinite"
+            />
+          </rect>
+          
+          {/* Cigarette body - white with orange fill as progress */}
+          <rect x="2" y="5" width="10" height="3" fill="#F3F4F6" />
+          <rect x="2" y="5" width="10" height="3" fill={fillColor} opacity="0.3" />
+          
+          {/* Filter - brown */}
+          <rect x="12" y="5" width="3" height="3" fill="#92400E" />
+          
+          {/* Burning tip - changes to ash at 3/5 */}
+          {currentCount >= 3 ? (
+            // Ash state - grey
+            <rect x="0" y="5" width="2" height="3" fill="#6B7280">
+              <animate
+                attributeName="opacity"
+                values="1;0.8;1"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </rect>
+          ) : (
+            // Burning state - red with glow
+            <rect x="0" y="5" width="2" height="3" fill="#EF4444">
+              <animate
+                attributeName="opacity"
+                values="1;0.7;1"
+                dur="1s"
+                repeatCount="indefinite"
+              />
+            </rect>
+          )}
+          
+          {/* Ash particles when burning */}
+          {currentCount >= 3 && (
+            <>
+              <rect x="0" y="8" width="1" height="1" fill="#9CA3AF" opacity="0.6">
+                <animate
+                  attributeName="y"
+                  values="8;10;8"
+                  dur="1.5s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0.6;0;0.6"
+                  dur="1.5s"
+                  repeatCount="indefinite"
+                />
+              </rect>
+              <rect x="1" y="8" width="1" height="1" fill="#9CA3AF" opacity="0.4">
+                <animate
+                  attributeName="y"
+                  values="8;11;8"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0.4;0;0.4"
+                  dur="2s"
+                  repeatCount="indefinite"
+                />
+              </rect>
+            </>
+          )}
         </svg>
       </button>
 
