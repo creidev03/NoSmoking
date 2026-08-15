@@ -109,6 +109,10 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
     const vidasAntes = gameState.remainingLives;
     const newCigarettesToday = gameState.cigarettesToday + 1;
 
+    // Reset streak on first cigarette of the day
+    const isFirstCigaretteToday = gameState.cigarettesToday === 0;
+    const newStreak = isFirstCigaretteToday ? 0 : gameState.streakDays;
+
     if (newCigarettesToday >= CIGS_PER_LIFE) {
       penaltyApplied = true;
       newCycle = true;
@@ -120,7 +124,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         .set({
           cigarettesToday: 0,
           remainingLives: Math.max(0, newRemainingLives),
-          streakDays: 0,
+          streakDays: newStreak,
           lastCigaretteAt: now,
           status: isRelapse ? "relapse" : gameState.status,
           relapseStartedAt: isRelapse ? now : gameState.relapseStartedAt,
@@ -132,7 +136,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         ...gameState,
         cigarettesToday: 0,
         remainingLives: Math.max(0, newRemainingLives),
-        streakDays: 0,
+        streakDays: newStreak,
         lastCigaretteAt: now,
         status: isRelapse ? "relapse" : gameState.status,
         relapseStartedAt: isRelapse ? now : gameState.relapseStartedAt,
@@ -143,7 +147,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
         .update(game_state)
         .set({
           cigarettesToday: newCigarettesToday,
-          streakDays: gameState.streakDays,
+          streakDays: newStreak,
           lastCigaretteAt: now,
           updatedAt: now,
         })
@@ -152,6 +156,7 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
       gameState = {
         ...gameState,
         cigarettesToday: newCigarettesToday,
+        streakDays: newStreak,
         lastCigaretteAt: now,
         updatedAt: now,
       };
