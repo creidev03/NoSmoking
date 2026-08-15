@@ -268,3 +268,44 @@ export async function registerPositiveAction(
     };
   });
 }
+
+// DEV ONLY: Reset all lives to full
+export async function devResetLives(userId: string): Promise<GameState> {
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("This action is only available in development");
+  }
+
+  return db.transaction(async (tx) => {
+    const row = await tx
+      .select()
+      .from(game_state)
+      .where(eq(game_state.userId, userId))
+      .get();
+
+    if (!row) throw new Error("Game state not found");
+
+    const now = new Date().toISOString();
+
+    await tx
+      .update(game_state)
+      .set({
+        remainingLives: row.totalLives,
+        totalPoints: 0,
+        cigarettesToday: 0,
+        status: "active",
+        relapseStartedAt: null,
+        updatedAt: now,
+      })
+      .where(eq(game_state.id, row.id));
+
+    return {
+      ...row,
+      remainingLives: row.totalLives,
+      totalPoints: 0,
+      cigarettesToday: 0,
+      status: "active",
+      relapseStartedAt: null,
+      updatedAt: now,
+    };
+  });
+}

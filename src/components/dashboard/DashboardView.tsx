@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { type GameState } from "@/lib/game-state";
 import { isCooldownActive, getPhase } from "@/lib/cooldown";
-import { registerPositiveAction, registerCigarette } from "@/app/dashboard/actions";
+import { registerPositiveAction, registerCigarette, devResetLives } from "@/app/dashboard/actions";
 import { LivesDisplay } from "./LivesDisplay";
 import { StreakDisplay } from "./StreakDisplay";
 import { CigarettesToday } from "./CigarettesToday";
@@ -112,6 +112,20 @@ export function DashboardView({
     }
   }, [state.userId]);
 
+  const handleDevResetLives = useCallback(async () => {
+    try {
+      const newGameState = await devResetLives(state.userId);
+      setState(newGameState);
+      saveCachedState(newGameState);
+      setToast({ message: "🔄 Vidas regeneradas (dev)", type: "success" });
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error("Failed to reset lives", err);
+    }
+  }, [state.userId]);
+
+  const isDev = process.env.NODE_ENV === "development";
+
   const isRelapsed = state.status === "relapse";
 
   return (
@@ -147,6 +161,17 @@ export function DashboardView({
         >
           🚬 Registrar cigarro
         </button>
+
+        {/* Dev Only: Reset Lives */}
+        {isDev && (
+          <button
+            onClick={handleDevResetLives}
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#8B5CF6]/30 bg-[#8B5CF6]/10 px-4 py-2 text-xs font-medium text-[#8B5CF6] transition-all active:scale-[0.98] hover:bg-[#8B5CF6]/15 dark:border-[#8B5CF6]/20 dark:bg-[#8B5CF6]/10"
+            data-testid="dev-reset-lives-button"
+          >
+            🔄 Regenerar vidas (dev)
+          </button>
+        )}
 
         {/* Toast */}
         {toast && (
