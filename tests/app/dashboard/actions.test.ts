@@ -8,6 +8,7 @@ vi.mock("@/lib/db", () => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           get: vi.fn(() => Promise.resolve(null)),
+          all: vi.fn(() => Promise.resolve([])),
         })),
       })),
     })),
@@ -37,6 +38,7 @@ vi.mock("@/lib/db", () => ({
           from: vi.fn(() => ({
             where: vi.fn(() => ({
               get: vi.fn(() => Promise.resolve(null)),
+              all: vi.fn(() => Promise.resolve([])),
             })),
           })),
         })),
@@ -84,6 +86,7 @@ function createGameState(overrides: Record<string, any> = {}) {
     nextActionAvailableAt: null,
     status: "active",
     relapseStartedAt: null,
+    totalPoints: 0,
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-15T10:00:00.000Z",
     ...overrides,
@@ -97,6 +100,7 @@ function mockTransactionWithGameState(gameState: any) {
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           get: vi.fn(() => Promise.resolve(gameState)),
+          all: vi.fn(() => Promise.resolve([])),
         })),
       })),
     })),
@@ -180,6 +184,43 @@ describe("registerCigarette", () => {
     await registerCigarette("user-1");
 
     expect(mockTx.insert).toHaveBeenCalled();
+  });
+
+  it("inserts a 'fumar' event with full spec detail on every cigarette", async () => {
+    const gameState = createGameState({ cigarettesToday: 2, remainingLives: 4 });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    await registerCigarette("user-1");
+
+    const insertedValues = mockTx.insert.mock.results[0].value.values.mock.calls[0][0];
+    expect(insertedValues.type).toBe("fumar");
+    const detail = JSON.parse(insertedValues.detail);
+    expect(detail).toEqual({
+      cantidad: 1,
+      cigarrillos_totales_hoy: 3,
+      vidas_antes: 4,
+      vidas_despues: 4,
+      penalizacion: false,
+    });
+  });
+
+  it("marks penalizacion=true and resets cigarrillos_totales_hoy in the 'fumar' event on the 5th cigarette", async () => {
+    const gameState = createGameState({ cigarettesToday: 4, remainingLives: 4 });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    await registerCigarette("user-1");
+
+    const insertedValues = mockTx.insert.mock.results[0].value.values.mock.calls[0][0];
+    const detail = JSON.parse(insertedValues.detail);
+    expect(detail).toEqual({
+      cantidad: 1,
+      cigarrillos_totales_hoy: 5,
+      vidas_antes: 4,
+      vidas_despues: 3,
+      penalizacion: true,
+    });
   });
 
   it("returns updated game state from transaction", async () => {
@@ -279,8 +320,9 @@ describe("registerPositiveAction", () => {
     expect(result.cooldownMinutes).toBe(0);
   });
 
-  it("increments remaining_lives by 1 (stored integer, displayed /2)", async () => {
+  it("increments remaining_lives by 0.5 for meditation", async () => {
     const gameState = createGameState({
+      totalLives: 8,
       remainingLives: 6,
       lastCigaretteAt: "2026-01-15T08:00:00.000Z",
       nextActionAvailableAt: null,
@@ -291,7 +333,56 @@ describe("registerPositiveAction", () => {
     const result = await registerPositiveAction("user-1", "meditation");
 
     expect(result.error).toBeUndefined();
-    expect(result.gameState.remainingLives).toBe(7);
+    expect(result.gameState.remainingLives).toBe(6.5);
+  });
+
+  it("increments remaining_lives by 0.5 for breathing", async () => {
+    const gameState = createGameState({
+      totalLives: 8,
+      remainingLives: 6,
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: null,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    const result = await registerPositiveAction("user-1", "breathing");
+
+    expect(result.error).toBeUndefined();
+    expect(result.gameState.remainingLives).toBe(6.5);
+  });
+
+  it("increments remaining_lives by 0.5 for music (standardized, same as other actions)", async () => {
+    const gameState = createGameState({
+      totalLives: 8,
+      remainingLives: 6,
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: null,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    const result = await registerPositiveAction("user-1", "music");
+
+    expect(result.error).toBeUndefined();
+    expect(result.gameState.remainingLives).toBe(6.5);
+  });
+
+  it("banks overflow into totalPoints (capped at 3) once remainingLives is at totalLives", async () => {
+    const gameState = createGameState({
+      totalLives: 4,
+      remainingLives: 4,
+      totalPoints: 2.75,
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: null,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    const result = await registerPositiveAction("user-1", "meditation");
+
+    expect(result.gameState.remainingLives).toBe(4);
+    expect(result.gameState.totalPoints).toBe(3);
   });
 
   it("inserts an action event", async () => {
@@ -305,6 +396,28 @@ describe("registerPositiveAction", () => {
     await registerPositiveAction("user-1", "music");
 
     expect(mockTx.insert).toHaveBeenCalled();
+  });
+
+  it("inserts an 'accion_positiva' event with full spec detail", async () => {
+    const gameState = createGameState({
+      totalLives: 8,
+      remainingLives: 4,
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z", // 2h ago → phase 2
+      nextActionAvailableAt: null,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    await registerPositiveAction("user-1", "meditation");
+
+    const insertedValues = mockTx.insert.mock.results[0].value.values.mock.calls[0][0];
+    expect(insertedValues.type).toBe("accion_positiva");
+    const detail = JSON.parse(insertedValues.detail);
+    expect(detail.subtipos).toBe("meditacion");
+    expect(detail.duracion_segundos).toBeGreaterThan(0);
+    expect(detail.vidas_recuperadas).toBe(0.5);
+    expect(detail.vidas_totales_despues).toBe(4.5);
+    expect(detail.proxima_accion_disponible).toBe("2026-01-15T10:15:00.000Z");
   });
 
   it("accepts all valid action types", async () => {

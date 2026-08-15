@@ -17,7 +17,7 @@ describe("game-state", () => {
       expect(computeInitialLives(4)).toBe(1);
     });
 
-    it("returns 1 for 5 cigarettes per day (floor(5/5)=1)", () => {
+    it("returns 1 for 5 cigarettes per day (ceil(5/5)=1)", () => {
       expect(computeInitialLives(5)).toBe(1);
     });
 
@@ -25,8 +25,8 @@ describe("game-state", () => {
       expect(computeInitialLives(10)).toBe(2);
     });
 
-    it("returns 2 for 12 cigarettes per day", () => {
-      expect(computeInitialLives(12)).toBe(2);
+    it("returns 3 for 12 cigarettes per day (ceil(12/5)=3, 1 caja + 2 extra)", () => {
+      expect(computeInitialLives(12)).toBe(3);
     });
 
     it("returns 5 for 25 cigarettes per day", () => {
@@ -64,6 +64,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -89,6 +90,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -113,6 +115,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T14:00:00Z",
       };
@@ -137,6 +140,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:00:00Z",
       };
@@ -161,6 +165,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -185,6 +190,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -209,6 +215,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-16T00:00:00Z",
       };
@@ -233,6 +240,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "relapse",
         relapseStartedAt: "2026-01-15T23:00:00Z",
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -260,6 +268,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "relapse",
         relapseStartedAt: "2026-01-15T23:00:00Z",
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -285,6 +294,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -310,6 +320,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -334,6 +345,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -360,6 +372,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "active",
         relapseStartedAt: null,
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -381,6 +394,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "relapse",
         relapseStartedAt: "2026-01-15T23:00:00Z",
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -403,6 +417,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "relapse",
         relapseStartedAt: "2026-01-15T23:00:00Z",
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -425,6 +440,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "relapse",
         relapseStartedAt: "2026-01-15T23:00:00Z",
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };
@@ -447,6 +463,7 @@ describe("game-state", () => {
         nextActionAvailableAt: null,
         status: "relapse",
         relapseStartedAt: "2026-01-15T23:00:00Z",
+        totalPoints: 0,
         createdAt: "2026-01-01T00:00:00Z",
         updatedAt: "2026-01-15T23:59:00Z",
       };

@@ -37,4 +37,16 @@ describe("computeLives", () => {
   it("returns 3 for 15 cigarettes per day", () => {
     expect(computeLives(15)).toBe(3);
   });
+
+  it("returns 2 for 6 cigarettes per day (ceil, not floor)", () => {
+    expect(computeLives(6)).toBe(2);
+  });
+
+  it("returns 4 for 20 cigarettes per day (1 caja)", () => {
+    expect(computeLives(20)).toBe(4);
+  });
+
+  it("returns 8 for 40 cigarettes per day (2 cajas)", () => {
+    expect(computeLives(40)).toBe(8);
+  });
 });

@@ -8,6 +8,7 @@ vi.mock("@/lib/db", () => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           get: vi.fn(() => Promise.resolve(null)),
+          all: vi.fn(() => Promise.resolve([])),
         })),
       })),
     })),
@@ -44,6 +45,7 @@ function mockSelectWithGameState(gameState: any) {
     from: vi.fn(() => ({
       where: vi.fn(() => ({
         get: vi.fn(() => Promise.resolve(gameState)),
+        all: vi.fn(() => Promise.resolve([])),
       })),
     })),
   } as any);
@@ -65,6 +67,7 @@ describe("DashboardPage", () => {
       from: vi.fn(() => ({
         where: vi.fn(() => ({
           get: vi.fn(() => Promise.resolve(null)),
+          all: vi.fn(() => Promise.resolve([])),
         })),
       })),
     } as any);
