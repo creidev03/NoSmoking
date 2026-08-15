@@ -55,7 +55,7 @@ describe("LandingMotion", () => {
     );
   });
 
-  it("reveals an intersecting target once and stops observing it", () => {
+  it("reveals, hides, and reveals a target as it enters and leaves", () => {
     vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
 
     const { container } = render(
@@ -68,11 +68,30 @@ describe("LandingMotion", () => {
     const observer = IntersectionObserverStub.instances[0];
 
     observer.callback([{ target, isIntersecting: true }]);
+    observer.callback([{ target, isIntersecting: false }]);
     observer.callback([{ target, isIntersecting: true }]);
 
     expect(target).toHaveAttribute("data-revealed", "true");
-    expect(observer.unobserved).toEqual([target]);
-    expect(observer.unobserve).toHaveBeenCalledOnce();
+    expect(observer.unobserved).toHaveLength(0);
+    expect(observer.unobserve).not.toHaveBeenCalled();
+  });
+
+  it("removes the revealed state when a target leaves the viewport", () => {
+    vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
+
+    const { container } = render(
+      <LandingMotion>
+        <section data-motion-reveal />
+      </LandingMotion>,
+    );
+
+    const target = container.querySelector("[data-motion-reveal]")!;
+    const observer = IntersectionObserverStub.instances[0];
+
+    observer.callback([{ target, isIntersecting: true }]);
+    observer.callback([{ target, isIntersecting: false }]);
+
+    expect(target).not.toHaveAttribute("data-revealed");
   });
 
   it("disconnects the observer when unmounted", () => {

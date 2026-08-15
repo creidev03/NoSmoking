@@ -27,14 +27,13 @@ export function LandingMotion({
     const targets = shell.querySelectorAll<HTMLElement>("[data-motion-reveal]");
     if (targets.length === 0) return;
 
-    const revealed = new Set<Element>();
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && !revealed.has(entry.target)) {
+          if (entry.isIntersecting) {
             entry.target.setAttribute("data-revealed", "true");
-            revealed.add(entry.target);
-            observer.unobserve(entry.target);
+          } else {
+            entry.target.removeAttribute("data-revealed");
           }
         }
       },
