@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="maestro-respiracion">
+<g id="aura"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#7fd8f5" stroke-width="0.7" stroke-dasharray="1.6 1.3" opacity="0.85"></circle></g><g id="ondas"><path fill="none" stroke="#7fd8f5" stroke-width="0.9" d="M1 3c1.2 -1.4 2.4 1.4 3.6 0"></path><path fill="none" stroke="#7fd8f5" stroke-width="0.9" d="M19.4 3c1.2 -1.4 2.4 1.4 3.6 0"></path></g><g id="traquea"><path fill="#8a8a8a" d="M11 2h2v5h-2z"></path></g><g id="lobulos"><path fill="#c0c0c0" d="M4 7h6v8h-6z"></path><path fill="#c0c0c0" d="M3 9h2v4h-2z"></path><path fill="#c0c0c0" d="M14 7h6v8h-6z"></path><path fill="#c0c0c0" d="M19 9h2v4h-2z"></path><path fill="#8a8a8a" d="M4 13h6v2h-6z"></path><path fill="#8a8a8a" d="M14 13h6v2h-6z"></path></g>
+</g>
+</svg>

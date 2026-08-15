@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="calendario">
+<path fill="#8a8a8a" d="M7 1h1.6v3h-1.6z"></path><path fill="#8a8a8a" d="M15.4 1h1.6v3h-1.6z"></path><path fill="#8a8a8a" d="M4 3h16v4h-16z"></path><path fill="#c0c0c0" d="M4 7h16v13h-16z"></path><path fill="#4a4a4a" d="M4 7h16v1h-16z"></path><path fill="#4a4a4a" d="M4 19h16v1h-16z"></path><path fill="#4a4a4a" d="M4 7h1v13h-1z"></path><path fill="#4a4a4a" d="M19 7h1v13h-1z"></path><path fill="#8a8a8a" d="M4 11h16v0.8h-16z"></path><path fill="#8a8a8a" d="M4 15h16v0.8h-16z"></path><g id="marcas"><path fill="#3fae5a" d="M6 9h2.2v2.2h-2.2z"></path><path fill="#3fae5a" d="M10.2 9h2.2v2.2h-2.2z"></path><path fill="#3fae5a" d="M14.4 9h2.2v2.2h-2.2z"></path></g>
+</g>
+</svg>

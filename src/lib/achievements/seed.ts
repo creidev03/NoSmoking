@@ -24,7 +24,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T001",
     name: "Primera Semana",
-    icon: "🔥",
+    icon: "/achievements/T001.svg",
     category: "time",
     difficulty: "easy",
     isSecret: false,
@@ -35,7 +35,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T002",
     name: "Dos Semanas",
-    icon: "🌟",
+    icon: "/achievements/T002.svg",
     category: "time",
     difficulty: "easy",
     isSecret: false,
@@ -46,7 +46,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T003",
     name: "Tres Semanas",
-    icon: "💪",
+    icon: "/achievements/T003.svg",
     category: "time",
     difficulty: "medium",
     isSecret: false,
@@ -57,7 +57,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T004",
     name: "Un Mes Limpio",
-    icon: "🏆",
+    icon: "/achievements/T004.svg",
     category: "time",
     difficulty: "medium",
     isSecret: false,
@@ -68,7 +68,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T005",
     name: "Dos Meses",
-    icon: "🎖️",
+    icon: "/achievements/T005.svg",
     category: "time",
     difficulty: "hard",
     isSecret: false,
@@ -79,7 +79,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T006",
     name: "Centenario",
-    icon: "💎",
+    icon: "/achievements/T006.svg",
     category: "time",
     difficulty: "hard",
     isSecret: false,
@@ -90,7 +90,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T007",
     name: "Seis Meses",
-    icon: "👑",
+    icon: "/achievements/T007.svg",
     category: "time",
     difficulty: "hard",
     isSecret: false,
@@ -101,7 +101,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "T008",
     name: "Un Año",
-    icon: "🏅",
+    icon: "/achievements/T008.svg",
     category: "time",
     difficulty: "extreme",
     isSecret: false,
@@ -114,7 +114,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "P001",
     name: "Primer Cigarrillo Evitado",
-    icon: "🚫",
+    icon: "/achievements/P001.svg",
     category: "progress",
     difficulty: "easy",
     isSecret: false,
@@ -125,7 +125,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "P002",
     name: "Diez Vidas Ahorradas",
-    icon: "❤️",
+    icon: "/achievements/P002.svg",
     category: "progress",
     difficulty: "easy",
     isSecret: false,
@@ -136,7 +136,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "P003",
     name: "Cincuenta Vidas",
-    icon: "💚",
+    icon: "/achievements/P003.svg",
     category: "progress",
     difficulty: "medium",
     isSecret: false,
@@ -147,7 +147,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "P004",
     name: "Cien Vidas",
-    icon: "💙",
+    icon: "/achievements/P004.svg",
     category: "progress",
     difficulty: "hard",
     isSecret: false,
@@ -158,7 +158,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "P005",
     name: "Cincocientas Vidas",
-    icon: "💜",
+    icon: "/achievements/P005.svg",
     category: "progress",
     difficulty: "extreme",
     isSecret: false,
@@ -171,7 +171,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "A001",
     name: "Primera Acción Positiva",
-    icon: "🎯",
+    icon: "/achievements/A001.svg",
     category: "actions",
     difficulty: "easy",
     isSecret: false,
@@ -182,7 +182,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "A002",
     name: "Diez Acciones",
-    icon: "📝",
+    icon: "/achievements/A002.svg",
     category: "actions",
     difficulty: "easy",
     isSecret: false,
@@ -193,7 +193,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "A003",
     name: "Cincuenta Acciones",
-    icon: "🔥",
+    icon: "/achievements/A003.svg",
     category: "actions",
     difficulty: "medium",
     isSecret: false,
@@ -204,7 +204,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "A004",
     name: "Cien Acciones",
-    icon: "💫",
+    icon: "/achievements/A004.svg",
     category: "actions",
     difficulty: "hard",
     isSecret: false,
@@ -215,7 +215,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "A005",
     name: "Acción Secreta",
-    icon: "🔮",
+    icon: "/achievements/A005.svg",
     category: "actions",
     difficulty: "extreme",
     isSecret: true,
@@ -228,7 +228,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "D001",
     name: "Desafío del Día",
-    icon: "⚔️",
+    icon: "/achievements/D001.svg",
     category: "challenges",
     difficulty: "easy",
     isSecret: false,
@@ -239,7 +239,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "D002",
     name: "Semana de Desafíos",
-    icon: "🛡️",
+    icon: "/achievements/D002.svg",
     category: "challenges",
     difficulty: "medium",
     isSecret: false,
@@ -250,7 +250,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "D003",
     name: "El Desafiante Secreto",
-    icon: "🤫",
+    icon: "/achievements/D003.svg",
     category: "challenges",
     difficulty: "extreme",
     isSecret: true,
@@ -263,7 +263,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "C001",
     name: "Cronómetro",
-    icon: "⏱️",
+    icon: "/achievements/C001.svg",
     category: "collection",
     difficulty: "hard",
     isSecret: false,
@@ -274,7 +274,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "C002",
     name: "Constructor de Progreso",
-    icon: "🏗️",
+    icon: "/achievements/C002.svg",
     category: "collection",
     difficulty: "hard",
     isSecret: false,
@@ -285,7 +285,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "C003",
     name: "Maestro de Acciones",
-    icon: "🎭",
+    icon: "/achievements/C003.svg",
     category: "collection",
     difficulty: "hard",
     isSecret: false,
@@ -296,7 +296,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "C004",
     name: "Conquistador de Desafíos",
-    icon: "🗡️",
+    icon: "/achievements/C004.svg",
     category: "collection",
     difficulty: "extreme",
     isSecret: false,
@@ -307,7 +307,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "C005",
     name: "La Estrella Oculta",
-    icon: "🌟",
+    icon: "/achievements/C005.svg",
     category: "collection",
     difficulty: "extreme",
     isSecret: true,
@@ -320,7 +320,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B001",
     name: "Primer Cigarrillo Registrado",
-    icon: "🚬",
+    icon: "/achievements/B001.svg",
     category: "awareness",
     difficulty: "easy",
     isSecret: false,
@@ -331,7 +331,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B002",
     name: "Diez Cigarrillos",
-    icon: "📊",
+    icon: "/achievements/B002.svg",
     category: "awareness",
     difficulty: "easy",
     isSecret: false,
@@ -342,7 +342,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B003",
     name: "Cincuenta Cigarrillos",
-    icon: "📈",
+    icon: "/achievements/B003.svg",
     category: "awareness",
     difficulty: "medium",
     isSecret: false,
@@ -353,7 +353,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B004",
     name: "Cien Cigarrillos",
-    icon: "📉",
+    icon: "/achievements/B004.svg",
     category: "awareness",
     difficulty: "hard",
     isSecret: false,
@@ -364,7 +364,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B005",
     name: "Racha de Tabaquismo",
-    icon: "⚠️",
+    icon: "/achievements/B005.svg",
     category: "awareness",
     difficulty: "medium",
     isSecret: false,
@@ -375,7 +375,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B006",
     name: "Semana Fumando",
-    icon: "🚨",
+    icon: "/achievements/B006.svg",
     category: "awareness",
     difficulty: "hard",
     isSecret: false,
@@ -386,7 +386,7 @@ export const ACHIEVEMENT_SEEDS: AchievementSeed[] = [
   {
     id: "B007",
     name: "Mes de Tabaquismo",
-    icon: "🛑",
+    icon: "/achievements/B007.svg",
     category: "awareness",
     difficulty: "extreme",
     isSecret: false,

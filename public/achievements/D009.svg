@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="amanecer">
+<g id="horizonte"><path fill="#3a2a1a" d="M1 17h22v2h-22z"></path></g><g id="sol"><circle cx="12" cy="14" r="6" fill="#ffb347"></circle><path d="M6 14a6 6 0 0 0 12 0z" fill="#ffd23f"></path></g><g id="rayos"><path fill="#ffd23f" d="M12 3h1.6v4h-1.6z"></path><path fill="#ffd23f" d="M5 7h3v1.6h-3z"></path><path fill="#ffd23f" d="M16 7h3v1.6h-3z"></path><path fill="#ffd23f" d="M3 13h2.4v1.6h-2.4z"></path><path fill="#ffd23f" d="M18.6 13h2.4v1.6h-2.4z"></path></g>
+</g>
+</svg>

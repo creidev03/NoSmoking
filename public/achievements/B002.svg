@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="cajetilla">
+<g id="caja"><path fill="#d9b98c" d="M5 4h14v17h-14z"></path><path fill="#a8875a" d="M5 4h14v3h-14z"></path></g><g id="advertencia"><path fill="#e2731c" d="M9 9h6v6h-6z"></path><text x="12" y="13.4" font-size="4.4" font-family="monospace" font-weight="bold" fill="#fff8ec" text-anchor="middle">30</text></g>
+</g>
+</svg>

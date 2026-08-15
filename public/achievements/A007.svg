@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="melodia-curativa">
+<g id="nota"><path fill="#cd7f32" d="M13 3h1.6v12h-1.6z"></path><path fill="#cd7f32" d="M14.6 3l4 1.4v3l-4 -1.2z"></path><circle cx="7.5" cy="18.5" r="3" fill="#cd7f32"></circle><circle cx="13.5" cy="17" r="1.8" fill="#cd7f32"></circle></g><g id="cruz-salud"><path fill="#3fae5a" d="M6.7 16.3h1.6v1.6h1.6v1.6h-1.6v1.6h-1.6v-1.6h-1.6v-1.6h1.6z"></path></g>
+</g>
+</svg>

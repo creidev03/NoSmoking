@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="cigarrillo-simple">
+<g id="humo"><circle cx="3" cy="7.5" r="1.1" fill="#b8b8b8" opacity="0.7"></circle><circle cx="2" cy="4.5" r="1.4" fill="#b8b8b8" opacity="0.55"></circle><circle cx="3.5" cy="2" r="1" fill="#b8b8b8" opacity="0.45"></circle></g><g id="cigarrillo"><path fill="#fff8ec" d="M3 11h15v2.4h-15z"></path><path fill="#e2731c" d="M18 11h2.4v2.4h-2.4z"></path><path fill="#8a3a10" d="M20 11h1.4v2.4h-1.4z"></path><path fill="#c25b18" d="M18 11h0.5v2.4h-0.5z"></path></g>
+</g>
+</svg>

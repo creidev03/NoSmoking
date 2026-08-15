@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="calendario-perfecto">
+<path fill="#b8860b" d="M7 1h1.6v3h-1.6z"></path><path fill="#b8860b" d="M15.4 1h1.6v3h-1.6z"></path><path fill="#b8860b" d="M4 3h16v4h-16z"></path><path fill="#ffd23f" d="M4 7h16v13h-16z"></path><path fill="#7a5a10" d="M4 7h16v1h-16z"></path><path fill="#7a5a10" d="M4 19h16v1h-16z"></path><path fill="#7a5a10" d="M4 7h1v13h-1z"></path><path fill="#7a5a10" d="M19 7h1v13h-1z"></path><g id="check"><path fill="none" stroke="#3fae5a" stroke-width="2" stroke-linecap="square" d="M8 13.5l3 3 6 -7"></path></g>
+</g>
+</svg>

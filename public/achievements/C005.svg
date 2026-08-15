@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="diamante-maestro">
+<g id="gema"><path fill="#bdeeff" d="M9 5h3v5H4z"></path><path fill="#6fd1f5" d="M12 5h3l5 5h-8z"></path><path fill="#2fa8d8" d="M4 10h8v10z"></path><path fill="#1a7fac" d="M12 10h8l-8 10z"></path><path fill="#ffffff" opacity="0.5" d="M4 9.6h16v0.8h-16z"></path><path fill="#eafcff" d="M11.6 5h0.8v15h-0.8z"></path><path fill="none" stroke="#0a4a63" stroke-width="0.7" d="M9 5h6l5 5-8 10-8-10z"></path></g><g id="brillo"><path fill="#ffffff" d="M18 1.7l0.55 1.1 1.1 0.55 -1.1 0.55 -0.55 1.1 -0.55 -1.1 -1.1 -0.55z"></path><path fill="#ffffff" d="M5 5.6l0.35 0.7 0.7 0.35 -0.7 0.35 -0.35 0.7 -0.35 -0.7 -0.7 -0.35z"></path></g>
+</g>
+</svg>

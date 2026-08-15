@@ -79,9 +79,20 @@ export function AchievementCard({
     >
       {/* Icon */}
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-2xl" aria-hidden="true">
-          {isUnlocked || !achievement.isSecret ? achievement.icon : "🔒"}
-        </span>
+        {achievement.icon.startsWith("/") ? (
+          <img
+            src={achievement.icon}
+            alt={achievement.name}
+            className="h-12 w-12"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/achievements/default.svg";
+            }}
+          />
+        ) : (
+          <span className="text-2xl" aria-hidden="true">
+            {isUnlocked || !achievement.isSecret ? achievement.icon : "🔒"}
+          </span>
+        )}
         <span
           className={cn(
             "rounded-full px-2 py-0.5 text-[10px] font-medium uppercase",

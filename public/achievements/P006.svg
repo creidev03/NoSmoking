@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges">
+
+<g id="pulmones">
+<g id="aura"></g><g id="traquea"><path fill="#b8860b" d="M11 2h2v5h-2z"></path></g><g id="lobulos"><path fill="#3fae5a" d="M4 7h6v8h-6z"></path><path fill="#3fae5a" d="M3 9h2v4h-2z"></path><path fill="#3fae5a" d="M14 7h6v8h-6z"></path><path fill="#3fae5a" d="M19 9h2v4h-2z"></path><path fill="#b8860b" d="M4 13h6v2h-6z"></path><path fill="#b8860b" d="M14 13h6v2h-6z"></path></g><g id="brote"><path fill="#2f8a45" d="M11.5 0h1v0.6h-1z"></path><path fill="#3fae5a" d="M11 0.6h2v0.6h-2z"></path><path fill="#66d17a" d="M10.5 1.2h3v0.6h-3z"></path><path fill="#3fae5a" d="M11 1.8h2v0.6h-2z"></path></g>
+</g>
+</svg>
