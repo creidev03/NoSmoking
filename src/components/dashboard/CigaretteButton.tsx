@@ -271,9 +271,9 @@ export function CigaretteButton({
       </button>
 
       {/* ── Count label ────────────────────────────────────────────── */}
-      <p className="text-xs font-medium text-[#6B7280] dark:text-[#9CA3AF]">
+      {/* <p className="text-xs font-medium text-[#6B7280] dark:text-[#9CA3AF]">
         {currentCount}/{threshold} cigarros
-      </p>
+      </p> */}
     </div>
   );
 }

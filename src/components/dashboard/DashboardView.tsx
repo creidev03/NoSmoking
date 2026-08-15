@@ -195,6 +195,11 @@ export function DashboardView({
               🎁 Vidas extra ganadas: {state.totalPoints}/3
             </p>
           )}
+          
+          <CigarettesToday
+            count={state.cigarettesToday}
+            threshold={CIGARETTE_THRESHOLD}
+          />
 
           <div className="flex justify-center py-2">
             <CigaretteButton
@@ -203,11 +208,6 @@ export function DashboardView({
               onRegister={handleRegisterCigarette}
             />
           </div>
-
-          <CigarettesToday
-            count={state.cigarettesToday}
-            threshold={CIGARETTE_THRESHOLD}
-          />
 
           <CooldownTimer
             nextActionAt={state.nextActionAvailableAt}
