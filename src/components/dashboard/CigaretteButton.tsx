@@ -71,17 +71,17 @@ export function CigaretteButton({
   // Color interpolation: orange → red as fill grows
   const fillColor =
     fillPercent === 0
-      ? "#F97316"
+      ? "var(--color-warning)"
       : fillPercent < 50
-        ? "#F97316"
-        : "#EF4444";
+        ? "var(--color-warning)"
+        : "var(--color-danger)";
 
   const borderColor =
     fillPercent === 0
-      ? "#FDBA74"
+      ? "var(--color-warning)"
       : fillPercent < 50
-        ? "#FDBA74"
-        : "#FCA5A5";
+        ? "var(--color-warning)"
+        : "var(--color-danger)";
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -215,7 +215,7 @@ export function CigaretteButton({
           {/* Burning tip - changes to ash at 3/5 */}
           {currentCount >= 3 ? (
             // Ash state - grey
-            <rect x="0" y="5" width="2" height="3" fill="#6B7280">
+            <rect x="0" y="5" width="2" height="3" fill="var(--color-text-muted)">
               <animate
                 attributeName="opacity"
                 values="1;0.8;1"
@@ -225,7 +225,7 @@ export function CigaretteButton({
             </rect>
           ) : (
             // Burning state - red with glow
-            <rect x="0" y="5" width="2" height="3" fill="#EF4444">
+            <rect x="0" y="5" width="2" height="3" fill="var(--color-danger)">
               <animate
                 attributeName="opacity"
                 values="1;0.7;1"
@@ -238,7 +238,7 @@ export function CigaretteButton({
           {/* Ash particles when burning */}
           {currentCount >= 3 && (
             <>
-              <rect x="0" y="8" width="1" height="1" fill="#9CA3AF" opacity="0.6">
+              <rect x="0" y="8" width="1" height="1" fill="var(--color-text-muted)" opacity="0.6">
                 <animate
                   attributeName="y"
                   values="8;10;8"
@@ -252,7 +252,7 @@ export function CigaretteButton({
                   repeatCount="indefinite"
                 />
               </rect>
-              <rect x="1" y="8" width="1" height="1" fill="#9CA3AF" opacity="0.4">
+              <rect x="1" y="8" width="1" height="1" fill="var(--color-text-muted)" opacity="0.4">
                 <animate
                   attributeName="y"
                   values="8;11;8"

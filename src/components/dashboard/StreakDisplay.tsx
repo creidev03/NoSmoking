@@ -28,20 +28,20 @@ export function StreakDisplay({ streakDays }: StreakDisplayProps) {
   const currentMessage = MESSAGES[messageIndex];
 
   return (
-    <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-[#374151] dark:bg-[#1F2937]">
+    <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F97316]/10">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-warning/10">
             <span className="text-2xl">🔥</span>
           </div>
           <div>
             <span
               data-testid="streak-days"
-              className="text-[32px] font-bold leading-none text-[#1F2937] dark:text-[#F3F4F6]"
+              className="text-[32px] font-bold leading-none text-text dark:text-text"
             >
               {streakDays}
             </span>
-            <p className="text-sm text-[#6B7280] dark:text-[#9CA3AF]">
+            <p className="text-sm text-text-muted dark:text-text-muted">
               {streakDays === 1 ? "día sin fumar" : "días sin fumar"}
             </p>
           </div>
@@ -49,7 +49,7 @@ export function StreakDisplay({ streakDays }: StreakDisplayProps) {
         {showBadge && (
           <div
             key={messageIndex}
-            className="flex items-center gap-1.5 text-xs text-[#F97316] animate-pulse"
+            className="flex items-center gap-1.5 text-xs text-warning animate-pulse"
           >
             <span>{currentMessage.icon}</span>
             <span className="font-medium">{currentMessage.text}</span>

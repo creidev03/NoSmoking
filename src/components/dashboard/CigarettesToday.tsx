@@ -8,8 +8,8 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
   const segments = Array.from({ length: threshold }, (_, i) => i < count);
 
   return (
-    <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-[#374151] dark:bg-[#1F2937]">
-      <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-[#6B7280]">
+    <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
+      <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
         🚬 Consumo de Hoy
       </h2>
 
@@ -18,15 +18,15 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
           data-testid="cigarette-count"
           className={`text-[48px] font-bold leading-none ${
             count >= threshold
-              ? "text-[#EF4444]"
+              ? "text-danger"
               : count >= threshold * 0.6
-                ? "text-[#F97316]"
-                : "text-[#1F2937] dark:text-[#F3F4F6]"
+                ? "text-warning"
+                : "text-text dark:text-text"
           }`}
         >
           {count}
         </span>
-        <span className="text-[#6B7280]">de {threshold} permitidos</span>
+        <span className="text-text-muted">de {threshold} permitidos</span>
       </div>
 
       {/* 5-segment progress bar */}
@@ -35,16 +35,16 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
           <div
             key={i}
             className={`h-2 flex-1 rounded transition-all duration-200 ${
-              filled ? "bg-[#EF4444]" : "bg-[#10B981]"
+              filled ? "bg-danger" : "bg-success"
             }`}
           />
         ))}
       </div>
 
       {remaining > 0 && (
-        <p data-testid="remaining-text" className="text-sm text-[#6B7280]">
+        <p data-testid="remaining-text" className="text-sm text-text-muted">
           Quedan{" "}
-          <span className="font-medium text-[#1F2937] dark:text-[#F3F4F6]">
+          <span className="font-medium text-text dark:text-text">
             {remaining}
           </span>{" "}
           antes de penalización
@@ -53,7 +53,7 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
       {count >= threshold && (
         <p
           data-testid="penalty-text"
-          className="text-sm font-medium text-[#EF4444]"
+          className="text-sm font-medium text-danger"
         >
           ⚠️ ¡Ciclo completado! Se perderá 1 vida
         </p>

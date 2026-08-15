@@ -45,6 +45,16 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    /* Semantic tokens */
+    --color-surface: var(--background);
+    --color-surface-card: var(--card);
+    --color-text: var(--foreground);
+    --color-text-muted: var(--muted-foreground);
+    --color-success: var(--primary);
+    --color-danger: var(--destructive);
+    --color-warning: var(--warning);
+    --color-info: var(--info);
+    --color-accent-purple: var(--accent-purple);
 }
 
 :root {
@@ -81,6 +91,9 @@
     --sidebar-accent-foreground: oklch(0.208 0.027 255.635);
     --sidebar-border: oklch(0.931 0.006 264.532);
     --sidebar-ring: oklch(0.715 0.163 155);
+    --warning: #F97316;
+    --info: #3B82F6;
+    --accent-purple: #8B5CF6;
 }
 
 .dark {
@@ -116,6 +129,9 @@
     --sidebar-accent-foreground: oklch(0.956 0.006 264.532);
     --sidebar-border: oklch(0.303 0.017 255.635);
     --sidebar-ring: oklch(0.715 0.163 155);
+    --warning: #F97316;
+    --info: #3B82F6;
+    --accent-purple: #8B5CF6;
 }
 
 @layer base {
@@ -135,4 +151,111 @@ img[style*="pixelated"] {
   image-rendering: pixelated;
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
+}
+
+/* Landing-only brand presentation. Product routes keep the global Geist stack. */
+.landing-shell {
+  --landing-green: oklch(0.56 0.16 155);
+  --landing-green-soft: oklch(0.94 0.04 155);
+  font-size: 1rem;
+}
+
+.dark .landing-shell {
+  --landing-green-soft: oklch(0.28 0.06 155);
+}
+
+.landing-shell .landing-heading {
+  font-family: var(--font-poppins), ui-sans-serif, sans-serif;
+}
+
+.landing-shell .landing-highlight {
+  font-family: var(--font-lora), Georgia, serif;
+}
+
+.landing-shell .landing-section {
+  scroll-margin-top: 6rem;
+}
+
+.landing-shell .landing-hearts {
+  animation: landing-heart-float 3.2s ease-in-out infinite;
+}
+
+.landing-shell [data-motion-progress="true"] {
+  animation: landing-progress-pulse 2.8s ease-in-out infinite;
+}
+
+.landing-shell .landing-flash {
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--landing-green);
+  opacity: 0;
+  animation: landing-flash 4s ease-in-out infinite;
+}
+
+.landing-shell .landing-flash-one { right: 12%; top: 18%; }
+.landing-shell .landing-flash-two { bottom: 14%; left: 10%; animation-delay: 1.7s; }
+
+@keyframes landing-heart-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.2rem); }
+}
+
+@keyframes landing-progress-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+}
+
+@keyframes landing-flash {
+  0%, 100% { opacity: 0; transform: scale(0.7); }
+  15% { opacity: 0.35; transform: scale(1); }
+  30% { opacity: 0; transform: scale(1.3); }
+}
+
+@media (min-width: 768px) and (pointer: fine) {
+  .landing-shell .landing-flash { display: block !important; }
+}
+
+/* JavaScript only enables the reveal state; content stays visible without it. */
+.landing-shell[data-motion-enabled] [data-motion-reveal] {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+
+.landing-shell[data-motion-enabled] [data-motion-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-shell *,
+  .landing-shell *::before,
+  .landing-shell *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+     animation-iteration-count: 1 !important;
+  }
+
+  .landing-shell[data-motion-enabled] [data-motion-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .landing-shell .landing-hearts,
+  .landing-shell [data-motion-progress="true"],
+  .landing-shell .landing-flash {
+    animation: none;
+  }
+
+  .landing-shell .landing-flash { display: none !important; }
+}
+
+@media (pointer: coarse) {
+  .landing-shell .landing-flash { display: none !important; }
 }

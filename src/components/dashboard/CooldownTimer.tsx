@@ -26,12 +26,12 @@ function getPhaseLabel(phase: number): string {
 
 function getPhaseColor(phase: number): string {
   const colors: Record<number, string> = {
-    1: "#EF4444", // Rojo Suave
-    2: "#F97316", // Naranja Energía
-    3: "#3B82F6", // Azul Calma
-    4: "#10B981", // Verde Esperanza
+    1: "var(--color-danger)",
+    2: "var(--color-warning)",
+    3: "var(--color-info)",
+    4: "var(--color-success)",
   };
-  return colors[phase] ?? "#6B7280";
+  return colors[phase] ?? "var(--color-text-muted)";
 }
 
 function getPhaseMaxSeconds(phase: number): number {
@@ -122,8 +122,8 @@ export function CooldownTimer({
   const circumference = 2 * Math.PI * 26; // 26px radius for 60px diameter
 
   return (
-    <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-[#374151] dark:bg-[#1F2937]">
-      <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-[#6B7280]">
+    <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
+      <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
         ⏱️ Próxima Acción
       </h2>
 
@@ -154,7 +154,7 @@ export function CooldownTimer({
             >
               ¡Listo para la siguiente acción!
             </p>
-            <p className="text-sm text-[#6B7280]">{getPhaseLabel(phase)}</p>
+            <p className="text-sm text-text-muted">{getPhaseLabel(phase)}</p>
           </div>
         </div>
       ) : (
@@ -170,9 +170,9 @@ export function CooldownTimer({
                 cy="30"
                 r="26"
                 fill="none"
-                stroke="#E5E7EB"
+                stroke="var(--color-border)"
                 strokeWidth="4"
-                className="dark:stroke-[#374151]"
+                className="dark:stroke-border"
               />
               <circle
                 cx="30"
@@ -191,7 +191,7 @@ export function CooldownTimer({
               role="timer"
               aria-label="Cooldown countdown"
               aria-live="polite"
-              className="absolute text-sm font-bold text-[#1F2937] dark:text-[#F3F4F6]"
+              className="absolute text-sm font-bold text-text dark:text-text"
             >
               {formatTime(remainingSeconds)}
             </span>
@@ -204,7 +204,7 @@ export function CooldownTimer({
             >
               {getPhaseLabel(phase)}
             </p>
-            <p className="text-sm text-[#6B7280]">Cooldown activo</p>
+            <p className="text-sm text-text-muted">Cooldown activo</p>
           </div>
         </div>
       )}
