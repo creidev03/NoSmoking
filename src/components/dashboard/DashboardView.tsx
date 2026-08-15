@@ -201,7 +201,7 @@ export function DashboardView({
             threshold={CIGARETTE_THRESHOLD}
           />
 
-          <div className="flex justify-center py-2">
+          <div className="flex justify-center rounded-xl border border-[#E5E7EB] bg-gradient-to-b from-[#F9FAFB] to-[#F3F4F6] py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-[#374151] dark:from-[#1F2937] dark:to-[#111827]">
             <CigaretteButton
               currentCount={state.cigarettesToday}
               threshold={CIGARETTE_THRESHOLD}
