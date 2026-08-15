@@ -8,6 +8,7 @@ import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cool
 import { randomUUID } from "crypto";
 import { evaluateAchievements } from "@/lib/achievements";
 import { normalizeEventWithPenalty, type TimelineEvent, type TimelineFilter } from "@/lib/timeline";
+import type { Achievement } from "@/lib/achievements/types";
 
 type ActionType = "breathing" | "meditation" | "music";
 
@@ -532,4 +533,27 @@ export async function getTimelineEvents(
     hasMore: offset + limit < total,
     total,
   };
+}
+
+/**
+ * Get all achievements from the database, sorted by category then difficulty.
+ * This is used by the logros page to display all achievements.
+ */
+export async function getAllAchievements(): Promise<Achievement[]> {
+  const rows = await db
+    .select()
+    .from(achievements)
+    .all();
+
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    icon: row.icon,
+    category: row.category as Achievement["category"],
+    difficulty: row.difficulty as Achievement["difficulty"],
+    isSecret: row.isSecret,
+    description: row.description,
+    conditionType: row.conditionType as Achievement["conditionType"],
+    conditionValue: Number(row.conditionValue),
+  }));
 }

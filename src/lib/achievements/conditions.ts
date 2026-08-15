@@ -123,7 +123,7 @@ export function checkNoPenalties(
 }
 
 export function checkPhaseActions(
-  events: Array<{ type: string; detail?: string; createdAt: string }>,
+  events: Array<{ type: string; detail?: string | null; createdAt: string }>,
   phase: string,
   count: number
 ): ConditionResult {

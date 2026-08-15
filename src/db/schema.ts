@@ -91,7 +91,9 @@ export const userAchievements = sqliteTable(
     unlockedAt: text("unlocked_at").notNull(),
     createdAt: text("created_at").notNull(),
   },
-  (t) => [unique().on(t.userId, t.achievementId)]
+  (t) => ({
+    uniqueUserAchievement: unique().on(t.userId, t.achievementId),
+  })
 );
 
 export const achievementProgress = sqliteTable(
@@ -107,5 +109,7 @@ export const achievementProgress = sqliteTable(
     currentValue: integer("current_value").notNull().default(0),
     lastUpdated: text("last_updated").notNull(),
   },
-  (t) => [unique().on(t.userId, t.achievementId)]
+  (t) => ({
+    uniqueAchievementProgress: unique().on(t.userId, t.achievementId),
+  })
 );

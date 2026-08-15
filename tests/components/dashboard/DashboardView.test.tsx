@@ -50,6 +50,18 @@ vi.mock("@/components/achievements/AchievementGallery", () => ({
   AchievementGallery: () => <div data-testid="achievement-gallery" />,
 }));
 
+vi.mock("@/components/dashboard/RecentAchievementsWidget", () => ({
+  RecentAchievementsWidget: () => <div data-testid="recent-achievements-widget" />,
+}));
+
+vi.mock("@/components/dashboard/QuickActionsGrid", () => ({
+  QuickActionsGrid: () => <div data-testid="quick-actions-grid" />,
+}));
+
+vi.mock("@/components/dashboard/UpcomingEventsWidget", () => ({
+  UpcomingEventsWidget: () => <div data-testid="upcoming-events-widget" />,
+}));
+
 const baseGameState: GameState = {
   id: "gs-1",
   userId: "u-1",

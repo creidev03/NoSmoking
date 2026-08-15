@@ -15,6 +15,9 @@ import { AwarenessModal } from "@/components/achievements/AwarenessModal";
 import { generateAwarenessMessage } from "@/lib/achievements/awareness-messages";
 import type { Achievement } from "@/lib/achievements/types";
 import { CigaretteButton } from "./CigaretteButton";
+import { RecentAchievementsWidget } from "./RecentAchievementsWidget";
+import { QuickActionsGrid } from "./QuickActionsGrid";
+import { UpcomingEventsWidget } from "./UpcomingEventsWidget";
 
 
 const CACHE_KEY = "dashboard-game-state";
@@ -290,12 +293,23 @@ export function DashboardView({
 
         {/* Main content - single column on mobile */}
         <div className="space-y-3">
-          <StreakDisplay streakDays={state.streakDays} />
-
-          <LivesDisplay
-            total={state.totalLives}
-            remaining={state.remainingLives}
-          />
+          {/* Stats grid - 2 columns mobile, 4 columns desktop */}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StreakDisplay streakDays={state.streakDays} />
+            <LivesDisplay
+              total={state.totalLives}
+              remaining={state.remainingLives}
+            />
+            <CigarettesToday
+              count={state.cigarettesToday}
+              threshold={CIGARETTE_THRESHOLD}
+            />
+            <CooldownTimer
+              nextActionAt={state.nextActionAvailableAt}
+              phase={phase}
+              onExpired={handleCooldownExpired}
+            />
+          </div>
 
           {state.totalPoints > 0 && (
             <p
@@ -305,12 +319,8 @@ export function DashboardView({
               🎁 Vidas extra ganadas: {state.totalPoints}/3
             </p>
           )}
-          
-          <CigarettesToday
-            count={state.cigarettesToday}
-            threshold={CIGARETTE_THRESHOLD}
-          />
 
+          {/* Cigarette button */}
           <div className="flex justify-center rounded-xl border border-border bg-gradient-to-b from-surface-card to-surface py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:from-surface-card dark:to-surface">
             <CigaretteButton
               currentCount={state.cigarettesToday}
@@ -319,23 +329,35 @@ export function DashboardView({
             />
           </div>
 
-          <CooldownTimer
-            nextActionAt={state.nextActionAvailableAt}
-            phase={phase}
-            onExpired={handleCooldownExpired}
+          {/* Recent achievements */}
+          <RecentAchievementsWidget
+            achievements={achievements}
+            userAchievements={userAchievementsState}
           />
 
-          <ActionButtons
+          {/* Quick actions */}
+          <QuickActionsGrid
+            userId={state.userId}
             onAction={handleAction}
             isCooldownActive={cooldownActive}
-            gameState={state}
           />
 
+          {/* Upcoming events */}
+          <UpcomingEventsWidget gameState={state} />
+
+          {/* Full achievement gallery */}
           <AchievementGallery
             achievements={achievements}
             userAchievements={userAchievementsState}
             progress={progressState}
             onAchievementClick={openAchievementModal}
+          />
+
+          {/* Action buttons (legacy) */}
+          <ActionButtons
+            onAction={handleAction}
+            isCooldownActive={cooldownActive}
+            gameState={state}
           />
         </div>
       </div>
