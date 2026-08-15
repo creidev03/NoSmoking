@@ -3,6 +3,7 @@ import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Toaster } from "sonner";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -23,6 +24,7 @@ export default function RootLayout({
           <ThemeToggle />
         </header>
         {children}
+        <Toaster richColors position="bottom-center" />
       </body>
     </html>
   );

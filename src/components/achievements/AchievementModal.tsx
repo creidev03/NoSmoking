@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/lib/achievements/types";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const difficultyLabels: Record<string, string> = {
   easy: "Fácil",
@@ -128,15 +129,18 @@ export function AchievementModal({
             variant="outline"
             className="flex-1"
             onClick={async () => {
-              const text = `🏆 ¡Desbloqueé "${achievement.name}" en No Smoking!\n\n${achievement.description}\n\n#DejarDeFumar #NoSmoking`;
-              if (navigator.share) {
-                try {
+              const text = `🏆 ¡Desbloqueé "${achievement.name}" en No Smoking!\n\n${achievement.description}`;
+              try {
+                if (navigator.share) {
                   await navigator.share({ title: achievement.name, text });
-                } catch {
-                  // user cancelled
+                } else {
+                  throw new Error("no share");
                 }
-              } else {
+              } catch {
                 await navigator.clipboard.writeText(text);
+                toast.success("Copiado al portapapeles", {
+                  description: "Pega el mensaje para compartir tu logro",
+                });
               }
             }}
           >
