@@ -84,6 +84,57 @@ function mapGameState(row: any): GameState {
   };
 }
 
+interface MultiCigaretteResult {
+  gameState: GameState;
+  totalRegistered: number;
+  penalties: boolean;
+}
+
+export async function registerCigaretteMulti(
+  userId: string,
+  quantity: number,
+  note?: string
+): Promise<MultiCigaretteResult> {
+  if (quantity < 1 || quantity > 10) {
+    throw new Error("Quantity must be between 1 and 10");
+  }
+
+  let lastResult: CigaretteResult | null = null;
+  let totalRegistered = 0;
+
+  for (let i = 0; i < quantity; i++) {
+    lastResult = await registerCigarette(userId);
+    totalRegistered++;
+  }
+
+  // Update the last event with the note and total quantity
+  if (lastResult && note !== undefined) {
+    const gameStateId = lastResult.gameState.id;
+    const lastEvent = await db
+      .select()
+      .from(events)
+      .where(eq(events.gameStateId, gameStateId))
+      .all()
+      .then((rows) => rows[rows.length - 1]);
+
+    if (lastEvent) {
+      const detail = JSON.parse(lastEvent.detail || "{}");
+      detail.nota = note;
+      detail.cantidad = quantity;
+      await db
+        .update(events)
+        .set({ detail: JSON.stringify(detail) })
+        .where(eq(events.id, lastEvent.id));
+    }
+  }
+
+  return {
+    gameState: lastResult!.gameState,
+    totalRegistered,
+    penalties: lastResult!.penaltyApplied || lastResult!.newCycle,
+  };
+}
+
 export async function registerCigarette(userId: string): Promise<CigaretteResult> {
   return db.transaction(async (tx) => {
     const row = await tx

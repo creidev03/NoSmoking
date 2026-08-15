@@ -10,6 +10,7 @@ import { CigarettesToday } from "./CigarettesToday";
 import { CooldownTimer } from "./CooldownTimer";
 import { ActionButtons } from "./ActionButtons";
 import { BadgesList } from "./BadgesList";
+import { RegisterCigaretteModal } from "./RegisterCigaretteModal";
 
 const CACHE_KEY = "dashboard-game-state";
 
@@ -92,6 +93,24 @@ export function DashboardView({
     }));
   }, []);
 
+  const [showCigaretteModal, setShowCigaretteModal] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
+
+  const handleCigaretteSuccess = useCallback(
+    (newGameState: GameState, penalty: boolean) => {
+      setState(newGameState);
+      saveCachedState(newGameState);
+      setToast({
+        message: penalty
+          ? "⚠️ Penalización: perdiste 1 vida"
+          : "Cigarro registrado",
+        type: penalty ? "warning" : "success",
+      });
+      setTimeout(() => setToast(null), 3000);
+    },
+    []
+  );
+
   const isRelapsed = state.status === "relapse";
 
   return (
@@ -116,6 +135,28 @@ export function DashboardView({
               ⚠️ Has perdido todas tus vidas. Tienes 24 horas para recuperarte
               completando acciones positivas.
             </p>
+          </div>
+        )}
+
+        {/* Register Cigarette Button */}
+        <button
+          onClick={() => setShowCigaretteModal(true)}
+          className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-[15px] font-semibold text-[#EF4444] transition-all active:scale-[0.98] hover:bg-[#EF4444]/15 dark:border-[#EF4444]/20 dark:bg-[#EF4444]/10"
+          data-testid="register-cigarette-button"
+        >
+          🚬 Registrar cigarro
+        </button>
+
+        {/* Toast */}
+        {toast && (
+          <div
+            className={`mb-4 rounded-xl px-4 py-3 text-sm font-medium text-center ${
+              toast.type === "success"
+                ? "border border-[#D1FAE5] bg-[#ECFDF5] text-[#065F46] dark:border-[#065F46] dark:bg-[#065F46]/20 dark:text-[#D1FAE5]"
+                : "border border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B] dark:border-[#991B1B] dark:bg-[#991B1B]/20 dark:text-[#FCA5A5]"
+            }`}
+          >
+            {toast.message}
           </div>
         )}
 
@@ -157,6 +198,13 @@ export function DashboardView({
           <BadgesList badges={badges} />
         </div>
       </div>
+
+      <RegisterCigaretteModal
+        isOpen={showCigaretteModal}
+        onClose={() => setShowCigaretteModal(false)}
+        userId={state.userId}
+        onSuccess={handleCigaretteSuccess}
+      />
     </div>
   );
 }
