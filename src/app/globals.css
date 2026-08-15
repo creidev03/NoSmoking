@@ -158,6 +158,24 @@ img[style*="pixelated"] {
   --landing-green: oklch(0.56 0.16 155);
   --landing-green-soft: oklch(0.94 0.04 155);
   font-size: 1rem;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.landing-shell .landing-container { width: min(100%, 72rem); margin-inline: auto; }
+.landing-shell .landing-header { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(12px); }
+.landing-shell .landing-header .landing-container { min-height: 4.5rem; padding-inline: 1rem; }
+.landing-shell .landing-eyebrow { color: var(--landing-green); font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.landing-shell .landing-step-number { color: var(--landing-green); font-family: var(--font-poppins), sans-serif; font-size: .875rem; font-weight: 700; }
+.landing-shell .landing-benefit-mark { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; border-radius: 9999px; background: var(--landing-green-soft); }
+.landing-shell .landing-heart { display: block; width: 2rem; height: 2rem; object-fit: contain; }
+.landing-shell .landing-heart-row { display: flex; gap: .35rem; }
+.landing-shell .landing-heart-row .landing-heart { width: 1.75rem; height: 1.75rem; }
+.landing-shell .landing-preview { max-width: 34rem; margin-inline: auto; }
+.landing-shell a { min-height: 3rem; }
+.landing-shell a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
 }
 
 .dark .landing-shell {
@@ -176,8 +194,9 @@ img[style*="pixelated"] {
   scroll-margin-top: 6rem;
 }
 
-.landing-shell .landing-hearts {
-  animation: landing-heart-float 3.2s ease-in-out infinite;
+.landing-shell .landing-hero {
+  position: relative;
+  overflow: clip;
 }
 
 .landing-shell [data-motion-progress="true"] {
@@ -198,11 +217,6 @@ img[style*="pixelated"] {
 
 .landing-shell .landing-flash-one { right: 12%; top: 18%; }
 .landing-shell .landing-flash-two { bottom: 14%; left: 10%; animation-delay: 1.7s; }
-
-@keyframes landing-heart-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-0.2rem); }
-}
 
 @keyframes landing-progress-pulse {
   0%, 100% { opacity: 1; }
@@ -247,7 +261,6 @@ img[style*="pixelated"] {
     transition: none;
   }
 
-  .landing-shell .landing-hearts,
   .landing-shell [data-motion-progress="true"],
   .landing-shell .landing-flash {
     animation: none;

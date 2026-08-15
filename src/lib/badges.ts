@@ -4,7 +4,7 @@ export interface BadgeThreshold {
   days: number;
 }
 
-const BADGE_THRESHOLDS: BadgeThreshold[] = [
+export const BADGE_THRESHOLDS: readonly BadgeThreshold[] = [
   { key: "primera_semana", days: 7 },
   { key: "un_mes", days: 30 },
   { key: "centenario", days: 100 },
