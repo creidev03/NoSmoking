@@ -309,3 +309,36 @@ export async function devResetLives(userId: string): Promise<GameState> {
     };
   });
 }
+
+// DEV ONLY: Remove cooldown
+export async function devRemoveCooldown(userId: string): Promise<GameState> {
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("This action is only available in development");
+  }
+
+  return db.transaction(async (tx) => {
+    const row = await tx
+      .select()
+      .from(game_state)
+      .where(eq(game_state.userId, userId))
+      .get();
+
+    if (!row) throw new Error("Game state not found");
+
+    const now = new Date().toISOString();
+
+    await tx
+      .update(game_state)
+      .set({
+        nextActionAvailableAt: null,
+        updatedAt: now,
+      })
+      .where(eq(game_state.id, row.id));
+
+    return {
+      ...row,
+      nextActionAvailableAt: null,
+      updatedAt: now,
+    };
+  });
+}
