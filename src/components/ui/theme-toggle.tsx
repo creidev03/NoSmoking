@@ -5,15 +5,13 @@ import { useTheme } from "@/hooks/useTheme";
 export function ThemeToggle() {
   const { resolvedTheme, toggleTheme, mounted } = useTheme();
 
-  if (!mounted) {
-    return <div className="h-9 w-9" />;
-  }
-
   return (
     <button
+      data-theme-toggle
       onClick={toggleTheme}
-      className="inline-flex items-center justify-center rounded-md h-9 w-9 hover:bg-accent hover:text-accent-foreground transition-colors"
-      aria-label={`Cambiar a tema ${resolvedTheme === "light" ? "oscuro" : "claro"}`}
+      disabled={!mounted}
+      className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      aria-label="Cambiar tema"
     >
       {resolvedTheme === "light" ? (
         <svg
