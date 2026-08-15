@@ -18,6 +18,7 @@ import { CigaretteButton } from "./CigaretteButton";
 import { RecentAchievementsWidget } from "./RecentAchievementsWidget";
 import { QuickActionsGrid } from "./QuickActionsGrid";
 import { UpcomingEventsWidget } from "./UpcomingEventsWidget";
+import { RelapseModal } from "./RelapseModal";
 
 
 const CACHE_KEY = "dashboard-game-state";
@@ -233,6 +234,20 @@ export function DashboardView({
 
   const isRelapsed = state.status === "relapse";
 
+  // Auto-show relapse modal when user enters relapse state
+  const [showRelapseModal, setShowRelapseModal] = useState(false);
+
+  // Track if we've shown the modal for this relapse session
+  const relapseSessionKey = state.relapseStartedAt || "";
+  const [lastShownRelapse, setLastShownRelapse] = useState("");
+
+  useEffect(() => {
+    if (isRelapsed && relapseSessionKey && relapseSessionKey !== lastShownRelapse) {
+      setShowRelapseModal(true);
+      setLastShownRelapse(relapseSessionKey);
+    }
+  }, [isRelapsed, relapseSessionKey, lastShownRelapse]);
+
   return (
     <div className="min-h-screen bg-surface dark:bg-surface">
       <div className="mx-auto max-w-2xl px-4 py-6">
@@ -380,6 +395,14 @@ export function DashboardView({
             ? generateAwarenessMessage(state.cigarettesToday || 1)
             : ""
         }
+      />
+
+      {/* Relapse recovery modal */}
+      <RelapseModal
+        isOpen={showRelapseModal}
+        onClose={() => setShowRelapseModal(false)}
+        gameState={state}
+        userId={state.userId}
       />
     </div>
   );

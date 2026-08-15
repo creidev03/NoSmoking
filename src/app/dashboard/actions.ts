@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { game_state, events, badges, userAchievements, achievementProgress } from "@/db/schema";
+import { game_state, events, badges, userAchievements, achievementProgress, achievements } from "@/db/schema";
 import { eq, gte, and, sql, count } from "drizzle-orm";
 import { checkMidnightReset, type GameState } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
@@ -532,6 +532,60 @@ export async function getTimelineEvents(
     events: timelineEvents,
     hasMore: offset + limit < total,
     total,
+  };
+}
+
+/**
+ * Check the current relapse status for a user.
+ * Returns whether the user is in relapse, time remaining, and recovery progress.
+ */
+export async function checkRelapseStatus(userId: string): Promise<{
+  isRelapsed: boolean;
+  timeRemaining: number;
+  livesRecovered: number;
+  livesNeeded: number;
+}> {
+  const row = await db
+    .select()
+    .from(game_state)
+    .where(eq(game_state.userId, userId))
+    .get();
+
+  if (!row) {
+    return { isRelapsed: false, timeRemaining: 0, livesRecovered: 0, livesNeeded: 0 };
+  }
+
+  const isRelapsed = row.status === "relapse";
+  if (!isRelapsed || !row.relapseStartedAt) {
+    return { isRelapsed: false, timeRemaining: 0, livesRecovered: 0, livesNeeded: 0 };
+  }
+
+  const RELAPSE_WINDOW_MS = 24 * 60 * 60 * 1000;
+  const relapseStart = new Date(row.relapseStartedAt);
+  const windowEnd = new Date(relapseStart.getTime() + RELAPSE_WINDOW_MS);
+  const now = new Date();
+  const timeRemaining = Math.max(0, windowEnd.getTime() - now.getTime());
+
+  // Count positive actions since relapse started
+  const [countRow] = await db
+    .select({ cnt: count() })
+    .from(events)
+    .where(
+      and(
+        eq(events.gameStateId, row.id),
+        eq(events.type, "accion_positiva"),
+        gte(events.createdAt, row.relapseStartedAt)
+      )
+    )
+    .all();
+
+  const livesRecovered = row.totalLives - row.remainingLives;
+
+  return {
+    isRelapsed,
+    timeRemaining,
+    livesRecovered,
+    livesNeeded: 1,
   };
 }
 
