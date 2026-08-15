@@ -231,14 +231,14 @@ export function DashboardView({
   const isRelapsed = state.status === "relapse";
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] dark:bg-[#111827]">
+    <div className="min-h-screen bg-surface dark:bg-surface">
       <div className="mx-auto max-w-2xl px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-[32px] font-bold leading-tight text-[#1F2937] dark:text-[#F3F4F6]">
+          <h1 className="text-[32px] font-bold leading-tight text-text dark:text-text">
             {isRelapsed ? "💚 Recuperación" : "Tu Progreso Hoy"}
           </h1>
-          <p className="text-[16px] text-[#6B7280]">
+          <p className="text-[16px] text-text-muted">
             {isRelapsed
               ? "Estás en ventana de recuperación. ¡No te rindas!"
               : "Cada día es una oportunidad para ser más fuerte"}
@@ -247,8 +247,8 @@ export function DashboardView({
 
         {/* Relapse banner */}
         {isRelapsed && (
-          <div className="mb-4 rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] p-3 dark:border-[#991B1B] dark:bg-[#7F1D1D]/30">
-            <p className="text-sm font-medium text-[#991B1B] dark:text-[#FCA5A5]">
+          <div className="mb-4 rounded-xl border border-danger-soft bg-danger-soft p-3 dark:border-danger dark:bg-danger/30">
+            <p className="text-sm font-medium text-danger dark:text-danger-soft">
               ⚠️ Has perdido todas tus vidas. Tienes 24 horas para recuperarte
               completando acciones positivas.
             </p>
@@ -260,14 +260,14 @@ export function DashboardView({
           <div className="mb-4 flex gap-2">
             <button
               onClick={handleDevResetLives}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-[#8B5CF6]/30 bg-[#8B5CF6]/10 px-4 py-2 text-xs font-medium text-[#8B5CF6] transition-all active:scale-[0.98] hover:bg-[#8B5CF6]/15 dark:border-[#8B5CF6]/20 dark:bg-[#8B5CF6]/10"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-accent-purple/30 bg-accent-purple/10 px-4 py-2 text-xs font-medium text-accent-purple transition-all active:scale-[0.98] hover:bg-accent-purple/15 dark:border-accent-purple/20 dark:bg-accent-purple/10"
               data-testid="dev-reset-lives-button"
             >
               🔄 Regenerar vidas
             </button>
             <button
               onClick={handleDevRemoveCooldown}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/10 px-4 py-2 text-xs font-medium text-[#F59E0B] transition-all active:scale-[0.98] hover:bg-[#F59E0B]/15 dark:border-[#F59E0B]/20 dark:bg-[#F59E0B]/10"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-warning/30 bg-warning/10 px-4 py-2 text-xs font-medium text-warning transition-all active:scale-[0.98] hover:bg-warning/15 dark:border-warning/20 dark:bg-warning/10"
               data-testid="dev-remove-cooldown-button"
             >
               ⚡ Quitar cooldown
@@ -280,8 +280,8 @@ export function DashboardView({
           <div
             className={`mb-4 rounded-xl px-4 py-3 text-sm font-medium text-center ${
               toast.type === "success"
-                ? "border border-[#D1FAE5] bg-[#ECFDF5] text-[#065F46] dark:border-[#065F46] dark:bg-[#065F46]/20 dark:text-[#D1FAE5]"
-                : "border border-[#FCA5A5] bg-[#FEF2F2] text-[#991B1B] dark:border-[#991B1B] dark:bg-[#991B1B]/20 dark:text-[#FCA5A5]"
+                ? "border border-success-soft bg-success-soft text-success dark:border-success dark:bg-success/20 dark:text-success-soft"
+                : "border border-danger-soft bg-danger-soft text-danger dark:border-danger dark:bg-danger/20 dark:text-danger-soft"
             }`}
           >
             {toast.message}
@@ -300,7 +300,7 @@ export function DashboardView({
           {state.totalPoints > 0 && (
             <p
               data-testid="extra-points"
-              className="text-sm text-[#6B7280]"
+              className="text-sm text-text-muted"
             >
               🎁 Vidas extra ganadas: {state.totalPoints}/3
             </p>
@@ -311,7 +311,7 @@ export function DashboardView({
             threshold={CIGARETTE_THRESHOLD}
           />
 
-          <div className="flex justify-center rounded-xl border border-[#E5E7EB] bg-gradient-to-b from-[#F9FAFB] to-[#F3F4F6] py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-[#374151] dark:from-[#1F2937] dark:to-[#111827]">
+          <div className="flex justify-center rounded-xl border border-border bg-gradient-to-b from-surface-card to-surface py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:from-surface-card dark:to-surface">
             <CigaretteButton
               currentCount={state.cigarettesToday}
               threshold={CIGARETTE_THRESHOLD}

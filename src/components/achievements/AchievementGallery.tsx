@@ -61,13 +61,13 @@ export function AchievementGallery({
   const totalUnlocked = userAchievements.length;
 
   return (
-    <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-[#374151] dark:bg-[#1F2937]">
+    <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-[#6B7280]">
+        <h2 className="text-xs font-medium uppercase tracking-wide text-text-muted">
           🏆 Logros
         </h2>
-        <p className="mt-1 text-sm text-[#1F2937] dark:text-[#F3F4F6]">
+        <p className="mt-1 text-sm text-text dark:text-text">
           {totalUnlocked} de {achievements.length} logros desbloqueados
         </p>
       </div>
@@ -83,8 +83,8 @@ export function AchievementGallery({
             className={cn(
               "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
               activeCategory === tab.id
-                ? "bg-[#10B981] text-white dark:bg-[#10B981]"
-                : "bg-[#E5E7EB] text-[#6B7280] hover:bg-[#D1D5DB] dark:bg-[#374151] dark:text-[#9CA3AF] dark:hover:bg-[#4B5563]"
+                ? "bg-success text-white dark:bg-success"
+                : "bg-border text-text-muted hover:bg-surface dark:bg-border dark:text-text-muted dark:hover:bg-surface"
             )}
           >
             {tab.label}
@@ -132,7 +132,7 @@ export function AchievementGallery({
       ) : (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="mb-2 text-4xl opacity-30">🎯</span>
-          <p className="text-sm text-[#6B7280]">
+          <p className="text-sm text-text-muted">
             No hay logros en esta categoría
           </p>
         </div>

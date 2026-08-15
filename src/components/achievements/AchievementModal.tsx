@@ -65,7 +65,7 @@ export function AchievementModal({
         onClick={(e) => e.stopPropagation()}
         className={cn(
           "relative mx-4 w-full max-w-sm rounded-2xl border p-8 shadow-xl",
-          "border-[#D1FAE5] bg-white dark:border-[#065F46] dark:bg-[#1F2937]",
+          "border-success-soft bg-white dark:border-success dark:bg-surface-card",
           "animate-in fade-in zoom-in-95 duration-200"
         )}
       >
