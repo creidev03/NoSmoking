@@ -62,9 +62,9 @@ export function CigaretteButton({
   // Gap at the bottom: ~12% of circumference (360° * 0.12 ≈ 43°)
   const gapLen = circumference * 0.12;
   const arcLen = circumference - gapLen;
-  // Dashed pattern: 10px dash, 5px gap (repeating)
-  const dashLen = 10;
-  const dashGap = 5;
+  // Dashed pattern: 6px dash, 6px gap (repeating)
+  const dashLen = 6;
+  const dashGap = 6;
   // Inner radius for fill (separate from border)
   const innerRadius = radius - stroke - 10;
 
