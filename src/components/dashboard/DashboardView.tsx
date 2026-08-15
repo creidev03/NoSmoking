@@ -9,7 +9,11 @@ import { StreakDisplay } from "./StreakDisplay";
 import { CigarettesToday } from "./CigarettesToday";
 import { CooldownTimer } from "./CooldownTimer";
 import { ActionButtons } from "./ActionButtons";
-import { BadgesList } from "./BadgesList";
+import { AchievementGallery } from "@/components/achievements/AchievementGallery";
+import { AchievementModal } from "@/components/achievements/AchievementModal";
+import { AwarenessModal } from "@/components/achievements/AwarenessModal";
+import { generateAwarenessMessage } from "@/lib/achievements/awareness-messages";
+import type { Achievement } from "@/lib/achievements/types";
 import { CigaretteButton } from "./CigaretteButton";
 
 
@@ -20,9 +24,22 @@ interface Badge {
   unlockedAt: string;
 }
 
+interface UserAchievement {
+  achievementId: string;
+  unlockedAt: string;
+}
+
+interface AchievementProgress {
+  achievementId: string;
+  currentValue: number;
+}
+
 interface DashboardViewProps {
   gameState: GameState;
   badges?: Badge[];
+  achievements?: Achievement[];
+  userAchievements?: UserAchievement[];
+  progress?: AchievementProgress[];
 }
 
 const CIGARETTE_THRESHOLD = 5;
@@ -54,11 +71,21 @@ function saveCachedState(gameState: GameState) {
 export function DashboardView({
   gameState,
   badges = [],
+  achievements = [],
+  userAchievements = [],
+  progress = [],
 }: DashboardViewProps) {
   const [state, setState] = useState(() => {
     const cached = loadCachedState();
     return cached ?? gameState;
   });
+
+  const [userAchievementsState, setUserAchievementsState] = useState<UserAchievement[]>(userAchievements);
+  const [progressState, setProgressState] = useState<AchievementProgress[]>(progress);
+
+  // Queue for unlocked achievements to show modals
+  const [unlockQueue, setUnlockQueue] = useState<Achievement[]>([]);
+  const [isProcessingQueue, setIsProcessingQueue] = useState(false);
 
   // Sync server state to cache on mount
   useEffect(() => {
@@ -72,6 +99,66 @@ export function DashboardView({
     return getPhase(new Date(state.lastCigaretteAt), new Date()).phase;
   }, [state.lastCigaretteAt]);
 
+  const [toast, setToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
+
+  // Modal state for achievement celebration / awareness
+  type ModalType = "positive" | "awareness" | null;
+  const [modalType, setModalType] = useState<ModalType>(null);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [modalUnlockedAt, setModalUnlockedAt] = useState<Date | undefined>(undefined);
+
+  const openAchievementModal = useCallback((achievement: Achievement, unlockedAt?: Date) => {
+    if (achievement.category === "awareness") {
+      setModalType("awareness");
+    } else {
+      setModalType("positive");
+    }
+    setSelectedAchievement(achievement);
+    setModalUnlockedAt(unlockedAt);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalType(null);
+    setSelectedAchievement(null);
+    setModalUnlockedAt(undefined);
+  }, []);
+
+  // Process newly unlocked achievements - add to state and queue modals
+  const processUnlockedAchievements = useCallback((unlockedIds: string[]) => {
+    if (unlockedIds.length === 0) return;
+
+    const now = new Date().toISOString();
+    const newAchievements: UserAchievement[] = unlockedIds.map((id) => ({
+      achievementId: id,
+      unlockedAt: now,
+    }));
+
+    setUserAchievementsState((prev) => [...prev, ...newAchievements]);
+
+    // Find achievement details and add to modal queue
+    const newAchievementDetails = unlockedIds
+      .map((id) => achievements.find((a) => a.id === id))
+      .filter((a): a is Achievement => a !== undefined);
+
+    setUnlockQueue((prev) => [...prev, ...newAchievementDetails]);
+  }, [achievements]);
+
+  // Process modal queue
+  useEffect(() => {
+    if (isProcessingQueue || unlockQueue.length === 0) return;
+
+    setIsProcessingQueue(true);
+    const nextAchievement = unlockQueue[0];
+    openAchievementModal(nextAchievement, new Date());
+  }, [unlockQueue, isProcessingQueue, openAchievementModal]);
+
+  // Handle modal close - process next in queue
+  const handleModalClose = useCallback(() => {
+    closeModal();
+    setUnlockQueue((prev) => prev.slice(1));
+    setIsProcessingQueue(false);
+  }, [closeModal]);
+
   const handleAction = useCallback(
     async (actionType: "breathing" | "meditation") => {
       try {
@@ -81,12 +168,13 @@ export function DashboardView({
           console.log("Updating gameState with nextActionAvailableAt:", result.gameState.nextActionAvailableAt);
           setState(result.gameState);
           saveCachedState(result.gameState);
+          processUnlockedAchievements(result.unlockedAchievements);
         }
       } catch (err) {
         console.error(`Action failed: ${actionType}`, err);
       }
     },
-    [state.userId]
+    [state.userId, processUnlockedAchievements]
   );
 
   const handleCooldownExpired = useCallback(() => {
@@ -96,13 +184,12 @@ export function DashboardView({
     }));
   }, []);
 
-  const [toast, setToast] = useState<{ message: string; type: "success" | "warning" } | null>(null);
-
   const handleRegisterCigarette = useCallback(async () => {
     try {
       const result = await registerCigarette(state.userId);
       setState(result.gameState);
       saveCachedState(result.gameState);
+      processUnlockedAchievements(result.unlockedAchievements);
       setToast({
         message: result.penaltyApplied
           ? "⚠️ Penalización: perdiste 1 vida"
@@ -113,7 +200,7 @@ export function DashboardView({
     } catch (err) {
       console.error("Failed to register cigarette", err);
     }
-  }, [state.userId]);
+  }, [state.userId, processUnlockedAchievements]);
 
   const handleDevResetLives = useCallback(async () => {
     try {
@@ -244,9 +331,34 @@ export function DashboardView({
             gameState={state}
           />
 
-          <BadgesList badges={badges} />
+          <AchievementGallery
+            achievements={achievements}
+            userAchievements={userAchievementsState}
+            progress={progressState}
+            onAchievementClick={openAchievementModal}
+          />
         </div>
       </div>
+
+      {/* Achievement celebration modal */}
+      <AchievementModal
+        achievement={selectedAchievement}
+        isOpen={modalType === "positive"}
+        onClose={handleModalClose}
+        unlockedAt={modalUnlockedAt}
+      />
+
+      {/* Awareness modal (bad achievements B001-B007) */}
+      <AwarenessModal
+        achievement={selectedAchievement}
+        isOpen={modalType === "awareness"}
+        onClose={handleModalClose}
+        message={
+          selectedAchievement
+            ? generateAwarenessMessage(state.cigarettesToday || 1)
+            : ""
+        }
+      />
     </div>
   );
 }

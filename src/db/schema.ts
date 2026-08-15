@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, unique } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -39,6 +39,8 @@ export const game_state = sqliteTable("game_state", {
   status: text("status").notNull().default("active"),
   relapseStartedAt: text("relapse_started_at"),
   totalPoints: real("total_points").notNull().default(0),
+  totalCigarettesAllTime: integer("total_cigarettes_all_time").notNull().default(0),
+  consecutiveSmokingDays: integer("consecutive_smoking_days").notNull().default(0),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
@@ -53,6 +55,7 @@ export const events = sqliteTable("events", {
   createdAt: text("created_at").notNull(),
 });
 
+// @deprecated — replaced by achievements system (userAchievements table). Remove after 30 days.
 export const badges = sqliteTable("badges", {
   id: text("id").primaryKey(),
   gameStateId: text("game_state_id")
@@ -61,3 +64,48 @@ export const badges = sqliteTable("badges", {
   badgeKey: text("badge_key").notNull(),
   unlockedAt: text("unlocked_at").notNull(),
 });
+
+export const achievements = sqliteTable("achievements", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  icon: text("icon").notNull(),
+  category: text("category").notNull(),
+  difficulty: text("difficulty").notNull(),
+  isSecret: integer("is_secret", { mode: "boolean" }).notNull().default(false),
+  description: text("description").notNull(),
+  conditionType: text("condition_type").notNull(),
+  conditionValue: text("condition_value").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+export const userAchievements = sqliteTable(
+  "user_achievements",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    achievementId: text("achievement_id")
+      .notNull()
+      .references(() => achievements.id),
+    unlockedAt: text("unlocked_at").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [unique().on(t.userId, t.achievementId)]
+);
+
+export const achievementProgress = sqliteTable(
+  "achievement_progress",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    achievementId: text("achievement_id")
+      .notNull()
+      .references(() => achievements.id),
+    currentValue: integer("current_value").notNull().default(0),
+    lastUpdated: text("last_updated").notNull(),
+  },
+  (t) => [unique().on(t.userId, t.achievementId)]
+);

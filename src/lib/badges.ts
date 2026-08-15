@@ -1,3 +1,4 @@
+// @deprecated — replaced by achievements system (src/lib/achievements/). Remove after 30 days.
 export interface BadgeThreshold {
   key: string;
   days: number;

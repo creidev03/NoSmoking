@@ -46,8 +46,8 @@ vi.mock("@/components/dashboard/ActionButtons", () => ({
   ),
 }));
 
-vi.mock("@/components/dashboard/BadgesList", () => ({
-  BadgesList: () => <div data-testid="badges-list" />,
+vi.mock("@/components/achievements/AchievementGallery", () => ({
+  AchievementGallery: () => <div data-testid="achievement-gallery" />,
 }));
 
 const baseGameState: GameState = {

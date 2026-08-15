@@ -1,4 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+// Mock achievements BEFORE any other modules
+const { mockEvaluateAchievements } = vi.hoisted(() => ({
+  mockEvaluateAchievements: vi.fn().mockResolvedValue({ unlocked: [] }),
+}));
+vi.mock("@/lib/achievements", () => ({
+  evaluateAchievements: mockEvaluateAchievements,
+}));
 
 // Mock the Turso client module
 const mockExecute = vi.fn();
@@ -67,7 +75,11 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-import { registerCigarette, registerPositiveAction } from "@/app/dashboard/actions";
+import {
+  registerCigarette,
+  registerPositiveAction,
+  getUserAchievements,
+} from "@/app/dashboard/actions";
 import { db } from "@/lib/db";
 
 const mockDb = vi.mocked(db);
@@ -276,6 +288,37 @@ describe("registerCigarette", () => {
 
     expect(result.gameState.remainingLives).toBe(0);
     expect(result.gameState.status).toBe("relapse");
+  });
+
+  it("calls evaluateAchievements after registering a cigarette", async () => {
+    const gameState = createGameState({ cigarettesToday: 2, remainingLives: 4 });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    await registerCigarette("user-1");
+
+    expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
+  });
+
+  it("returns unlockedAchievements from evaluateAchievements", async () => {
+    const gameState = createGameState({ cigarettesToday: 2, remainingLives: 4 });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+    mockEvaluateAchievements.mockResolvedValueOnce({ unlocked: ["achievement-1", "achievement-2"] });
+
+    const result = await registerCigarette("user-1");
+
+    expect(result.unlockedAchievements).toEqual(["achievement-1", "achievement-2"]);
+  });
+
+  it("returns empty unlockedAchievements when none are unlocked", async () => {
+    const gameState = createGameState({ cigarettesToday: 2, remainingLives: 4 });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    const result = await registerCigarette("user-1");
+
+    expect(result.unlockedAchievements).toEqual([]);
   });
 });
 
@@ -514,5 +557,125 @@ describe("registerPositiveAction", () => {
 
     expect(result.gameState.remainingLives).toBe(6);
     expect(result.error).toBe("Cooldown active");
+  });
+
+  it("calls evaluateAchievements after a successful action", async () => {
+    const gameState = createGameState({
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: null,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    await registerPositiveAction("user-1", "breathing");
+
+    expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
+  });
+
+  it("does NOT call evaluateAchievements when action is blocked by cooldown", async () => {
+    const futureDate = new Date("2026-01-15T11:00:00.000Z").toISOString();
+    const gameState = createGameState({
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: futureDate,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    await registerPositiveAction("user-1", "breathing");
+
+    expect(mockEvaluateAchievements).not.toHaveBeenCalled();
+  });
+
+  it("returns unlockedAchievements from evaluateAchievements", async () => {
+    const gameState = createGameState({
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: null,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+    mockEvaluateAchievements.mockResolvedValueOnce({ unlocked: ["meditation-master"] });
+
+    const result = await registerPositiveAction("user-1", "meditation");
+
+    expect(result.unlockedAchievements).toEqual(["meditation-master"]);
+  });
+
+  it("returns empty unlockedAchievements when action is blocked", async () => {
+    const futureDate = new Date("2026-01-15T11:00:00.000Z").toISOString();
+    const gameState = createGameState({
+      lastCigaretteAt: "2026-01-15T08:00:00.000Z",
+      nextActionAvailableAt: futureDate,
+    });
+    const mockTx = mockTransactionWithGameState(gameState);
+    mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
+
+    const result = await registerPositiveAction("user-1", "breathing");
+
+    expect(result.unlockedAchievements).toEqual([]);
+  });
+});
+
+describe("getUserAchievements", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns user achievements and progress data", async () => {
+    const mockAchievements = [
+      { achievementId: "ach-1", unlockedAt: "2026-01-10T00:00:00.000Z" },
+      { achievementId: "ach-2", unlockedAt: "2026-01-12T00:00:00.000Z" },
+    ];
+    const mockProgress = [
+      { achievementId: "ach-3", currentValue: 7 },
+      { achievementId: "ach-4", currentValue: 3 },
+    ];
+
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          all: vi.fn().mockResolvedValue(mockAchievements),
+        }),
+      }),
+    });
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          all: vi.fn().mockResolvedValue(mockProgress),
+        }),
+      }),
+    });
+
+    const result = await getUserAchievements("user-1");
+
+    expect(result.userAchievements).toEqual([
+      { achievementId: "ach-1", unlockedAt: "2026-01-10T00:00:00.000Z" },
+      { achievementId: "ach-2", unlockedAt: "2026-01-12T00:00:00.000Z" },
+    ]);
+    expect(result.progress).toEqual([
+      { achievementId: "ach-3", currentValue: 7 },
+      { achievementId: "ach-4", currentValue: 3 },
+    ]);
+  });
+
+  it("returns empty arrays when user has no achievements or progress", async () => {
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          all: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    });
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          all: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    });
+
+    const result = await getUserAchievements("user-1");
+
+    expect(result.userAchievements).toEqual([]);
+    expect(result.progress).toEqual([]);
   });
 });

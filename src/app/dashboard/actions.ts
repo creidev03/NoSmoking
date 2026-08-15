@@ -1,11 +1,12 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { game_state, events, badges } from "@/db/schema";
+import { game_state, events, badges, userAchievements, achievementProgress } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { checkMidnightReset, type GameState } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
 import { randomUUID } from "crypto";
+import { evaluateAchievements } from "@/lib/achievements";
 
 type ActionType = "breathing" | "meditation" | "music";
 
@@ -31,6 +32,7 @@ interface CigaretteResult {
   gameState: GameState;
   penaltyApplied: boolean;
   newCycle: boolean;
+  unlockedAchievements: string[];
 }
 
 interface ActionResult {
@@ -38,6 +40,12 @@ interface ActionResult {
   cooldownMinutes: number;
   nextActionAvailableAt: string;
   error?: string;
+  unlockedAchievements: string[];
+}
+
+export interface UserAchievementData {
+  userAchievements: { achievementId: string; unlockedAt: string }[];
+  progress: { achievementId: string; currentValue: number }[];
 }
 
 async function getExistingBadgeKeys(tx: any, gameStateId: string): Promise<string[]> {
@@ -85,7 +93,7 @@ function mapGameState(row: any): GameState {
 }
 
 export async function registerCigarette(userId: string): Promise<CigaretteResult> {
-  return db.transaction(async (tx) => {
+  const transactionResult = await db.transaction(async (tx) => {
     const row = await tx
       .select()
       .from(game_state)
@@ -178,13 +186,17 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
 
     return { gameState, penaltyApplied, newCycle };
   });
+
+  // Evaluate achievements after transaction commits
+  const { unlocked } = await evaluateAchievements(userId);
+  return { ...transactionResult, unlockedAchievements: unlocked };
 }
 
 export async function registerPositiveAction(
   userId: string,
   actionType: ActionType
 ): Promise<ActionResult> {
-  return db.transaction(async (tx) => {
+  const transactionResult = await db.transaction(async (tx) => {
     const row = await tx
       .select()
       .from(game_state)
@@ -273,6 +285,14 @@ export async function registerPositiveAction(
       nextActionAvailableAt: nextAvailable,
     };
   });
+
+  // Only evaluate achievements if the action was successful (no cooldown error)
+  if (transactionResult.error) {
+    return { ...transactionResult, unlockedAchievements: [] };
+  }
+
+  const { unlocked } = await evaluateAchievements(userId);
+  return { ...transactionResult, unlockedAchievements: unlocked };
 }
 
 // DEV ONLY: Reset all lives to full
@@ -347,4 +367,92 @@ export async function devRemoveCooldown(userId: string): Promise<GameState> {
       updatedAt: now,
     };
   });
+}
+
+/**
+ * Process midnight reset: persist the reset if a new day has started,
+ * then evaluate achievements so streak-based ones (T001-T008) are
+ * checked daily. Returns the updated game state + achievement data.
+ */
+export async function processMidnightReset(userId: string): Promise<{
+  gameState: GameState;
+  newBadges: string[];
+  achievements: UserAchievementData;
+}> {
+  const transactionResult = await db.transaction(async (tx) => {
+    const row = await tx
+      .select()
+      .from(game_state)
+      .where(eq(game_state.userId, userId))
+      .get();
+
+    if (!row) {
+      throw new Error("No game state found for user");
+    }
+
+    const gameState = mapGameState(row);
+    const existingBadgeKeys = await getExistingBadgeKeys(tx, gameState.id);
+    const resetResult = checkMidnightReset(gameState, new Date(), existingBadgeKeys);
+
+    // Persist the reset if it actually changed state
+    const resetHappened =
+      resetResult.gameState.streakDays !== row.streakDays ||
+      resetResult.gameState.cigarettesToday !== row.cigarettesToday ||
+      resetResult.gameState.status !== row.status;
+
+    if (resetHappened) {
+      await tx
+        .update(game_state)
+        .set({
+          streakDays: resetResult.gameState.streakDays,
+          cigarettesToday: resetResult.gameState.cigarettesToday,
+          status: resetResult.gameState.status,
+          relapseStartedAt: resetResult.gameState.relapseStartedAt,
+          updatedAt: resetResult.gameState.updatedAt,
+        })
+        .where(eq(game_state.id, gameState.id));
+
+      // Insert any new badges earned during reset
+      const now = resetResult.gameState.updatedAt;
+      await insertNewBadges(tx, gameState.id, resetResult.newBadges, now);
+    }
+
+    return {
+      gameState: resetResult.gameState,
+      newBadges: resetResult.newBadges,
+    };
+  });
+
+  // Evaluate achievements after reset is persisted
+  await evaluateAchievements(userId);
+
+  // Return fresh achievement data
+  const achievements = await getUserAchievements(userId);
+
+  return { ...transactionResult, achievements };
+}
+
+export async function getUserAchievements(userId: string): Promise<UserAchievementData> {
+  const userAchievementRows = await db
+    .select()
+    .from(userAchievements)
+    .where(eq(userAchievements.userId, userId))
+    .all();
+
+  const progressRows = await db
+    .select()
+    .from(achievementProgress)
+    .where(eq(achievementProgress.userId, userId))
+    .all();
+
+  return {
+    userAchievements: userAchievementRows.map((row) => ({
+      achievementId: row.achievementId,
+      unlockedAt: row.unlockedAt,
+    })),
+    progress: progressRows.map((row) => ({
+      achievementId: row.achievementId,
+      currentValue: row.currentValue,
+    })),
+  };
 }

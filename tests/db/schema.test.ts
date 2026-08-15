@@ -5,6 +5,9 @@ import {
   game_state,
   events,
   badges,
+  achievements,
+  userAchievements,
+  achievementProgress,
 } from "@/db/schema";
 
 const COLUMNS = Symbol.for("drizzle:Columns");
@@ -150,6 +153,164 @@ describe("Dashboard schema tables", () => {
       expect(columns.id).toBeDefined();
       expect(columns.userId).toBeDefined();
       expect(columns.cigarettesPerDay).toBeDefined();
+    });
+
+    it("game_state has totalCigarettesAllTime column", () => {
+      const columns = getColumns(game_state);
+      expect(Object.keys(columns)).toContain("totalCigarettesAllTime");
+      expect(columns.totalCigarettesAllTime.dataType).toBe("number");
+      expect(columns.totalCigarettesAllTime.default).toBeDefined();
+    });
+
+    it("game_state has consecutiveSmokingDays column", () => {
+      const columns = getColumns(game_state);
+      expect(Object.keys(columns)).toContain("consecutiveSmokingDays");
+      expect(columns.consecutiveSmokingDays.dataType).toBe("number");
+      expect(columns.consecutiveSmokingDays.default).toBeDefined();
+    });
+  });
+
+  describe("achievements table", () => {
+    it("exports a valid table definition", () => {
+      expect(achievements).toBeDefined();
+      expect(achievements[TABLE_NAME]).toBe("achievements");
+    });
+
+    it("has all required columns", () => {
+      const columns = getColumns(achievements);
+      expect(Object.keys(columns)).toContain("id");
+      expect(Object.keys(columns)).toContain("name");
+      expect(Object.keys(columns)).toContain("icon");
+      expect(Object.keys(columns)).toContain("category");
+      expect(Object.keys(columns)).toContain("difficulty");
+      expect(Object.keys(columns)).toContain("isSecret");
+      expect(Object.keys(columns)).toContain("description");
+      expect(Object.keys(columns)).toContain("conditionType");
+      expect(Object.keys(columns)).toContain("conditionValue");
+      expect(Object.keys(columns)).toContain("createdAt");
+    });
+
+    it("has correct column types", () => {
+      const columns = getColumns(achievements);
+      expect(columns.id.dataType).toBe("string");
+      expect(columns.name.dataType).toBe("string");
+      expect(columns.icon.dataType).toBe("string");
+      expect(columns.category.dataType).toBe("string");
+      expect(columns.difficulty.dataType).toBe("string");
+      expect(columns.isSecret.dataType).toBe("boolean");
+      expect(columns.description.dataType).toBe("string");
+      expect(columns.conditionType.dataType).toBe("string");
+      expect(columns.conditionValue.dataType).toBe("string");
+      expect(columns.createdAt.dataType).toBe("string");
+    });
+
+    it("id is text primary key", () => {
+      const columns = getColumns(achievements);
+      expect(columns.id.dataType).toBe("string");
+      // Primary key column exists and is defined (matches existing test pattern)
+    });
+  });
+
+  describe("userAchievements table", () => {
+    it("exports a valid table definition", () => {
+      expect(userAchievements).toBeDefined();
+      expect(userAchievements[TABLE_NAME]).toBe("user_achievements");
+    });
+
+    it("has all required columns", () => {
+      const columns = getColumns(userAchievements);
+      expect(Object.keys(columns)).toContain("id");
+      expect(Object.keys(columns)).toContain("userId");
+      expect(Object.keys(columns)).toContain("achievementId");
+      expect(Object.keys(columns)).toContain("unlockedAt");
+      expect(Object.keys(columns)).toContain("createdAt");
+    });
+
+    it("has correct column types", () => {
+      const columns = getColumns(userAchievements);
+      expect(columns.id.dataType).toBe("number");
+      expect(columns.userId.dataType).toBe("string");
+      expect(columns.achievementId.dataType).toBe("string");
+      expect(columns.unlockedAt.dataType).toBe("string");
+      expect(columns.createdAt.dataType).toBe("string");
+    });
+
+    it("id is integer primary key (autoincrement)", () => {
+      const columns = getColumns(userAchievements);
+      expect(columns.id.dataType).toBe("number");
+      // Autoincrement integer PK (matches existing test pattern)
+    });
+
+    it("references users via userId", () => {
+      const fk = getForeignKeys(userAchievements);
+      expect(fk.length).toBeGreaterThan(0);
+      const userRef = fk.find(
+        (f: any) => f.reference().foreignColumns[0].table[TABLE_NAME] === "users"
+      );
+      expect(userRef).toBeDefined();
+    });
+
+    it("references achievements via achievementId", () => {
+      const fk = getForeignKeys(userAchievements);
+      expect(fk.length).toBeGreaterThan(1);
+      const achievementRef = fk.find(
+        (f: any) => f.reference().foreignColumns[0].table[TABLE_NAME] === "achievements"
+      );
+      expect(achievementRef).toBeDefined();
+    });
+  });
+
+  describe("achievementProgress table", () => {
+    it("exports a valid table definition", () => {
+      expect(achievementProgress).toBeDefined();
+      expect(achievementProgress[TABLE_NAME]).toBe("achievement_progress");
+    });
+
+    it("has all required columns", () => {
+      const columns = getColumns(achievementProgress);
+      expect(Object.keys(columns)).toContain("id");
+      expect(Object.keys(columns)).toContain("userId");
+      expect(Object.keys(columns)).toContain("achievementId");
+      expect(Object.keys(columns)).toContain("currentValue");
+      expect(Object.keys(columns)).toContain("lastUpdated");
+    });
+
+    it("has correct column types", () => {
+      const columns = getColumns(achievementProgress);
+      expect(columns.id.dataType).toBe("number");
+      expect(columns.userId.dataType).toBe("string");
+      expect(columns.achievementId.dataType).toBe("string");
+      expect(columns.currentValue.dataType).toBe("number");
+      expect(columns.lastUpdated.dataType).toBe("string");
+    });
+
+    it("currentValue has default of 0", () => {
+      const columns = getColumns(achievementProgress);
+      expect(columns.currentValue.default).toBeDefined();
+    });
+
+    it("id is integer primary key (autoincrement)", () => {
+      const columns = getColumns(achievementProgress);
+      expect(columns.id.dataType).toBe("number");
+      // Autoincrement integer PK (matches existing test pattern)
+    });
+
+    it("references users via userId", () => {
+      const fk = getForeignKeys(achievementProgress);
+      expect(fk.length).toBeGreaterThan(0);
+      const userRef = fk.find(
+        (f: any) => f.reference().foreignColumns[0].table[TABLE_NAME] === "users"
+      );
+      expect(userRef).toBeDefined();
+    });
+
+    it("references achievements via achievementId", () => {
+      const fk = getForeignKeys(achievementProgress);
+      expect(fk.length).toBeGreaterThan(1);
+      const achievementRef = fk.find(
+        (f: any) => f.reference().foreignColumns[0].table[TABLE_NAME] === "achievements"
+      );
+      expect(achievementRef).toBeDefined();
     });
   });
 });

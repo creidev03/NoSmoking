@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 // Mock the db module
@@ -15,15 +15,21 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-// Mock DashboardView
+// Mock DashboardView — capture props for assertions
+let dashboardViewProps: any = null;
 vi.mock("@/components/dashboard/DashboardView", () => ({
-  DashboardView: ({ gameState }: any) => (
-    <div data-testid="dashboard-view">
-      <span data-testid="remaining-lives">{gameState.remainingLives}</span>
-      <span data-testid="streak-days">{gameState.streakDays}</span>
-      <span data-testid="cigarettes-today">{gameState.cigarettesToday}</span>
-    </div>
-  ),
+  DashboardView: (props: any) => {
+    dashboardViewProps = props;
+    return (
+      <div data-testid="dashboard-view">
+        <span data-testid="remaining-lives">{props.gameState.remainingLives}</span>
+        <span data-testid="streak-days">{props.gameState.streakDays}</span>
+        <span data-testid="cigarettes-today">{props.gameState.cigarettesToday}</span>
+        <span data-testid="user-achievements-count">{props.userAchievements?.length ?? 0}</span>
+        <span data-testid="progress-count">{props.progress?.length ?? 0}</span>
+      </div>
+    );
+  },
 }));
 
 // Mock redirect
@@ -31,6 +37,36 @@ vi.mock("next/navigation", () => ({
   redirect: vi.fn(() => {
     throw new Error("NEXT_REDIRECT");
   }),
+}));
+
+// Mock processMidnightReset
+const { mockProcessMidnightReset } = vi.hoisted(() => ({
+  mockProcessMidnightReset: vi.fn().mockResolvedValue({
+    gameState: {
+      id: "gs-1",
+      userId: "user-1",
+      totalLives: 4,
+      remainingLives: 3,
+      cigarettesToday: 2,
+      streakDays: 7,
+      lastCigaretteAt: null,
+      lastActionAt: null,
+      nextActionAvailableAt: null,
+      status: "active",
+      relapseStartedAt: null,
+      totalPoints: 0,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-15T10:00:00.000Z",
+    },
+    newBadges: [],
+    achievements: {
+      userAchievements: [],
+      progress: [],
+    },
+  }),
+}));
+vi.mock("@/app/dashboard/actions", () => ({
+  processMidnightReset: mockProcessMidnightReset,
 }));
 
 import DashboardPage from "@/app/dashboard/page";
@@ -56,6 +92,32 @@ describe("DashboardPage", () => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-15T10:00:00.000Z"));
+    dashboardViewProps = null;
+
+    // Default mock return
+    mockProcessMidnightReset.mockResolvedValue({
+      gameState: {
+        id: "gs-1",
+        userId: "user-1",
+        totalLives: 4,
+        remainingLives: 3,
+        cigarettesToday: 2,
+        streakDays: 7,
+        lastCigaretteAt: null,
+        lastActionAt: null,
+        nextActionAvailableAt: null,
+        status: "active",
+        relapseStartedAt: null,
+        totalPoints: 0,
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-15T10:00:00.000Z",
+      },
+      newBadges: [],
+      achievements: {
+        userAchievements: [],
+        progress: [],
+      },
+    });
   });
 
   afterEach(() => {
@@ -104,17 +166,17 @@ describe("DashboardPage", () => {
     expect(screen.getByTestId("cigarettes-today")).toHaveTextContent("2");
   });
 
-  it("passes complete game state to DashboardView", async () => {
+  it("calls processMidnightReset with the user ID", async () => {
     const gameState = {
-      id: "gs-2",
-      userId: "user-2",
-      totalLives: 6,
-      remainingLives: 5,
-      cigarettesToday: 0,
-      streakDays: 30,
-      lastCigaretteAt: "2026-01-14T20:00:00.000Z",
-      lastActionAt: "2026-01-15T09:00:00.000Z",
-      nextActionAvailableAt: "2026-01-15T09:20:00.000Z",
+      id: "gs-1",
+      userId: "user-1",
+      totalLives: 4,
+      remainingLives: 3,
+      cigarettesToday: 2,
+      streakDays: 7,
+      lastCigaretteAt: null,
+      lastActionAt: null,
+      nextActionAvailableAt: null,
       status: "active",
       relapseStartedAt: null,
       createdAt: "2026-01-01T00:00:00.000Z",
@@ -123,10 +185,89 @@ describe("DashboardPage", () => {
 
     mockSelectWithGameState(gameState);
 
+    await DashboardPage();
+
+    expect(mockProcessMidnightReset).toHaveBeenCalledWith("user-1");
+  });
+
+  it("passes userAchievements and progress from processMidnightReset to DashboardView", async () => {
+    const gameState = {
+      id: "gs-1",
+      userId: "user-1",
+      totalLives: 4,
+      remainingLives: 3,
+      cigarettesToday: 2,
+      streakDays: 7,
+      lastCigaretteAt: null,
+      lastActionAt: null,
+      nextActionAvailableAt: null,
+      status: "active",
+      relapseStartedAt: null,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-15T10:00:00.000Z",
+    };
+
+    mockSelectWithGameState(gameState);
+
+    mockProcessMidnightReset.mockResolvedValueOnce({
+      gameState,
+      newBadges: [],
+      achievements: {
+        userAchievements: [
+          { achievementId: "T001", unlockedAt: "2026-01-10T00:00:00.000Z" },
+          { achievementId: "P001", unlockedAt: "2026-01-12T00:00:00.000Z" },
+        ],
+        progress: [
+          { achievementId: "T002", currentValue: 7 },
+        ],
+      },
+    });
+
+    dashboardViewProps = null;
     const element = await DashboardPage();
     render(element);
 
-    expect(screen.getByTestId("remaining-lives")).toHaveTextContent("5");
-    expect(screen.getByTestId("streak-days")).toHaveTextContent("30");
+    expect(dashboardViewProps).not.toBeNull();
+    expect(dashboardViewProps.userAchievements).toHaveLength(2);
+    expect(dashboardViewProps.userAchievements[0].achievementId).toBe("T001");
+    expect(dashboardViewProps.progress).toHaveLength(1);
+    expect(dashboardViewProps.progress[0].achievementId).toBe("T002");
+  });
+
+  it("passes empty achievement arrays when user has none", async () => {
+    const gameState = {
+      id: "gs-1",
+      userId: "user-1",
+      totalLives: 4,
+      remainingLives: 3,
+      cigarettesToday: 2,
+      streakDays: 7,
+      lastCigaretteAt: null,
+      lastActionAt: null,
+      nextActionAvailableAt: null,
+      status: "active",
+      relapseStartedAt: null,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-15T10:00:00.000Z",
+    };
+
+    mockSelectWithGameState(gameState);
+
+    mockProcessMidnightReset.mockResolvedValueOnce({
+      gameState,
+      newBadges: [],
+      achievements: {
+        userAchievements: [],
+        progress: [],
+      },
+    });
+
+    dashboardViewProps = null;
+    const element = await DashboardPage();
+    render(element);
+
+    expect(dashboardViewProps).not.toBeNull();
+    expect(dashboardViewProps.userAchievements).toHaveLength(0);
+    expect(dashboardViewProps.progress).toHaveLength(0);
   });
 });
