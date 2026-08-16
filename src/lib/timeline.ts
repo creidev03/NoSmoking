@@ -50,7 +50,7 @@ export function normalizeEvent(
         timestamp,
         data: detail,
         message: t
-          ? t("timeline.events.cigarette", { count: cantidad, total: cigarrillos_totales_hoy })
+          ? t("events.cigarette", { count: cantidad, total: cigarrillos_totales_hoy })
           : `Fumaste ${cantidad} cigarro(s). Total hoy: ${cigarrillos_totales_hoy} de 5`,
         icon: "🚬",
         color: "orange",
@@ -64,20 +64,20 @@ export function normalizeEvent(
         string,
         { icon: string; label: string; key: string }
       > = {
-        respiracion: { icon: "🫁", label: "Respiración guiada completada", key: "timeline.events.breathing" },
-        meditacion: { icon: "🧘", label: "Meditación completada", key: "timeline.events.meditation" },
-        musica: { icon: "🎵", label: "Música de relajación completada", key: "timeline.events.music" },
+        respiracion: { icon: "🫁", label: "Respiración guiada completada", key: "events.breathing" },
+        meditacion: { icon: "🧘", label: "Meditación completada", key: "events.meditation" },
+        musica: { icon: "🎵", label: "Música de relajación completada", key: "events.music" },
       };
 
       const config = subtipoConfig[subtipos] || {
         icon: "✨",
         label: "Acción positiva completada",
-        key: "timeline.events.positiveAction",
+        key: "events.positiveAction",
       };
 
       const labelText = t ? t(config.key) : config.label;
       const recoveredText = t
-        ? t("timeline.events.livesRecovered", { count: vidas_recuperadas })
+        ? t("events.livesRecovered", { count: vidas_recuperadas })
         : `+${vidas_recuperadas} vidas recuperadas`;
 
       return {
@@ -110,7 +110,7 @@ export function normalizeEventWithPenalty(
     const detail = JSON.parse(event.detail);
     if (detail.penalizacion) {
       const penaltyMessage = t
-        ? t("timeline.events.penalty", { remaining: detail.vidas_despues })
+        ? t("events.penalty", { remaining: detail.vidas_despues })
         : `Perdiste 1 vida. Te quedan ${detail.vidas_despues} de 4`;
       result.push({
         id: `${event.id}-penalty`,
@@ -150,13 +150,13 @@ export function groupEventsByDay(
 export function getRelativeDayLabel(date: Date, locale: string = "es", t?: TranslationFn): string {
   const dateFnsLocale = locale === "en" ? enUS : es;
 
-  if (isToday(date)) return t ? t("timeline.relativeDay.today") : (locale === "en" ? "TODAY" : "HOY");
-  if (isYesterday(date)) return t ? t("timeline.relativeDay.yesterday") : (locale === "en" ? "YESTERDAY" : "AYER");
+  if (isToday(date)) return t ? t("relativeDay.today") : (locale === "en" ? "TODAY" : "HOY");
+  if (isYesterday(date)) return t ? t("relativeDay.yesterday") : (locale === "en" ? "YESTERDAY" : "AYER");
 
   const daysAgo = differenceInDays(new Date(), date);
   if (daysAgo <= 30) {
     return t
-      ? t("timeline.relativeDay.daysAgo", { count: daysAgo })
+      ? t("relativeDay.daysAgo", { count: daysAgo })
       : (locale === "en" ? `${daysAgo} DAYS AGO` : `HACE ${daysAgo} DÍAS`);
   }
 
