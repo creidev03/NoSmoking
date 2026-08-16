@@ -13,10 +13,7 @@ export function LivesDisplay({ total, remaining }: LivesDisplayProps) {
   const grayHearts = heartsCount - fullHearts - (hasHalfHeart ? 1 : 0);
 
   return (
-    <div
-      data-testid="lives-display"
-      className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card"
-    >
+    <div data-testid="lives-display">
       <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
         🫀 Vidas Restantes
       </h2>
