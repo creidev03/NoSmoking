@@ -1,6 +1,8 @@
 import { format, isToday, isYesterday, differenceInDays } from "date-fns";
 import { es, enUS } from "date-fns/locale";
 
+export type TranslationFn = (key: string, params?: Record<string, any>) => string;
+
 export type TimelineEventType =
   | "cigarette"
   | "positive_action"
@@ -30,7 +32,8 @@ export interface TimelineEventRaw {
 }
 
 export function normalizeEvent(
-  event: TimelineEventRaw
+  event: TimelineEventRaw,
+  t?: TranslationFn
 ): TimelineEvent | null {
   const timestamp = new Date(event.createdAt);
   const detail: Record<string, any> = event.detail
@@ -46,7 +49,9 @@ export function normalizeEvent(
         type: "cigarette",
         timestamp,
         data: detail,
-        message: `Fumaste ${cantidad} cigarro(s). Total hoy: ${cigarrillos_totales_hoy} de 5`,
+        message: t
+          ? t("timeline.events.cigarette", { count: cantidad, total: cigarrillos_totales_hoy })
+          : `Fumaste ${cantidad} cigarro(s). Total hoy: ${cigarrillos_totales_hoy} de 5`,
         icon: "🚬",
         color: "orange",
       };
@@ -57,17 +62,23 @@ export function normalizeEvent(
 
       const subtipoConfig: Record<
         string,
-        { icon: string; label: string }
+        { icon: string; label: string; key: string }
       > = {
-        respiracion: { icon: "🫁", label: "Respiración guiada completada" },
-        meditacion: { icon: "🧘", label: "Meditación completada" },
-        musica: { icon: "🎵", label: "Música de relajación completada" },
+        respiracion: { icon: "🫁", label: "Respiración guiada completada", key: "timeline.events.breathing" },
+        meditacion: { icon: "🧘", label: "Meditación completada", key: "timeline.events.meditation" },
+        musica: { icon: "🎵", label: "Música de relajación completada", key: "timeline.events.music" },
       };
 
       const config = subtipoConfig[subtipos] || {
         icon: "✨",
         label: "Acción positiva completada",
+        key: "timeline.events.positiveAction",
       };
+
+      const labelText = t ? t(config.key) : config.label;
+      const recoveredText = t
+        ? t("timeline.events.livesRecovered", { count: vidas_recuperadas })
+        : `+${vidas_recuperadas} vidas recuperadas`;
 
       return {
         id: event.id,
@@ -75,7 +86,7 @@ export function normalizeEvent(
         type: "positive_action",
         timestamp,
         data: detail,
-        message: `${config.label}. +${vidas_recuperadas} vidas recuperadas`,
+        message: `${labelText}. ${recoveredText}`,
         icon: config.icon,
         color: "green",
       };
@@ -87,9 +98,10 @@ export function normalizeEvent(
 }
 
 export function normalizeEventWithPenalty(
-  event: TimelineEventRaw
+  event: TimelineEventRaw,
+  t?: TranslationFn
 ): TimelineEvent[] {
-  const main = normalizeEvent(event);
+  const main = normalizeEvent(event, t);
   if (!main) return [];
 
   const result: TimelineEvent[] = [main];
@@ -97,13 +109,16 @@ export function normalizeEventWithPenalty(
   if (event.type === "fumar" && event.detail) {
     const detail = JSON.parse(event.detail);
     if (detail.penalizacion) {
+      const penaltyMessage = t
+        ? t("timeline.events.penalty", { remaining: detail.vidas_despues })
+        : `Perdiste 1 vida. Te quedan ${detail.vidas_despues} de 4`;
       result.push({
         id: `${event.id}-penalty`,
         userId: "",
         type: "penalty",
         timestamp: new Date(event.createdAt),
         data: detail,
-        message: `Perdiste 1 vida. Te quedan ${detail.vidas_despues} de 4`,
+        message: penaltyMessage,
         icon: "⚠️",
         color: "red",
       });
@@ -132,17 +147,17 @@ export function groupEventsByDay(
   return sorted;
 }
 
-export function getRelativeDayLabel(date: Date, locale: string = "es"): string {
+export function getRelativeDayLabel(date: Date, locale: string = "es", t?: TranslationFn): string {
   const dateFnsLocale = locale === "en" ? enUS : es;
 
-  if (isToday(date)) return locale === "en" ? "TODAY" : "HOY";
-  if (isYesterday(date)) return locale === "en" ? "YESTERDAY" : "AYER";
+  if (isToday(date)) return t ? t("timeline.relativeDay.today") : (locale === "en" ? "TODAY" : "HOY");
+  if (isYesterday(date)) return t ? t("timeline.relativeDay.yesterday") : (locale === "en" ? "YESTERDAY" : "AYER");
 
   const daysAgo = differenceInDays(new Date(), date);
   if (daysAgo <= 30) {
-    return locale === "en"
-      ? `${daysAgo} DAYS AGO`
-      : `HACE ${daysAgo} DÍAS`;
+    return t
+      ? t("timeline.relativeDay.daysAgo", { count: daysAgo })
+      : (locale === "en" ? `${daysAgo} DAYS AGO` : `HACE ${daysAgo} DÍAS`);
   }
 
   return format(date, "d 'de' MMMM", { locale: dateFnsLocale });

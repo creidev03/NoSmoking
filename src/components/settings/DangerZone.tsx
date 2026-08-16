@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 import { resetProgress } from "@/app/[locale]/dashboard/settings/actions";
 
 interface DangerZoneProps {
@@ -10,6 +11,7 @@ interface DangerZoneProps {
 }
 
 export function DangerZone({ userId }: DangerZoneProps) {
+  const t = useTranslations("settings");
   const [showResetModal, setShowResetModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [resetConfirm, setResetConfirm] = useState("");
@@ -40,15 +42,15 @@ export function DangerZone({ userId }: DangerZoneProps) {
     <>
       <Card className="border-destructive/30">
         <CardHeader>
-          <CardTitle className="text-destructive">⚠️ Zona de peligro</CardTitle>
+          <CardTitle className="text-destructive">⚠️ {t("danger.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Reset progress */}
           <div className="space-y-3">
             <div>
-              <h3 className="text-sm font-medium text-text">Reiniciar progreso</h3>
+              <h3 className="text-sm font-medium text-text">{t("danger.resetProgress")}</h3>
               <p className="text-xs text-text-muted">
-                Esto borrará todas tus vidas, días, logros y eventos. No se puede deshacer.
+                {t("danger.resetDesc")}
               </p>
             </div>
             <Button
@@ -57,19 +59,19 @@ export function DangerZone({ userId }: DangerZoneProps) {
               data-testid="reset-progress-btn"
               onClick={() => setShowResetModal(true)}
             >
-              Reiniciar progreso
+              {t("danger.resetButton")}
             </Button>
             {resetDone && (
-              <p className="text-sm text-primary">✓ Progreso reiniciado correctamente</p>
+              <p className="text-sm text-primary">{t("danger.resetDone")}</p>
             )}
           </div>
 
           {/* Delete account */}
           <div className="space-y-3 border-t border-border pt-6">
             <div>
-              <h3 className="text-sm font-medium text-text">Eliminar cuenta</h3>
+              <h3 className="text-sm font-medium text-text">{t("danger.deleteAccount")}</h3>
               <p className="text-xs text-text-muted">
-                Esto eliminará permanentemente tu cuenta y todos tus datos. No se puede deshacer.
+                {t("danger.deleteDesc")}
               </p>
             </div>
             <Button
@@ -78,7 +80,7 @@ export function DangerZone({ userId }: DangerZoneProps) {
               data-testid="delete-account-btn"
               onClick={() => setShowDeleteModal(true)}
             >
-              Eliminar cuenta
+              {t("danger.deleteButton")}
             </Button>
           </div>
         </CardContent>
@@ -89,14 +91,13 @@ export function DangerZone({ userId }: DangerZoneProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="mx-4 w-full max-w-md rounded-xl bg-card p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-text mb-2">
-              ⚠️ Reiniciar progreso
+              ⚠️ {t("danger.resetModalTitle")}
             </h3>
             <p className="text-sm text-text-muted mb-4">
-              Esto borrará <strong>todas tus vidas, días, logros y eventos</strong>.
-              Esta acción no se puede deshacer.
+              {t("danger.resetModalDesc")}
             </p>
             <p className="text-sm text-text-muted mb-4">
-              Escribe <strong>REINICIAR</strong> para confirmar:
+              {t("danger.resetConfirmPrompt")}
             </p>
             <input
               type="text"
@@ -110,14 +111,14 @@ export function DangerZone({ userId }: DangerZoneProps) {
                 variant="outline"
                 onClick={() => { setShowResetModal(false); setResetConfirm(""); }}
               >
-                Cancelar
+                {t("danger.cancel")}
               </Button>
               <Button
                 variant="destructive"
                 disabled={resetConfirm !== "REINICIAR" || resetting}
                 onClick={handleReset}
               >
-                {resetting ? "Reiniciando..." : "Reiniciar"}
+                {resetting ? t("danger.resetting") : t("danger.reset")}
               </Button>
             </div>
           </div>
@@ -129,14 +130,13 @@ export function DangerZone({ userId }: DangerZoneProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="mx-4 w-full max-w-md rounded-xl bg-card p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-text mb-2">
-              🗑️ Eliminar cuenta
+              🗑️ {t("danger.deleteModalTitle")}
             </h3>
             <p className="text-sm text-text-muted mb-4">
-              Esto eliminará permanentemente tu cuenta y <strong>todos tus datos</strong>.
-              Esta acción no se puede deshacer.
+              {t("danger.deleteModalDesc")}
             </p>
             <p className="text-sm text-text-muted mb-4">
-              Escribe tu email para confirmar:
+              {t("danger.deleteConfirmPrompt")}
             </p>
             <input
               type="email"
@@ -150,7 +150,7 @@ export function DangerZone({ userId }: DangerZoneProps) {
                 variant="outline"
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirm(""); }}
               >
-                Cancelar
+                {t("danger.cancel")}
               </Button>
               <Button
                 variant="destructive"
@@ -158,7 +158,7 @@ export function DangerZone({ userId }: DangerZoneProps) {
                 disabled={!deleteConfirm.includes("@")}
                 onClick={handleDelete}
               >
-                Eliminar cuenta
+                {t("danger.deleteButton")}
               </Button>
             </div>
           </div>

@@ -4,26 +4,31 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { updateUserProfile } from "@/app/[locale]/dashboard/settings/actions";
-import type { UserProfile } from "@/app/[locale]/dashboard/settings/actions";
+import { useTranslations } from "next-intl";
+import { updateUserProfile, updateOnboardingMotivation } from "@/app/[locale]/dashboard/settings/actions";
+import type { UserProfile, OnboardingData } from "@/app/[locale]/dashboard/settings/actions";
+import { Heart, Banknote, Users, Mail, Cigarette, Calendar, RotateCcw, Bell, User } from "lucide-react";
 
 interface ProfileSectionProps {
   userId: string;
   profile: UserProfile | null;
+  onboarding: OnboardingData | null;
+  userEmail: string | null;
 }
 
-const MOTIVATION_OPTIONS = [
-  { id: "salud", label: "Salud", icon: "❤️" },
-  { id: "dinero", label: "Dinero", icon: "💰" },
-  { id: "familia", label: "Familia", icon: "👨‍👩‍👧‍👦" },
-];
-
-export function ProfileSection({ userId, profile }: ProfileSectionProps) {
+export function ProfileSection({ userId, profile, onboarding, userEmail }: ProfileSectionProps) {
+  const t = useTranslations("settings");
   const [motivations, setMotivations] = useState<string[]>(
     profile?.motivations ?? []
   );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const motivationOptions = [
+    { id: "salud", label: t("profile.health"), Icon: Heart },
+    { id: "dinero", label: t("profile.money"), Icon: Banknote },
+    { id: "familia", label: t("profile.family"), Icon: Users },
+  ];
 
   const toggleMotivation = (id: string) => {
     setMotivations((prev) =>
@@ -36,6 +41,9 @@ export function ProfileSection({ userId, profile }: ProfileSectionProps) {
     setSaving(true);
     try {
       await updateUserProfile(userId, { motivations });
+      if (onboarding?.motivation) {
+        await updateOnboardingMotivation(userId, motivations.join(", "));
+      }
       setSaved(true);
     } finally {
       setSaving(false);
@@ -45,45 +53,96 @@ export function ProfileSection({ userId, profile }: ProfileSectionProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Perfil</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <User className="h-5 w-5" />
+          {t("profile.title")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Avatar */}
-        <div className="flex items-center gap-4">
-          <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center text-3xl">
-            {profile?.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt="Avatar"
-                className="h-full w-full rounded-full object-cover"
-              />
-            ) : (
-              <span>👤</span>
-            )}
-          </div>
-          <div>
-            <p className="text-sm text-text-muted">
-              Tu avatar se gestiona desde tu cuenta de Clerk
-            </p>
-          </div>
-        </div>
-
         {/* Email (read-only) */}
         <div className="space-y-2">
-          <Label>Email</Label>
+          <Label className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            {t("profile.email")}
+          </Label>
           <input
             type="email"
             disabled
-            value="Gestionado por Clerk"
+            value={userEmail || t("profile.emailNotAvailable")}
             className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-text-muted"
           />
         </div>
 
-        {/* Motivations */}
+        {/* Onboarding data - read-only */}
+        {onboarding && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-text">{t("profile.onboardingTitle")}</h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Cigarettes per day */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-text-muted">
+                  <Cigarette className="h-4 w-4" />
+                  {t("profile.cigarettesPerDay")}
+                </Label>
+                <input
+                  type="text"
+                  disabled
+                  value={onboarding.cigarettesPerDay ?? t("profile.notSpecified")}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-text-muted"
+                />
+              </div>
+
+              {/* Smoking years */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-text-muted">
+                  <Calendar className="h-4 w-4" />
+                  {t("profile.smokingYears")}
+                </Label>
+                <input
+                  type="text"
+                  disabled
+                  value={onboarding.smokingYears ? `${onboarding.smokingYears} años` : t("profile.notSpecified")}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-text-muted"
+                />
+              </div>
+
+              {/* Quit attempts */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-text-muted">
+                  <RotateCcw className="h-4 w-4" />
+                  {t("profile.quitAttempts")}
+                </Label>
+                <input
+                  type="text"
+                  disabled
+                  value={onboarding.quitAttempts ?? t("profile.notSpecified")}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-text-muted"
+                />
+              </div>
+
+              {/* Notifications */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2 text-text-muted">
+                  <Bell className="h-4 w-4" />
+                  {t("profile.notifications")}
+                </Label>
+                <input
+                  type="text"
+                  disabled
+                  value={onboarding.notificationEnabled ? t("profile.notificationsEnabled") : t("profile.notificationsDisabled")}
+                  className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-text-muted"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Motivations (editable) */}
         <div className="space-y-3">
-          <Label>Motivaciones para dejar de fumar</Label>
+          <Label>{t("profile.motivations")}</Label>
           <div className="flex flex-wrap gap-3">
-            {MOTIVATION_OPTIONS.map((opt) => (
+            {motivationOptions.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => toggleMotivation(opt.id)}
@@ -93,7 +152,7 @@ export function ProfileSection({ userId, profile }: ProfileSectionProps) {
                     : "border-border bg-card text-text-muted hover:bg-accent"
                 }`}
               >
-                <span>{opt.icon}</span>
+                <opt.Icon className="h-4 w-4" />
                 {opt.label}
               </button>
             ))}
@@ -103,10 +162,10 @@ export function ProfileSection({ userId, profile }: ProfileSectionProps) {
         {/* Save */}
         <div className="flex items-center gap-3">
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Guardando..." : "Guardar cambios"}
+            {saving ? t("profile.saving") : t("profile.save")}
           </Button>
           {saved && (
-            <span className="text-sm text-primary">✓ Guardado</span>
+            <span className="text-sm text-primary">{t("profile.saved")}</span>
           )}
         </div>
       </CardContent>

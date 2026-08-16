@@ -4,18 +4,19 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Home, Trophy, BarChart3, Settings, ShieldOff } from "lucide-react";
 
 export function DashboardNav() {
   const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations("nav");
 
   const navItems = [
-    { href: `/${locale}/dashboard`, label: "Home", icon: Home },
-    { href: `/${locale}/dashboard/logros`, label: "Logros", icon: Trophy },
-    { href: `/${locale}/dashboard/timeline`, label: "Timeline", icon: BarChart3 },
-    { href: `/${locale}/dashboard/settings`, label: "Configuración", icon: Settings },
+    { href: `/${locale}/dashboard`, label: t("home"), icon: Home },
+    { href: `/${locale}/dashboard/logros`, label: t("achievements"), icon: Trophy },
+    { href: `/${locale}/dashboard/timeline`, label: t("timeline"), icon: BarChart3 },
+    { href: `/${locale}/dashboard/settings`, label: t("settings"), icon: Settings },
   ];
 
   return (

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { differenceInSeconds } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface RelapseCountdownProps {
   startedAt: string;
@@ -13,6 +14,7 @@ const RELAPSE_WINDOW_HOURS = 24;
 const RELAPSE_WINDOW_SECONDS = RELAPSE_WINDOW_HOURS * 60 * 60;
 
 export function RelapseCountdown({ startedAt, onExpired }: RelapseCountdownProps) {
+  const t = useTranslations("relapse");
   const calculateRemaining = useCallback(() => {
     const start = new Date(startedAt);
     const end = new Date(start.getTime() + RELAPSE_WINDOW_SECONDS * 1000);
@@ -47,7 +49,7 @@ export function RelapseCountdown({ startedAt, onExpired }: RelapseCountdownProps
   return (
     <div className="text-center">
       <p className="mb-1 text-sm text-text-muted dark:text-text-muted">
-        ⏱️ Tiempo restante:
+        {t("countdown.remaining")}
       </p>
       <p
         data-testid="countdown-display"

@@ -5,7 +5,7 @@ import { getRelativeDayLabel } from "@/lib/timeline";
 import { TimelineItem } from "./TimelineItem";
 import { format } from "date-fns";
 import { es, enUS } from "date-fns/locale";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface TimelineGroupProps {
   dateKey: string;
@@ -14,9 +14,10 @@ interface TimelineGroupProps {
 
 export function TimelineGroup({ dateKey, events }: TimelineGroupProps) {
   const locale = useLocale();
+  const t = useTranslations("timeline");
   const dateFnsLocale = locale === "en" ? enUS : es;
   const date = new Date(dateKey + "T12:00:00");
-  const label = getRelativeDayLabel(date, locale);
+  const label = getRelativeDayLabel(date, locale, t);
   const fullDate = format(date, "d 'de' MMMM, yyyy", { locale: dateFnsLocale });
 
   return (

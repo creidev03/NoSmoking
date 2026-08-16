@@ -1,32 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { User, Bell, Database } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { ProfileSection } from "./ProfileSection";
 import { PreferencesSection } from "./PreferencesSection";
-import { AccountSection } from "./AccountSection";
 import { DataSection } from "./DataSection";
-import { DangerZone } from "./DangerZone";
-import type { UserProfile, UserPreferences } from "@/app/[locale]/dashboard/settings/actions";
+import type { UserProfile, UserPreferences, OnboardingData } from "@/app/[locale]/dashboard/settings/actions";
 
 interface SettingsTabsProps {
   userId: string;
   profile: UserProfile | null;
   preferences: UserPreferences | null;
+  onboarding: OnboardingData | null;
+  userEmail: string | null;
 }
 
-const tabs = [
-  { id: "profile", label: "Perfil", icon: "👤" },
-  { id: "preferences", label: "Preferencias", icon: "🔔" },
-  { id: "account", label: "Cuenta", icon: "🔐" },
-  { id: "data", label: "Datos", icon: "📦" },
-  { id: "danger", label: "Peligro", icon: "⚠️" },
-] as const;
+type TabId = "profile" | "preferences" | "data";
 
-type TabId = (typeof tabs)[number]["id"];
+function getTabFromURL(): TabId {
+  if (typeof window === "undefined") return "profile";
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  if (tab && ["profile", "preferences", "data"].includes(tab)) return tab as TabId;
+  return "profile";
+}
 
-export function SettingsTabs({ userId, profile, preferences }: SettingsTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabId>("profile");
+export function SettingsTabs({ userId, profile, preferences, onboarding, userEmail }: SettingsTabsProps) {
+  const t = useTranslations("settings");
+  const [activeTab, setActiveTabState] = useState<TabId>("profile");
+
+  const tabs = [
+    { id: "profile" as const, label: t("tabs.profile"), Icon: User },
+    { id: "preferences" as const, label: t("tabs.preferences"), Icon: Bell },
+    { id: "data" as const, label: t("tabs.data"), Icon: Database },
+  ];
+
+  // Read tab from URL on mount
+  useEffect(() => {
+    setActiveTabState(getTabFromURL());
+  }, []);
+
+  const setActiveTab = useCallback((tab: TabId) => {
+    setActiveTabState(tab);
+    // Update URL without reload to preserve tab across navigation
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", tab);
+    window.history.replaceState({}, "", url.toString());
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -43,7 +65,7 @@ export function SettingsTabs({ userId, profile, preferences }: SettingsTabsProps
                 : "text-text-muted hover:text-text hover:bg-accent"
             )}
           >
-            <span>{tab.icon}</span>
+            <tab.Icon className="h-4 w-4" />
             <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
@@ -52,19 +74,18 @@ export function SettingsTabs({ userId, profile, preferences }: SettingsTabsProps
       {/* Tab content */}
       <div className="min-h-[400px]">
         {activeTab === "profile" && (
-          <ProfileSection userId={userId} profile={profile} />
+          <ProfileSection
+            userId={userId}
+            profile={profile}
+            onboarding={onboarding}
+            userEmail={userEmail}
+          />
         )}
         {activeTab === "preferences" && (
           <PreferencesSection userId={userId} preferences={preferences} />
         )}
-        {activeTab === "account" && (
-          <AccountSection userId={userId} />
-        )}
         {activeTab === "data" && (
           <DataSection userId={userId} />
-        )}
-        {activeTab === "danger" && (
-          <DangerZone userId={userId} />
         )}
       </div>
     </div>

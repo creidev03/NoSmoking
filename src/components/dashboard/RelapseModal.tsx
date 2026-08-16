@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 import { RelapseCountdown } from "./RelapseCountdown";
 import { RelapseProgress } from "./RelapseProgress";
 import { RelapseTips } from "./RelapseTips";
@@ -39,6 +40,7 @@ export function RelapseModal({
   userId,
   onGameStateUpdate,
 }: RelapseModalProps) {
+  const t = useTranslations("relapse");
   const [localGameState, setLocalGameState] = useState<GameState>(gameState);
   const [showTips, setShowTips] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
@@ -49,17 +51,17 @@ export function RelapseModal({
       try {
         const result = await registerPositiveAction(userId, actionType);
         if (result.error) {
-          toast.error("Error al registrar la acción");
+          toast.error(t("modal.errorRegister"));
           return;
         }
         setLocalGameState(result.gameState);
         onGameStateUpdate?.(result.gameState);
         if (result.gameState.remainingLives > 0) {
-          toast.success("¡Recuperaste vidas! Sigue así 💚");
+          toast.success(t("modal.recoveredLives"));
           onClose();
         }
       } catch {
-        toast.error("Error inesperado");
+        toast.error(t("modal.unexpectedError"));
       } finally {
         setLoadingAction(null);
       }
@@ -84,17 +86,16 @@ export function RelapseModal({
           {/* Header */}
           <div className="mb-4 text-center">
             <h2 className="text-2xl font-bold text-warning dark:text-warning">
-              ⚠️ RECAÍDA DETECTADA
+              {t("modal.detected")}
             </h2>
           </div>
 
           {/* Empathetic message */}
           <p className="mb-4 text-center text-text dark:text-text">
-            No te rindas. Esto es normal.
+            {t("modal.dontGiveUp")}
           </p>
           <p className="mb-6 text-center text-sm text-text-muted dark:text-text-muted">
-            Tienes 24 horas para recuperar al menos 1 vida con actividades
-            positivas.
+            {t("modal.recoverTime")}
           </p>
 
           {/* Countdown */}
@@ -117,7 +118,7 @@ export function RelapseModal({
           {/* Actions */}
           <div className="mb-6">
             <p className="mb-3 text-sm font-medium text-text dark:text-text">
-              ¿Qué hacer ahora?
+              {t("modal.whatToDo")}
             </p>
             <div className="space-y-3">
               {ACTIONS.map((action) => {
@@ -145,7 +146,7 @@ export function RelapseModal({
                     </div>
                     {isOnCooldown ? (
                       <span className="text-xs text-warning dark:text-warning">
-                        Disponible en {cooldownMins} min
+                        {t("modal.availableIn", { minutes: cooldownMins })}
                       </span>
                     ) : (
                       <Button
@@ -155,7 +156,7 @@ export function RelapseModal({
                         disabled={isLoading}
                         data-testid={`action-${action.type}`}
                       >
-                        {isLoading ? "..." : "INICIAR"}
+                        {isLoading ? "..." : t("modal.start")}
                       </Button>
                     )}
                   </div>
@@ -166,7 +167,7 @@ export function RelapseModal({
 
           {/* Warning */}
           <p className="mb-6 text-center text-xs text-text-muted dark:text-text-muted">
-            Si no recuperas en 24h, tu contador de días reinicia.
+            {t("modal.recoverWarning")}
           </p>
 
           {/* Footer buttons */}
@@ -177,7 +178,7 @@ export function RelapseModal({
               onClick={onClose}
               data-testid="understood-button"
             >
-              ENTENDIDO
+              {t("modal.understood")}
             </Button>
             <Button
               variant="ghost"
@@ -185,7 +186,7 @@ export function RelapseModal({
               onClick={() => setShowTips(true)}
               data-testid="tips-button"
             >
-              💡 TIPS
+              {t("modal.tips")}
             </Button>
           </div>
         </div>

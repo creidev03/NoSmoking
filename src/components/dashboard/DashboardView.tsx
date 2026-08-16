@@ -240,7 +240,7 @@ export function DashboardView({
               onClick={() => setShowRelapseModal(true)}
               className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-warning/30 bg-warning/10 px-4 py-2 text-xs font-medium text-warning transition-all active:scale-[0.98] hover:bg-warning/15 dark:border-warning/20 dark:bg-warning/10 dark:text-warning"
             >
-              🔄 Ver opciones de recuperación
+              🔄 {t("recoveryButton")}
             </button>
           </div>
         )}
@@ -253,14 +253,14 @@ export function DashboardView({
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-accent-purple/30 bg-accent-purple/10 px-4 py-2 text-xs font-medium text-accent-purple transition-all active:scale-[0.98] hover:bg-accent-purple/15 dark:border-accent-purple/20 dark:bg-accent-purple/10"
               data-testid="dev-reset-lives-button"
             >
-              🔄 Regenerar vidas
+              🔄 {t("devResetLives")}
             </button>
             <button
               onClick={handleDevRemoveCooldown}
               className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-warning/30 bg-warning/10 px-4 py-2 text-xs font-medium text-warning transition-all active:scale-[0.98] hover:bg-warning/15 dark:border-warning/20 dark:bg-warning/10"
               data-testid="dev-remove-cooldown-button"
             >
-              ⚡ Quitar cooldown
+              ⚡ {t("devRemoveCooldown")}
             </button>
           </div>
         )}

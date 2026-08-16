@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface RelapseProgressProps {
   currentLives: number;
@@ -13,6 +14,7 @@ export function RelapseProgress({
   targetLives,
   totalLives,
 }: RelapseProgressProps) {
+  const t = useTranslations("relapse");
   const recovered = currentLives;
   const needed = targetLives;
   const remaining = Math.max(0, needed - recovered);
@@ -36,7 +38,7 @@ export function RelapseProgress({
   return (
     <div className="rounded-xl border border-border bg-surface-card p-4 dark:border-border dark:bg-surface-card">
       <p className="mb-2 text-sm font-medium text-text dark:text-text">
-        Progreso de recuperación:
+        {t("progress.recoveryLabel")}
       </p>
       <div className="flex items-center gap-2">
         <div className="flex gap-1" data-testid="progress-blocks">
@@ -46,7 +48,7 @@ export function RelapseProgress({
             {remaining > 0 && (
               <span className="text-text-muted dark:text-text-muted">
                 {" "}
-                ({remaining} más)
+                {t("progress.remaining", { count: remaining })}
               </span>
             )}
           </span>

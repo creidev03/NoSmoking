@@ -6,7 +6,7 @@ import { groupEventsByDay } from "@/lib/timeline";
 import { getTimelineEvents } from "@/app/[locale]/dashboard/actions";
 import { TimelineFilters } from "./TimelineFilters";
 import { TimelineGroup } from "./TimelineGroup";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface TimelineViewProps {
   userId: string;
@@ -20,6 +20,7 @@ export function TimelineView({
   initialHasMore,
 }: TimelineViewProps) {
   const t = useTranslations("timeline");
+  const locale = useLocale();
   const [activeFilter, setActiveFilter] = useState<TimelineFilter>("all");
   const [events, setEvents] = useState<TimelineEvent[]>(initialEvents);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -31,7 +32,7 @@ export function TimelineView({
       setActiveFilter(filter);
       setLoading(true);
       try {
-        const result = await getTimelineEvents(userId, filter, 0, 20);
+        const result = await getTimelineEvents(userId, filter, 0, 20, locale);
         setEvents(result.events);
         setHasMore(result.hasMore);
         setPage(0);
@@ -47,7 +48,7 @@ export function TimelineView({
     setLoading(true);
     try {
       const nextPage = page + 1;
-      const result = await getTimelineEvents(userId, activeFilter, nextPage, 20);
+      const result = await getTimelineEvents(userId, activeFilter, nextPage, 20, locale);
       setEvents((prev) => [...prev, ...result.events]);
       setHasMore(result.hasMore);
       setPage(nextPage);

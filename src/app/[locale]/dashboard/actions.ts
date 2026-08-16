@@ -7,10 +7,38 @@ import { checkMidnightReset, type GameState } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
 import { randomUUID } from "crypto";
 import { evaluateAchievements } from "@/lib/achievements";
-import { normalizeEventWithPenalty, type TimelineEvent, type TimelineFilter } from "@/lib/timeline";
+import { normalizeEventWithPenalty, type TimelineEvent, type TimelineFilter, type TranslationFn } from "@/lib/timeline";
 import type { Achievement } from "@/lib/achievements/types";
+import enMessages from "../../../../messages/en.json";
+import esMessages from "../../../../messages/es.json";
 
 type ActionType = "breathing" | "meditation" | "music";
+
+const messages = { en: enMessages, es: esMessages } as const;
+
+function getNestedValue(obj: any, path: string): string | undefined {
+  const keys = path.split(".");
+  let current = obj;
+  for (const key of keys) {
+    if (current === null || current === undefined) return undefined;
+    current = current[key];
+  }
+  return typeof current === "string" ? current : undefined;
+}
+
+function createTranslationFn(locale: string): TranslationFn {
+  const msgs = messages[locale as "en" | "es"] || messages.es;
+  return (key: string, params?: Record<string, any>): string => {
+    let value = getNestedValue(msgs, key);
+    if (value === undefined) return key;
+    if (params) {
+      for (const [paramKey, paramValue] of Object.entries(params)) {
+        value = value.replace(new RegExp(`\\{${paramKey}\\}`, "g"), String(paramValue));
+      }
+    }
+    return value;
+  };
+}
 
 const CIGS_PER_LIFE = 5;
 const MAX_EXTRA_POINTS = 3;
@@ -463,7 +491,8 @@ export async function getTimelineEvents(
   userId: string,
   filter: TimelineFilter = "all",
   page: number = 0,
-  limit: number = 20
+  limit: number = 20,
+  locale: string = "es"
 ): Promise<{ events: TimelineEvent[]; hasMore: boolean; total: number }> {
   const gs = await db
     .select()
@@ -514,6 +543,7 @@ export async function getTimelineEvents(
     .offset(offset)
     .all();
 
+  const t = createTranslationFn(locale);
   const timelineEvents: TimelineEvent[] = [];
   for (const row of rows) {
     const normalized = normalizeEventWithPenalty({
@@ -521,7 +551,7 @@ export async function getTimelineEvents(
       type: row.type,
       detail: row.detail,
       createdAt: row.createdAt,
-    });
+    }, t);
     for (const e of normalized) {
       e.userId = userId;
     }

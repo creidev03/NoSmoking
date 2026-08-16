@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 import { downloadUserData } from "@/app/[locale]/dashboard/settings/actions";
+import { Download, FileSpreadsheet } from "lucide-react";
 
 interface DataSectionProps {
   userId: string;
 }
 
 export function DataSection({ userId }: DataSectionProps) {
+  const t = useTranslations("settings");
   const [downloading, setDownloading] = useState(false);
 
   const handleDownloadJson = async () => {
@@ -29,7 +32,6 @@ export function DataSection({ userId }: DataSectionProps) {
   };
 
   const handleExportCsv = () => {
-    // CSV export placeholder — will be implemented with timeline data
     const csv = "type,detail,createdAt\n";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -43,35 +45,23 @@ export function DataSection({ userId }: DataSectionProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Datos</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <FileSpreadsheet className="h-5 w-5" />
+          {t("data.title")}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Export */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <Button onClick={handleDownloadJson} disabled={downloading} variant="outline">
-              {downloading ? "Descargando..." : "📥 Descargar mis datos"}
+              <Download className="mr-2 h-4 w-4" />
+              {downloading ? t("data.downloading") : t("data.downloadData")}
             </Button>
           </div>
           <div className="flex items-center gap-3">
             <Button onClick={handleExportCsv} variant="outline">
-              📊 Exportar timeline
-            </Button>
-          </div>
-        </div>
-
-        {/* GDPR */}
-        <div className="rounded-lg border border-border p-4 space-y-3">
-          <h3 className="text-sm font-medium text-text">Privacidad (GDPR)</h3>
-          <p className="text-xs text-text-muted">
-            Tienes derecho a acceder, rectificar o eliminar tus datos personales.
-          </p>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" disabled>
-              Solicitar acceso
-            </Button>
-            <Button variant="destructive" size="sm" disabled>
-              Solicitar eliminación
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              {t("data.exportTimeline")}
             </Button>
           </div>
         </div>

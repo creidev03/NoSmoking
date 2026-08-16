@@ -118,6 +118,12 @@
       "question": "How many previous attempts have you had?"
     }
   },
+  "nav": {
+    "home": "Home",
+    "achievements": "Achievements",
+    "timeline": "Timeline",
+    "settings": "Settings"
+  },
   "dashboard": {
     "title": "Your Progress Today",
     "subtitle": "Every day is an opportunity to be stronger",
@@ -127,6 +133,7 @@
     "extraLives": "🎁 Extra lives earned: {count}/3",
     "cigaretteRegistered": "Cigarette logged",
     "penaltyApplied": "⚠️ Penalty: you lost 1 life",
+    "recoveryButton": "🔄 See recovery options",
     "devResetLives": "🔄 Lives regenerated (dev)",
     "devRemoveCooldown": "⚡ Cooldown removed (dev)",
     "lives": {
@@ -285,6 +292,45 @@
     "B006": { "name": "Week of Smoking", "description": "7 consecutive days smoking — consider seeking help" },
     "B007": { "name": "Month of Smoking", "description": "30 consecutive days smoking — every cigarette counts, start today" }
   },
+  "relapse": {
+    "modal": {
+      "detected": "⚠️ RELAPSE DETECTED",
+      "dontGiveUp": "Don't give up. This is normal.",
+      "recoverTime": "You have 24 hours to recover at least 1 life with positive activities.",
+      "whatToDo": "What to do now?",
+      "availableIn": "Available in {minutes} min",
+      "start": "START",
+      "recoverWarning": "If you don't recover in 24h, your day counter resets.",
+      "understood": "UNDERSTOOD",
+      "tips": "💡 TIPS",
+      "errorRegister": "Error registering action",
+      "recoveredLives": "You recovered lives! Keep going 💚",
+      "unexpectedError": "Unexpected error"
+    },
+    "tips": {
+      "title": "💡 Recovery Tips",
+      "closeLabel": "Close tips",
+      "whyNormal": "Why is a relapse normal?",
+      "whyNormalDesc": "Recovery from tobacco addiction is not a linear process. According to studies, 75% of people quit after several attempts. Each attempt brings you closer to your goal. A relapse doesn't erase your progress — it's part of the path.",
+      "whatToDoAfter": "What to do after smoking?",
+      "stopNow": "Don't smoke another cigarette — stop here",
+      "drinkWater": "Drink a glass of water",
+      "doPositiveAction": "Do a positive action (breathing, meditation)",
+      "provenTools": "Proven tools",
+      "deepBreathing": "Deep breathing exercises",
+      "meditation10": "10-15 minute meditation",
+      "lightExercise": "Light physical activity (walking, stretching)",
+      "callSomeone": "Call a trusted friend or family member",
+      "close": "Understood"
+    },
+    "progress": {
+      "recoveryLabel": "Recovery progress:",
+      "remaining": "({count} more)"
+    },
+    "countdown": {
+      "remaining": "⏱️ Time remaining:"
+    }
+  },
   "awareness": {
     "autoClose": "Auto-close in",
     "seconds": "seconds",
@@ -301,18 +347,24 @@
     }
   },
   "settings": {
-    "title": "⚙️ Settings",
+    "title": "Settings",
     "tabs": {
       "profile": "Profile",
       "preferences": "Preferences",
-      "account": "Account",
-      "data": "Data",
-      "danger": "Danger"
+      "data": "Data"
     },
     "profile": {
       "title": "Profile",
-      "avatarNote": "Your avatar is managed through your Clerk account",
-      "emailManaged": "Managed by Clerk",
+      "email": "Email",
+      "emailNotAvailable": "Not available",
+      "onboardingTitle": "Onboarding questionnaire data",
+      "cigarettesPerDay": "Cigarettes per day",
+      "smokingYears": "Years smoking",
+      "quitAttempts": "Previous attempts",
+      "notifications": "Notifications",
+      "notificationsEnabled": "Enabled",
+      "notificationsDisabled": "Disabled",
+      "notSpecified": "Not specified",
       "motivations": "Motivations to quit smoking",
       "health": "Health",
       "money": "Money",
@@ -357,15 +409,11 @@
     "data": {
       "title": "Data",
       "downloading": "Downloading...",
-      "downloadData": "📥 Download my data",
-      "exportTimeline": "📊 Export timeline",
-      "privacy": "Privacy (GDPR)",
-      "privacyDesc": "You have the right to access, rectify, or delete your personal data.",
-      "requestAccess": "Request access",
-      "requestDeletion": "Request deletion"
+      "downloadData": "Download my data",
+      "exportTimeline": "Export timeline"
     },
     "danger": {
-      "title": "⚠️ Danger zone",
+      "title": "Danger zone",
       "resetProgress": "Reset progress",
       "resetDesc": "This will erase all your lives, days, achievements, and events. This cannot be undone.",
       "resetButton": "Reset progress",
@@ -373,13 +421,13 @@
       "deleteAccount": "Delete account",
       "deleteDesc": "This will permanently delete your account and all your data. This cannot be undone.",
       "deleteButton": "Delete account",
-      "resetModalTitle": "⚠️ Reset progress",
+      "resetModalTitle": "Reset progress",
       "resetModalDesc": "This will erase all your lives, days, achievements, and events. This action cannot be undone.",
       "resetConfirmPrompt": "Type RESET to confirm:",
       "cancel": "Cancel",
       "resetting": "Resetting...",
       "reset": "Reset",
-      "deleteModalTitle": "🗑️ Delete account",
+      "deleteModalTitle": "Delete account",
       "deleteModalDesc": "This will permanently delete your account and all your data. This action cannot be undone.",
       "deleteConfirmPrompt": "Type your email to confirm:"
     }

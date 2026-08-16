@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useTheme } from "@/hooks/useTheme";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +16,13 @@ interface PreferencesSectionProps {
 }
 
 export function PreferencesSection({ userId, preferences }: PreferencesSectionProps) {
+  const { setTheme } = useTheme(preferences?.theme as "light" | "dark" | "system" | undefined);
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations("settings");
+  const redirectGuard = useRef(false);
+
   const [notifications, setNotifications] = useState(
     preferences?.notificationsEnabled ?? true
   );
@@ -20,10 +30,28 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
     preferences?.reminderInterval ?? "6h"
   );
   const [language, setLanguage] = useState(preferences?.language ?? "es");
-  const [theme, setTheme] = useState(preferences?.theme ?? "auto");
+  const [themeLocal, setThemeLocal] = useState(preferences?.theme ?? "auto");
   const [sounds, setSounds] = useState(preferences?.soundsEnabled ?? true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // Sync theme from DB to shared state on mount
+  useEffect(() => {
+    if (preferences?.theme) {
+      const themeValue = preferences.theme as "light" | "dark" | "system";
+      setTheme(themeValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync language from DB on mount — redirect if DB locale ≠ URL locale
+  useEffect(() => {
+    if (preferences?.language && preferences.language !== locale && !redirectGuard.current) {
+      redirectGuard.current = true;
+      router.replace(`${pathname}?tab=preferences`, { locale: preferences.language });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
@@ -32,9 +60,18 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
         notificationsEnabled: notifications,
         reminderInterval,
         language,
-        theme,
+        theme: themeLocal,
         soundsEnabled: sounds,
       });
+
+      // Apply theme immediately to DOM + localStorage
+      setTheme(themeLocal as "light" | "dark" | "system");
+
+      // Redirect if language changed
+      if (language !== locale) {
+        router.replace(`${pathname}?tab=preferences`, { locale: language });
+      }
+
       setSaved(true);
     } finally {
       setSaving(false);
@@ -44,14 +81,14 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Preferencias</CardTitle>
+        <CardTitle>{t("preferences.title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Notifications toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <Label>Notificaciones push</Label>
-            <p className="text-xs text-text-muted">Recibe recordatorios para dejar de fumar</p>
+            <Label>{t("preferences.notifications")}</Label>
+            <p className="text-xs text-text-muted">{t("preferences.notificationsDesc")}</p>
           </div>
           <button
             onClick={() => { setNotifications(!notifications); setSaved(false); }}
@@ -69,22 +106,22 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
 
         {/* Reminder interval */}
         <div className="space-y-2">
-          <Label>Intervalo de recordatorio</Label>
+          <Label>{t("preferences.reminderInterval")}</Label>
           <select
             value={reminderInterval}
             onChange={(e) => { setReminderInterval(e.target.value); setSaved(false); }}
             className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-text"
           >
-            <option value="4h">Cada 4 horas</option>
-            <option value="6h">Cada 6 horas</option>
-            <option value="8h">Cada 8 horas</option>
-            <option value="12h">Cada 12 horas</option>
+            <option value="4h">{t("preferences.every4h")}</option>
+            <option value="6h">{t("preferences.every6h")}</option>
+            <option value="8h">{t("preferences.every8h")}</option>
+            <option value="12h">{t("preferences.every12h")}</option>
           </select>
         </div>
 
         {/* Language */}
         <div className="space-y-2">
-          <Label>Idioma</Label>
+          <Label>{t("preferences.language")}</Label>
           <select
             value={language}
             onChange={(e) => { setLanguage(e.target.value); setSaved(false); }}
@@ -97,23 +134,23 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
 
         {/* Theme */}
         <div className="space-y-2">
-          <Label>Tema</Label>
+          <Label>{t("preferences.theme")}</Label>
           <select
-            value={theme}
-            onChange={(e) => { setTheme(e.target.value); setSaved(false); }}
+            value={themeLocal}
+            onChange={(e) => { setThemeLocal(e.target.value); setSaved(false); }}
             className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-text"
           >
-            <option value="auto">Automático</option>
-            <option value="light">Claro</option>
-            <option value="dark">Oscuro</option>
+            <option value="auto">{t("preferences.auto")}</option>
+            <option value="light">{t("preferences.light")}</option>
+            <option value="dark">{t("preferences.dark")}</option>
           </select>
         </div>
 
         {/* Sounds toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <Label>Sonidos</Label>
-            <p className="text-xs text-text-muted">Sonidos de notificación y efectos</p>
+            <Label>{t("preferences.sounds")}</Label>
+            <p className="text-xs text-text-muted">{t("preferences.soundsDesc")}</p>
           </div>
           <button
             onClick={() => { setSounds(!sounds); setSaved(false); }}
@@ -132,10 +169,10 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
         {/* Save */}
         <div className="flex items-center gap-3">
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Guardando..." : "Guardar preferencias"}
+            {saving ? t("preferences.saving") : t("preferences.save")}
           </Button>
           {saved && (
-            <span className="text-sm text-primary">✓ Guardado</span>
+            <span className="text-sm text-primary">{t("preferences.saved")}</span>
           )}
         </div>
       </CardContent>
