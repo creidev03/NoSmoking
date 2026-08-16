@@ -39,7 +39,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-import { submitStep, completeOnboarding } from "@/app/onboarding/actions";
+import { submitStep, completeOnboarding } from "@/app/[locale]/onboarding/actions";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 
@@ -135,7 +135,7 @@ describe("completeOnboarding", () => {
     mockDb.select.mockReturnValue({ from: mockFrom } as any);
 
     await expect(completeOnboarding("user-1")).rejects.toThrow("NEXT_REDIRECT");
-    expect(mockRedirect).toHaveBeenCalledWith("/dashboard");
+    expect(mockRedirect).toHaveBeenCalledWith("/es/dashboard");
   });
 
   it("throws when no onboarding record found", async () => {

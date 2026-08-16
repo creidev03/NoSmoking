@@ -1,4 +1,7 @@
+"use client";
+
 import { HeartIcon } from "@/components/icons/HeartIcon";
+import { useTranslations } from "next-intl";
 
 interface LivesDisplayProps {
   total: number;
@@ -6,6 +9,7 @@ interface LivesDisplayProps {
 }
 
 export function LivesDisplay({ total, remaining }: LivesDisplayProps) {
+  const t = useTranslations("dashboard.lives");
   // Ensure at least 1 heart if total > 0
   const heartsCount = total > 0 ? Math.max(1, Math.round(total)) : 0;
   const fullHearts = Math.floor(remaining);
@@ -15,7 +19,7 @@ export function LivesDisplay({ total, remaining }: LivesDisplayProps) {
   return (
     <div data-testid="lives-display">
       <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
-        🫀 Vidas Restantes
+        {t("title")}
       </h2>
       <div className="mb-3 flex flex-wrap items-center gap-1">
         {Array.from({ length: fullHearts }, (_, i) => (
@@ -29,7 +33,7 @@ export function LivesDisplay({ total, remaining }: LivesDisplayProps) {
       <p className="text-3xl font-bold text-text dark:text-text">
         {remaining}{" "}
         <span className="text-base font-normal text-text-muted">
-          de {total} vidas
+          {t("ofTotal", { total })}
         </span>
       </p>
     </div>

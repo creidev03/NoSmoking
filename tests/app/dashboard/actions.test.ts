@@ -79,7 +79,7 @@ import {
   registerCigarette,
   registerPositiveAction,
   getUserAchievements,
-} from "@/app/dashboard/actions";
+} from "@/app/[locale]/dashboard/actions";
 import { db } from "@/lib/db";
 
 const mockDb = vi.mocked(db);

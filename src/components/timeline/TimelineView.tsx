@@ -3,9 +3,10 @@
 import { useState, useCallback } from "react";
 import type { TimelineEvent, TimelineFilter } from "@/lib/timeline";
 import { groupEventsByDay } from "@/lib/timeline";
-import { getTimelineEvents } from "@/app/dashboard/actions";
+import { getTimelineEvents } from "@/app/[locale]/dashboard/actions";
 import { TimelineFilters } from "./TimelineFilters";
 import { TimelineGroup } from "./TimelineGroup";
+import { useTranslations } from "next-intl";
 
 interface TimelineViewProps {
   userId: string;
@@ -18,6 +19,7 @@ export function TimelineView({
   initialEvents,
   initialHasMore,
 }: TimelineViewProps) {
+  const t = useTranslations("timeline");
   const [activeFilter, setActiveFilter] = useState<TimelineFilter>("all");
   const [events, setEvents] = useState<TimelineEvent[]>(initialEvents);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -58,7 +60,7 @@ export function TimelineView({
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-bold text-foreground">Línea de tiempo</h1>
+      <h1 className="mb-4 text-2xl font-bold text-foreground">{t("title")}</h1>
 
       <TimelineFilters active={activeFilter} onChange={handleFilterChange} />
 
@@ -86,7 +88,7 @@ export function TimelineView({
         {!loading && events.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-lg text-muted-foreground">
-              Aún no hay eventos. ¡Registra tu primer cigarro o actividad positiva!
+              {t("empty")}
             </p>
           </div>
         )}
@@ -104,7 +106,7 @@ export function TimelineView({
                   disabled={loading}
                   className="rounded-full bg-muted px-6 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
                 >
-                  {loading ? "Cargando..." : "Cargar más..."}
+                  {loading ? t("loading") : t("loadMore")}
                 </button>
               </div>
             )}

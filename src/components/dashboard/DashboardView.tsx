@@ -3,7 +3,8 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { type GameState } from "@/lib/game-state";
 import { isCooldownActive, getPhase } from "@/lib/cooldown";
-import { registerPositiveAction, registerCigarette, devResetLives, devRemoveCooldown } from "@/app/dashboard/actions";
+import { registerPositiveAction, registerCigarette, devResetLives, devRemoveCooldown } from "@/app/[locale]/dashboard/actions";
+import { useTranslations } from "next-intl";
 import { LivesDisplay } from "./LivesDisplay";
 import { StreakDisplay } from "./StreakDisplay";
 import { CigarettesToday } from "./CigarettesToday";
@@ -56,6 +57,7 @@ export function DashboardView({
   gameState,
   achievements = [],
 }: DashboardViewProps) {
+  const t = useTranslations("dashboard");
   const [state, setState] = useState(() => {
     const cached = loadCachedState();
     return cached ?? gameState;
@@ -150,8 +152,8 @@ export function DashboardView({
       processUnlockedAchievements(result.unlockedAchievements);
       setToast({
         message: result.penaltyApplied
-          ? "⚠️ Penalización: perdiste 1 vida"
-          : "Cigarro registrado",
+          ? t("penaltyApplied")
+          : t("cigaretteRegistered"),
         type: result.penaltyApplied ? "warning" : "success",
       });
       setTimeout(() => setToast(null), 3000);
@@ -165,7 +167,7 @@ export function DashboardView({
       const newGameState = await devResetLives(state.userId);
       setState(newGameState);
       saveCachedState(newGameState);
-      setToast({ message: "🔄 Vidas regeneradas (dev)", type: "success" });
+      setToast({ message: t("devResetLives"), type: "success" });
       setTimeout(() => setToast(null), 3000);
     } catch (err) {
       console.error("Failed to reset lives", err);
@@ -177,7 +179,7 @@ export function DashboardView({
       const newGameState = await devRemoveCooldown(state.userId);
       setState(newGameState);
       saveCachedState(newGameState);
-      setToast({ message: "⚡ Cooldown eliminado (dev)", type: "success" });
+      setToast({ message: t("devRemoveCooldown"), type: "success" });
       setTimeout(() => setToast(null), 3000);
     } catch (err) {
       console.error("Failed to remove cooldown", err);
@@ -208,12 +210,12 @@ export function DashboardView({
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-[32px] font-bold leading-tight text-text dark:text-text">
-            {isRelapsed ? "💚 Recuperación" : "Tu Progreso Hoy"}
+            {isRelapsed ? t("recoveryTitle") : t("title")}
           </h1>
           <p className="text-[16px] text-text-muted">
             {isRelapsed
-              ? "Estás en ventana de recuperación. ¡No te rindas!"
-              : "Cada día es una oportunidad para ser más fuerte"}
+              ? t("recoverySubtitle")
+              : t("subtitle")}
           </p>
         </div>
 
@@ -221,8 +223,7 @@ export function DashboardView({
         {isRelapsed && (
           <div className="mb-4 rounded-xl border border-danger-soft bg-danger-soft p-3 dark:border-danger dark:bg-danger/30">
             <p className="text-sm font-medium text-danger dark:text-danger-soft">
-              ⚠️ Has perdido todas tus vidas. Tienes 24 horas para recuperarte
-              completando acciones positivas.
+              {t("relapseWarning")}
             </p>
           </div>
         )}
@@ -293,7 +294,7 @@ export function DashboardView({
               data-testid="extra-points"
               className="text-sm text-text-muted"
             >
-              🎁 Vidas extra ganadas: {state.totalPoints}/3
+              🎁 {t("extraLives", { count: state.totalPoints })}
             </p>
           )}
 

@@ -117,5 +117,245 @@
     "attempts": {
       "question": "¿Cuántos intentos previos has tenido?"
     }
+  },
+  "dashboard": {
+    "title": "Tu Progreso Hoy",
+    "subtitle": "Cada día es una oportunidad para ser más fuerte",
+    "recoveryTitle": "💚 Recuperación",
+    "recoverySubtitle": "Estás en ventana de recuperación. ¡No te rindas!",
+    "relapseWarning": "⚠️ Has perdido todas tus vidas. Tienes 24 horas para recuperarte completando acciones positivas.",
+    "extraLives": "🎁 Vidas extra ganadas: {count}/3",
+    "cigaretteRegistered": "Cigarro registrado",
+    "penaltyApplied": "⚠️ Penalización: perdiste 1 vida",
+    "devResetLives": "🔄 Vidas regeneradas (dev)",
+    "devRemoveCooldown": "⚡ Cooldown eliminado (dev)",
+    "lives": {
+      "title": "🫀 Vidas Restantes",
+      "ofTotal": "de {total} vidas"
+    },
+    "cigarettes": {
+      "title": "🚬 Consumo de Hoy",
+      "ofAllowed": "de {threshold} permitidos",
+      "remaining": "Quedan {count} antes de penalización",
+      "penalty": "⚠️ ¡Ciclo completado! Se perderá 1 vida"
+    },
+    "streak": {
+      "day": "día sin fumar",
+      "days": "días sin fumar",
+      "messages": [
+        { "icon": "🏅", "text": "¡Sigue así!" },
+        { "icon": "💪", "text": "¡Fuerte!" },
+        { "icon": "🎯", "text": "¡En el objetivo!" },
+        { "icon": "⭐", "text": "¡Increíble!" },
+        { "icon": "🏆", "text": "¡Campeón!" },
+        { "icon": "🔥", "text": "¡Racha larga!" }
+      ]
+    },
+    "cooldown": {
+      "nextAction": "⏱️ Próxima Acción",
+      "ready": "¡Listo para la siguiente acción!",
+      "active": "Cooldown activo",
+      "phase1": "Ansiedad inicial",
+      "phase2": "Inquietud máxima",
+      "phase3": "Ansiedad disminuye",
+      "phase4": "Recuperación completa"
+    },
+    "actions": {
+      "title": "🫁 Actividades Positivas",
+      "breathing": "Respiración",
+      "meditation": "Meditación",
+      "livesReward": "+0.5 vidas",
+      "waitForCooldown": "⏳ Espera a que termine el cooldown"
+    },
+    "upcoming": {
+      "title": "📅 Próximos eventos",
+      "dailyReset": "Reset diario",
+      "cooldownActive": "Cooldown activo",
+      "actionAvailable": "Acción disponible",
+      "ready": "¡Listo!",
+      "currentPhase": "Fase actual"
+    },
+    "recentAchievements": {
+      "title": "📈 Tus últimos logros",
+      "empty": "Aún no has desbloqueado logros. ¡Sigue intentando!",
+      "viewAll": "Ver todos los logros",
+      "more": "y {count} más →"
+    },
+    "quickActions": {
+      "title": "⚡ Acciones rápidas",
+      "cigarette": "Registrar Cigarro",
+      "cigaretteDesc": "Registrar un cigarrillo fumado",
+      "breathing": "Respiración Guiada",
+      "breathingDesc": "Ejercicio de respiración calmante",
+      "meditation": "Meditación",
+      "meditationDesc": "Sesión de meditación breve",
+      "music": "Música Premium",
+      "musicDesc": "Escucha música relajante"
+    }
+  },
+  "timeline": {
+    "title": "Línea de tiempo",
+    "empty": "Aún no hay eventos. ¡Registra tu primer cigarro o actividad positiva!",
+    "loading": "Cargando...",
+    "loadMore": "Cargar más...",
+    "filters": {
+      "today": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes",
+      "all": "Todos"
+    },
+    "relativeDay": {
+      "today": "HOY",
+      "yesterday": "AYER",
+      "daysAgo": "HACE {count} DÍAS"
+    },
+    "events": {
+      "cigarette": "Fumaste {count} cigarro(s). Total hoy: {total} de 5",
+      "penalty": "Perdiste 1 vida. Te quedan {remaining} de 4",
+      "breathing": "Respiración guiada completada",
+      "meditation": "Meditación completada",
+      "music": "Música de relajación completada",
+      "positiveAction": "Acción positiva completada",
+      "livesRecovered": "+{count} vidas recuperadas"
+    }
+  },
+  "achievements": {
+    "title": "🏆 Tus Logros",
+    "ofTotal": "de {total} desbloqueados ({percent}%)",
+    "categories": {
+      "all": "Todos",
+      "time": "Tiempo",
+      "progress": "Progreso",
+      "actions": "Acciones",
+      "challenges": "Desafíos",
+      "collection": "Colecciones",
+      "awareness": "Consciencia"
+    },
+    "difficulty": {
+      "easy": "Fácil",
+      "balanced": "Equilibrado",
+      "medium": "Medio",
+      "hard": "Difícil",
+      "extreme": "Extremo"
+    },
+    "progress": "Progreso",
+    "unlocked": "Desbloqueado: {date}",
+    "share": "COMPARTIR",
+    "understood": "ENTENDIDO",
+    "shareMessage": "🏆 ¡Desbloqueé \"{name}\" en No Smoking!\n\n{description}",
+    "copied": "Copiado al portapapeles",
+    "copiedDescription": "Pega el mensaje para compartir tu logro",
+    "close": "Cerrar",
+    "loadMore": "Cargar más ({visible} de {total})",
+    "emptyCategory": "No hay logros en esta categoría",
+    "noAchievements": "No hay logros en esta categoría",
+    "autoClose": "Auto-cierre en",
+    "seconds": "segundos"
+  },
+  "settings": {
+    "title": "⚙️ Configuración",
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferencias",
+      "account": "Cuenta",
+      "data": "Datos",
+      "danger": "Peligro"
+    },
+    "profile": {
+      "title": "Perfil",
+      "avatarNote": "Tu avatar se gestiona desde tu cuenta de Clerk",
+      "emailManaged": "Gestionado por Clerk",
+      "motivations": "Motivaciones para dejar de fumar",
+      "health": "Salud",
+      "money": "Dinero",
+      "family": "Familia",
+      "saving": "Guardando...",
+      "save": "Guardar cambios",
+      "saved": "✓ Guardado"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "notifications": "Notificaciones push",
+      "notificationsDesc": "Recibe recordatorios para dejar de fumar",
+      "reminderInterval": "Intervalo de recordatorio",
+      "every4h": "Cada 4 horas",
+      "every6h": "Cada 6 horas",
+      "every8h": "Cada 8 horas",
+      "every12h": "Cada 12 horas",
+      "language": "Idioma",
+      "theme": "Tema",
+      "auto": "Automático",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "sounds": "Sonidos",
+      "soundsDesc": "Sonidos de notificación y efectos",
+      "saving": "Guardando...",
+      "save": "Guardar preferencias",
+      "saved": "✓ Guardado"
+    },
+    "account": {
+      "title": "Cuenta",
+      "email": "Email",
+      "changeEmail": "Cambiar email",
+      "password": "Contraseña",
+      "changePassword": "Cambiar contraseña",
+      "twoFactor": "Autenticación en dos pasos",
+      "active": "✓ Activa",
+      "deactivate": "Desactivar",
+      "activeSessions": "Sesiones activas",
+      "current": "Actual",
+      "closeAllSessions": "Cerrar todas las sesiones"
+    },
+    "data": {
+      "title": "Datos",
+      "downloading": "Descargando...",
+      "downloadData": "📥 Descargar mis datos",
+      "exportTimeline": "📊 Exportar timeline",
+      "privacy": "Privacidad (GDPR)",
+      "privacyDesc": "Tienes derecho a acceder, rectificar o eliminar tus datos personales.",
+      "requestAccess": "Solicitar acceso",
+      "requestDeletion": "Solicitar eliminación"
+    },
+    "danger": {
+      "title": "⚠️ Zona de peligro",
+      "resetProgress": "Reiniciar progreso",
+      "resetDesc": "Esto borrará todas tus vidas, días, logros y eventos. No se puede deshacer.",
+      "resetButton": "Reiniciar progreso",
+      "resetDone": "✓ Progreso reiniciado correctamente",
+      "deleteAccount": "Eliminar cuenta",
+      "deleteDesc": "Esto eliminará permanentemente tu cuenta y todos tus datos. No se puede deshacer.",
+      "deleteButton": "Eliminar cuenta",
+      "resetModalTitle": "⚠️ Reiniciar progreso",
+      "resetModalDesc": "Esto borrará todas tus vidas, días, logros y eventos. Esta acción no se puede deshacer.",
+      "resetConfirmPrompt": "Escribe REINICIAR para confirmar:",
+      "cancel": "Cancelar",
+      "resetting": "Reiniciando...",
+      "reset": "Reiniciar",
+      "deleteModalTitle": "🗑️ Eliminar cuenta",
+      "deleteModalDesc": "Esto eliminará permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.",
+      "deleteConfirmPrompt": "Escribe tu email para confirmar:"
+    }
+  },
+  "errors": {
+    "somethingWrong": "Algo salió mal",
+    "unexpected": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "dashboardLoad": "No pudimos cargar tu dashboard",
+    "networkError": "Parece que hay un problema de conexión. Verifica tu internet.",
+    "databaseError": "Estamos teniendo problemas para acceder a tus datos. Intenta de nuevo en unos segundos.",
+    "unexpectedError": "Algo inesperado ocurrió. Por favor intenta de nuevo.",
+    "settingsLoad": "No pudimos cargar la configuración",
+    "logrosLoad": "No pudimos cargar tus logros",
+    "logrosError": "Algo inesperado ocurrió al cargar la página de logros.",
+    "timelineLoad": "No se pudo cargar la línea de tiempo."
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish"
   }
 }

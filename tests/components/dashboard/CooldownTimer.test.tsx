@@ -2,6 +2,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import { CooldownTimer } from "@/components/dashboard/CooldownTimer";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    // useTranslations("dashboard.cooldown") scopes the namespace,
+    // so t("ready") receives just "ready", not "dashboard.cooldown.ready"
+    const translations: Record<string, string> = {
+      "nextAction": "⏱️ Próxima Acción",
+      "ready": "¡Listo para la siguiente acción!",
+      "active": "Cooldown activo",
+      "phase1": "Ansiedad inicial",
+      "phase2": "Inquietud máxima",
+      "phase3": "Ansiedad disminuye",
+      "phase4": "Recuperación completa",
+    };
+    return translations[key] || key;
+  },
+}));
+
 describe("CooldownTimer", () => {
   beforeEach(() => {
     vi.useFakeTimers();

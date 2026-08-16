@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
 
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => "es",
+}));
+
 // Mock next/navigation
 const mockPathname = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -30,7 +36,7 @@ describe("DashboardNav", () => {
   });
 
   it("renders all 4 nav items (desktop sidebar)", () => {
-    mockPathname.mockReturnValue("/dashboard");
+    mockPathname.mockReturnValue("/es/dashboard");
     const { container } = render(<DashboardNav />);
 
     // Desktop sidebar has hidden md:flex class
@@ -46,7 +52,7 @@ describe("DashboardNav", () => {
   });
 
   it("highlights active route for Home", () => {
-    mockPathname.mockReturnValue("/dashboard");
+    mockPathname.mockReturnValue("/es/dashboard");
     const { container } = render(<DashboardNav />);
 
     // Find the desktop sidebar links
@@ -57,7 +63,7 @@ describe("DashboardNav", () => {
   });
 
   it("highlights active route for Logros", () => {
-    mockPathname.mockReturnValue("/dashboard/logros");
+    mockPathname.mockReturnValue("/es/dashboard/logros");
     const { container } = render(<DashboardNav />);
 
     const sidebar = container.querySelector("aside");
@@ -67,7 +73,7 @@ describe("DashboardNav", () => {
   });
 
   it("highlights active route for Timeline", () => {
-    mockPathname.mockReturnValue("/dashboard/timeline");
+    mockPathname.mockReturnValue("/es/dashboard/timeline");
     const { container } = render(<DashboardNav />);
 
     const sidebar = container.querySelector("aside");
@@ -77,7 +83,7 @@ describe("DashboardNav", () => {
   });
 
   it("highlights active route for Settings", () => {
-    mockPathname.mockReturnValue("/dashboard/settings");
+    mockPathname.mockReturnValue("/es/dashboard/settings");
     const { container } = render(<DashboardNav />);
 
     const sidebar = container.querySelector("aside");
@@ -87,23 +93,23 @@ describe("DashboardNav", () => {
   });
 
   it("shows user menu on desktop", () => {
-    mockPathname.mockReturnValue("/dashboard");
+    mockPathname.mockReturnValue("/es/dashboard");
     render(<DashboardNav />);
 
     expect(screen.getByTestId("user-button")).toBeInTheDocument();
   });
 
   it("renders navigation links with correct hrefs", () => {
-    mockPathname.mockReturnValue("/dashboard");
+    mockPathname.mockReturnValue("/es/dashboard");
     const { container } = render(<DashboardNav />);
 
     const sidebar = container.querySelector("aside");
     const links = sidebar?.querySelectorAll("a") ?? [];
     const hrefs = Array.from(links).map((link) => link.getAttribute("href"));
 
-    expect(hrefs).toContain("/dashboard");
-    expect(hrefs).toContain("/dashboard/logros");
-    expect(hrefs).toContain("/dashboard/timeline");
-    expect(hrefs).toContain("/dashboard/settings");
+    expect(hrefs).toContain("/es/dashboard");
+    expect(hrefs).toContain("/es/dashboard/logros");
+    expect(hrefs).toContain("/es/dashboard/timeline");
+    expect(hrefs).toContain("/es/dashboard/settings");
   });
 });

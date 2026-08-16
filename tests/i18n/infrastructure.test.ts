@@ -2,21 +2,21 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-describe("middleware (Clerk-only, reverted from next-intl)", () => {
-  it("does NOT import next-intl/middleware", () => {
+describe("middleware (next-intl)", () => {
+  it("imports next-intl/middleware", () => {
     const source = readFileSync(
       join(process.cwd(), "src/middleware.ts"),
       "utf-8"
     );
-    expect(source).not.toContain("next-intl/middleware");
+    expect(source).toContain("next-intl/middleware");
   });
 
-  it("does NOT import i18n routing", () => {
+  it("imports i18n routing", () => {
     const source = readFileSync(
       join(process.cwd(), "src/middleware.ts"),
       "utf-8"
     );
-    expect(source).not.toContain("@/i18n/routing");
+    expect(source).toContain("@/i18n/routing");
   });
 
   it("exports middleware function", () => {
@@ -45,31 +45,41 @@ describe("middleware (Clerk-only, reverted from next-intl)", () => {
   });
 });
 
-describe("[locale] route (reverted)", () => {
-  it("does NOT have src/app/[locale]/layout.tsx", () => {
+describe("[locale] route", () => {
+  it("has src/app/[locale]/layout.tsx", () => {
     const fs = require("fs");
     const layoutPath = join(
       process.cwd(),
       "src/app/[locale]/layout.tsx"
     );
-    expect(fs.existsSync(layoutPath)).toBe(false);
+    expect(fs.existsSync(layoutPath)).toBe(true);
   });
 
-  it("does NOT have src/app/[locale]/page.tsx", () => {
+  it("has src/app/[locale]/page.tsx", () => {
     const fs = require("fs");
     const pagePath = join(
       process.cwd(),
       "src/app/[locale]/page.tsx"
     );
-    expect(fs.existsSync(pagePath)).toBe(false);
+    expect(fs.existsSync(pagePath)).toBe(true);
   });
 
-  it("root layout has html lang attribute", () => {
+  it("locale layout has html lang attribute via root layout", () => {
+    const layoutSource = readFileSync(
+      join(process.cwd(), "src/app/[locale]/layout.tsx"),
+      "utf-8"
+    );
+    expect(layoutSource).toContain("suppressHydrationWarning");
+    expect(layoutSource).toContain("<html");
+  });
+
+  it("root layout is a thin shell", () => {
     const rootSource = readFileSync(
       join(process.cwd(), "src/app/layout.tsx"),
       "utf-8"
     );
-    expect(rootSource).toContain("suppressHydrationWarning");
-    expect(rootSource).toContain("<html");
+    // Root layout should NOT have ClerkProvider or html tag
+    expect(rootSource).not.toContain("ClerkProvider");
+    expect(rootSource).not.toContain("<html");
   });
 });

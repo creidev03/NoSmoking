@@ -1,20 +1,17 @@
+"use client";
+
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface StreakDisplayProps {
   streakDays: number;
 }
 
-const MESSAGES = [
-  { icon: "🏅", text: "¡Sigue así!" },
-  { icon: "💪", text: "¡Fuerte!" },
-  { icon: "🎯", text: "¡En el objetivo!" },
-  { icon: "⭐", text: "¡Increíble!" },
-  { icon: "🏆", text: "¡Campeón!" },
-  { icon: "🔥", text: "¡Racha larga!" },
-];
-
 export function StreakDisplay({ streakDays }: StreakDisplayProps) {
+  const t = useTranslations("dashboard.streak");
   const [messageIndex, setMessageIndex] = useState(0);
+
+  const MESSAGES = t.raw("messages") as { icon: string; text: string }[];
 
   useEffect(() => {
     if (streakDays < 7) return;
@@ -22,7 +19,7 @@ export function StreakDisplay({ streakDays }: StreakDisplayProps) {
       setMessageIndex((prev) => (prev + 1) % MESSAGES.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [streakDays]);
+  }, [streakDays, MESSAGES.length]);
 
   const showBadge = streakDays >= 7;
   const currentMessage = MESSAGES[messageIndex];
@@ -42,7 +39,7 @@ export function StreakDisplay({ streakDays }: StreakDisplayProps) {
               {streakDays}
             </span>
             <p className="text-sm text-text-muted dark:text-text-muted">
-              {streakDays === 1 ? "día sin fumar" : "días sin fumar"}
+              {streakDays === 1 ? t("day") : t("days")}
             </p>
           </div>
         </div>

@@ -5,7 +5,7 @@ import type { GameState } from "@/lib/game-state";
 
 // Mock server actions
 const mockRegisterPositiveAction = vi.fn();
-vi.mock("@/app/dashboard/actions", () => ({
+vi.mock("@/app/[locale]/dashboard/actions", () => ({
   registerPositiveAction: (...args: any[]) => mockRegisterPositiveAction(...args),
 }));
 

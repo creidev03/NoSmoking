@@ -1,6 +1,22 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { LivesDisplay } from "@/components/dashboard/LivesDisplay";
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      "title": "🫀 Vidas Restantes",
+      "ofTotal": "de {total} vidas",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+}));
 
 describe("LivesDisplay", () => {
   it("renders filled hearts for remaining lives", () => {

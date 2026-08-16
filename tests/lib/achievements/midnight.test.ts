@@ -40,8 +40,8 @@ const { mockDb } = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/db", () => ({ db: mockDb }));
 
-vi.mock("@/app/dashboard/actions", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@/app/dashboard/actions")>();
+vi.mock("@/app/[locale]/dashboard/actions", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/app/[locale]/dashboard/actions")>();
   return {
     ...original,
     getUserAchievements: mockGetUserAchievements,
@@ -49,7 +49,7 @@ vi.mock("@/app/dashboard/actions", async (importOriginal) => {
 });
 
 import { checkMidnightReset, type GameState } from "@/lib/game-state";
-import { processMidnightReset } from "@/app/dashboard/actions";
+import { processMidnightReset } from "@/app/[locale]/dashboard/actions";
 
 function makeGameState(overrides: Partial<GameState> = {}): GameState {
   return {

@@ -1,8 +1,9 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 import type { TimelineEvent } from "@/lib/timeline";
+import { useLocale } from "next-intl";
 
 const COLOR_MAP: Record<string, string> = {
   green: "bg-primary",
@@ -17,10 +18,11 @@ interface TimelineItemProps {
 }
 
 export function TimelineItem({ event }: TimelineItemProps) {
+  const locale = useLocale();
   const dotColor = COLOR_MAP[event.color] || "bg-muted-foreground";
   const relativeTime = formatDistanceToNow(event.timestamp, {
     addSuffix: true,
-    locale: es,
+    locale: locale === "en" ? enUS : es,
   });
 
   return (

@@ -3,9 +3,34 @@ import { render, screen, act, waitFor } from "@testing-library/react";
 import { DashboardView } from "@/components/dashboard/DashboardView";
 import type { GameState } from "@/lib/game-state";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    // useTranslations("dashboard") scopes the namespace
+    const translations: Record<string, string> = {
+      "title": "Tu Progreso Hoy",
+      "subtitle": "Cada día es una oportunidad para ser más fuerte",
+      "recoveryTitle": "💚 Recuperación",
+      "recoverySubtitle": "Estás en ventana de recuperación. ¡No te rindas!",
+      "relapseWarning": "⚠️ Has perdido todas tus vidas. Tienes 24 horas para recuperarte completando acciones positivas.",
+      "extraLives": "🎁 Vidas extra ganadas: {count}/3",
+      "cigaretteRegistered": "Cigarro registrado",
+      "penaltyApplied": "⚠️ Penalización: perdiste 1 vida",
+      "devResetLives": "🔄 Vidas regeneradas (dev)",
+      "devRemoveCooldown": "⚡ Cooldown eliminado (dev)",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+}));
+
 // Mock server actions
 const mockRegisterPositiveAction = vi.fn();
-vi.mock("@/app/dashboard/actions", () => ({
+vi.mock("@/app/[locale]/dashboard/actions", () => ({
   registerPositiveAction: (...args: any[]) => mockRegisterPositiveAction(...args),
 }));
 

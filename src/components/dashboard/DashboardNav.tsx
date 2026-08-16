@@ -4,16 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { href: "/dashboard", label: "Home", icon: "🏠" },
-  { href: "/dashboard/logros", label: "Logros", icon: "🏆" },
-  { href: "/dashboard/timeline", label: "Timeline", icon: "📊" },
-  { href: "/dashboard/settings", label: "Configuración", icon: "⚙️" },
-];
+import { useLocale } from "next-intl";
 
 export function DashboardNav() {
   const pathname = usePathname();
+  const locale = useLocale();
+
+  const navItems = [
+    { href: `/${locale}/dashboard`, label: "Home", icon: "🏠" },
+    { href: `/${locale}/dashboard/logros`, label: "Logros", icon: "🏆" },
+    { href: `/${locale}/dashboard/timeline`, label: "Timeline", icon: "📊" },
+    { href: `/${locale}/dashboard/settings`, label: "Configuración", icon: "⚙️" },
+  ];
 
   return (
     <>
@@ -30,8 +32,8 @@ export function DashboardNav() {
           <nav className="flex-1 px-3 space-y-1">
             {navItems.map((item) => {
               const isActive =
-                item.href === "/dashboard"
-                  ? pathname === "/dashboard"
+                item.href === `/${locale}/dashboard`
+                  ? pathname === `/${locale}/dashboard`
                   : pathname.startsWith(item.href);
 
               return (
@@ -70,8 +72,8 @@ export function DashboardNav() {
         <div className="flex justify-around items-center h-16">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/dashboard"
-                ? pathname === "/dashboard"
+              item.href === `/${locale}/dashboard`
+                ? pathname === `/${locale}/dashboard`
                 : pathname.startsWith(item.href);
 
             return (

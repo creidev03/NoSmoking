@@ -5,7 +5,7 @@ import { ProfileSection } from "@/components/settings/ProfileSection";
 
 // Mock server action
 const mockUpdateUserProfile = vi.fn();
-vi.mock("@/app/dashboard/settings/actions", () => ({
+vi.mock("@/app/[locale]/dashboard/settings/actions", () => ({
   updateUserProfile: (...args: any[]) => mockUpdateUserProfile(...args),
 }));
 

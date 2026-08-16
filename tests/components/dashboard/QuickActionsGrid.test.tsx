@@ -2,6 +2,24 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QuickActionsGrid } from "@/components/dashboard/QuickActionsGrid";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    // useTranslations("dashboard.quickActions") scopes the namespace
+    const translations: Record<string, string> = {
+      "title": "⚡ Acciones rápidas",
+      "cigarette": "Registrar Cigarro",
+      "cigaretteDesc": "Registrar un cigarrillo fumado",
+      "breathing": "Respiración Guiada",
+      "breathingDesc": "Ejercicio de respiración calmante",
+      "meditation": "Meditación",
+      "meditationDesc": "Sesión de meditación breve",
+      "music": "Música Premium",
+      "musicDesc": "Escucha música relajante",
+    };
+    return translations[key] || key;
+  },
+}));
+
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
   useRouter: () => ({

@@ -4,8 +4,16 @@ import { game_state } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getTimelineEvents } from "../actions";
 import { TimelineView } from "@/components/timeline/TimelineView";
+import { setRequestLocale } from "next-intl/server";
 
-export default async function TimelinePage() {
+export default async function TimelinePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const row = await db
     .select()
     .from(game_state)
@@ -13,7 +21,7 @@ export default async function TimelinePage() {
     .get();
 
   if (!row) {
-    redirect("/onboarding");
+    redirect(`/${locale}/onboarding`);
   }
 
   const initialData = await getTimelineEvents(row.userId, "all", 0, 20);

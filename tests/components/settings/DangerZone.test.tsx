@@ -5,7 +5,7 @@ import { DangerZone } from "@/components/settings/DangerZone";
 
 // Mock server action
 const mockResetProgress = vi.fn();
-vi.mock("@/app/dashboard/settings/actions", () => ({
+vi.mock("@/app/[locale]/dashboard/settings/actions", () => ({
   resetProgress: (...args: any[]) => mockResetProgress(...args),
 }));
 

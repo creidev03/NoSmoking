@@ -1,13 +1,7 @@
 "use client";
 
 import type { TimelineFilter } from "@/lib/timeline";
-
-const FILTERS: { key: TimelineFilter; label: string }[] = [
-  { key: "today", label: "Hoy" },
-  { key: "week", label: "Esta semana" },
-  { key: "month", label: "Este mes" },
-  { key: "all", label: "Todos" },
-];
+import { useTranslations } from "next-intl";
 
 interface TimelineFiltersProps {
   active: TimelineFilter;
@@ -15,6 +9,15 @@ interface TimelineFiltersProps {
 }
 
 export function TimelineFilters({ active, onChange }: TimelineFiltersProps) {
+  const t = useTranslations("timeline.filters");
+
+  const FILTERS: { key: TimelineFilter; label: string }[] = [
+    { key: "today", label: t("today") },
+    { key: "week", label: t("week") },
+    { key: "month", label: t("month") },
+    { key: "all", label: t("all") },
+  ];
+
   return (
     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
       {FILTERS.map((f) => (

@@ -2,15 +2,16 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { submitStep, completeOnboarding } from "@/app/onboarding/actions";
+import { submitStep, completeOnboarding } from "@/app/[locale]/onboarding/actions";
 import { StepIndicator } from "./StepIndicator";
 import { StepForm } from "./StepForm";
 
 interface OnboardingWizardProps {
   initialStep: number;
+  locale: string;
 }
 
-export function OnboardingWizard({ initialStep }: OnboardingWizardProps) {
+export function OnboardingWizard({ initialStep, locale }: OnboardingWizardProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [isPending, startTransition] = useTransition();
@@ -23,7 +24,7 @@ export function OnboardingWizard({ initialStep }: OnboardingWizardProps) {
         const result = await submitStep("stub-user-id", currentStep, formData);
         if (result.nextStep > 4) {
           await completeOnboarding("stub-user-id");
-          router.push("/dashboard");
+          router.push(`/${locale}/dashboard`);
         } else {
           setCurrentStep(result.nextStep);
         }

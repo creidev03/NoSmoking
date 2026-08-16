@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { downloadUserData } from "@/app/dashboard/settings/actions";
+import { downloadUserData } from "@/app/[locale]/dashboard/settings/actions";
 
 interface DataSectionProps {
   userId: string;

@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { TimelineItem } from "@/components/timeline/TimelineItem";
 import type { TimelineEvent } from "@/lib/timeline";
+
+vi.mock("next-intl", () => ({
+  useLocale: () => "es",
+}));
 
 describe("TimelineItem", () => {
   const baseEvent: TimelineEvent = {

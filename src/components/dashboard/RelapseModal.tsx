@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RelapseCountdown } from "./RelapseCountdown";
 import { RelapseProgress } from "./RelapseProgress";
 import { RelapseTips } from "./RelapseTips";
-import { registerPositiveAction } from "@/app/dashboard/actions";
+import { registerPositiveAction } from "@/app/[locale]/dashboard/actions";
 import { isCooldownActive } from "@/lib/cooldown";
 import { type GameState } from "@/lib/game-state";
 import { toast } from "sonner";

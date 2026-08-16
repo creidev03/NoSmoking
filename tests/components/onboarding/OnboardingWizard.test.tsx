@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
-import * as actions from "@/app/onboarding/actions";
+import * as actions from "@/app/[locale]/onboarding/actions";
 
 vi.mock("next-intl", () => ({
   useTranslations: (namespace: string) => {
@@ -36,7 +36,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/app/onboarding/actions", () => ({
+vi.mock("@/app/[locale]/onboarding/actions", () => ({
   submitStep: vi.fn(),
   completeOnboarding: vi.fn(),
 }));
@@ -46,41 +46,41 @@ describe("OnboardingWizard", () => {
     vi.clearAllMocks();
   });
   it("renders step 1 by default", () => {
-    render(<OnboardingWizard initialStep={1} />);
+    render(<OnboardingWizard initialStep={1} locale="es" />);
     expect(
       screen.getByText("¿Cuántos cigarrillos fumas al día en promedio?")
     ).toBeInTheDocument();
   });
 
   it("renders step indicator with 4 steps", () => {
-    render(<OnboardingWizard initialStep={1} />);
+    render(<OnboardingWizard initialStep={1} locale="es" />);
     const steps = screen.getAllByRole("listitem");
     expect(steps).toHaveLength(4);
   });
 
   it("renders step 2 when initialStep is 2", () => {
-    render(<OnboardingWizard initialStep={2} />);
+    render(<OnboardingWizard initialStep={2} locale="es" />);
     expect(
       screen.getByText("¿Hace cuánto tiempo fumas?")
     ).toBeInTheDocument();
   });
 
   it("renders step 3 when initialStep is 3", () => {
-    render(<OnboardingWizard initialStep={3} />);
+    render(<OnboardingWizard initialStep={3} locale="es" />);
     expect(
       screen.getByText("¿Qué te motiva a dejar de fumar?")
     ).toBeInTheDocument();
   });
 
   it("renders step 4 when initialStep is 4", () => {
-    render(<OnboardingWizard initialStep={4} />);
+    render(<OnboardingWizard initialStep={4} locale="es" />);
     expect(
       screen.getByText("¿Cuántos intentos previos has tenido?")
     ).toBeInTheDocument();
   });
 
   it("shows card styling", () => {
-    render(<OnboardingWizard initialStep={1} />);
+    render(<OnboardingWizard initialStep={1} locale="es" />);
     const card = screen.getByRole("navigation").closest("div");
     expect(card).toHaveClass("rounded-2xl");
     expect(card).toHaveClass("shadow-lg");
@@ -92,7 +92,7 @@ describe("OnboardingWizard", () => {
       new Error("Network error")
     );
 
-    render(<OnboardingWizard initialStep={1} />);
+    render(<OnboardingWizard initialStep={1} locale="es" />);
     await user.click(screen.getByRole("button", { name: /6-10/i }));
 
     expect(
@@ -106,7 +106,7 @@ describe("OnboardingWizard", () => {
       .mockRejectedValueOnce(new Error("Network error"))
       .mockResolvedValueOnce({ nextStep: 2 });
 
-    render(<OnboardingWizard initialStep={1} />);
+    render(<OnboardingWizard initialStep={1} locale="es" />);
     await user.click(screen.getByRole("button", { name: /6-10/i }));
 
     // Error should appear
@@ -123,7 +123,7 @@ describe("OnboardingWizard", () => {
       .mockRejectedValueOnce(new Error("Network error"))
       .mockResolvedValueOnce({ nextStep: 2 });
 
-    render(<OnboardingWizard initialStep={1} />);
+    render(<OnboardingWizard initialStep={1} locale="es" />);
     await user.click(screen.getByRole("button", { name: /6-10/i }));
 
     // Error appears

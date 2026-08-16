@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import type { Achievement } from "@/lib/achievements/types";
 
 interface UserAchievement {
@@ -19,6 +20,8 @@ export function RecentAchievementsWidget({
   userAchievements,
   maxItems = 3,
 }: RecentAchievementsWidgetProps) {
+  const t = useTranslations("dashboard.recentAchievements");
+  const locale = useLocale();
   // Sort by unlockedAt desc and take top N
   const sorted = [...userAchievements]
     .sort((a, b) => new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime())
@@ -31,12 +34,12 @@ export function RecentAchievementsWidget({
   return (
     <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
       <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
-        📈 Tus últimos logros
+        {t("title")}
       </h2>
 
       {sorted.length === 0 ? (
         <p className="text-sm text-text-muted">
-          Aún no has desbloqueado logros. ¡Sigue intentando!
+          {t("empty")}
         </p>
       ) : (
         <div className="space-y-2">
@@ -68,7 +71,7 @@ export function RecentAchievementsWidget({
                     {achievement.name}
                   </p>
                   <p className="text-[10px] text-text-muted">
-                    {new Date(ua.unlockedAt).toLocaleDateString("es-ES", {
+                    {new Date(ua.unlockedAt).toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
                       day: "numeric",
                       month: "short",
                     })}
@@ -80,10 +83,10 @@ export function RecentAchievementsWidget({
 
           {remaining > 0 && (
             <Link
-              href="/dashboard/logros"
+              href={`/${locale}/dashboard/logros`}
               className="block text-center text-xs font-medium text-primary hover:underline"
             >
-              y {remaining} más →
+              {t("more", { count: remaining })}
             </Link>
           )}
         </div>
@@ -91,10 +94,10 @@ export function RecentAchievementsWidget({
 
       {userAchievements.length > 0 && (
         <Link
-          href="/dashboard/logros"
+          href={`/${locale}/dashboard/logros`}
           className="mt-3 block text-center text-xs font-medium text-text-muted hover:text-primary"
         >
-          Ver todos los logros
+          {t("viewAll")}
         </Link>
       )}
     </div>

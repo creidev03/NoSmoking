@@ -1,16 +1,21 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 interface CigarettesTodayProps {
   count: number;
   threshold: number;
 }
 
 export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
+  const t = useTranslations("dashboard.cigarettes");
   const remaining = Math.max(0, threshold - count);
   const segments = Array.from({ length: threshold }, (_, i) => i < count);
 
   return (
     <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
       <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
-        🚬 Consumo de Hoy
+        {t("title")}
       </h2>
 
       <div className="mb-4 flex items-baseline gap-2">
@@ -26,7 +31,7 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
         >
           {count}
         </span>
-        <span className="text-text-muted">de {threshold} permitidos</span>
+        <span className="text-text-muted">{t("ofAllowed", { threshold })}</span>
       </div>
 
       {/* 5-segment progress bar */}
@@ -43,11 +48,7 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
 
       {remaining > 0 && (
         <p data-testid="remaining-text" className="text-sm text-text-muted">
-          Quedan{" "}
-          <span className="font-medium text-text dark:text-text">
-            {remaining}
-          </span>{" "}
-          antes de penalización
+          {t("remaining", { count: remaining })}
         </p>
       )}
       {count >= threshold && (
@@ -55,7 +56,7 @@ export function CigarettesToday({ count, threshold }: CigarettesTodayProps) {
           data-testid="penalty-text"
           className="text-sm font-medium text-danger"
         >
-          ⚠️ ¡Ciclo completado! Se perderá 1 vida
+          {t("penalty")}
         </p>
       )}
     </div>

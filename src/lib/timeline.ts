@@ -1,5 +1,5 @@
 import { format, isToday, isYesterday, differenceInDays } from "date-fns";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 
 export type TimelineEventType =
   | "cigarette"
@@ -132,12 +132,18 @@ export function groupEventsByDay(
   return sorted;
 }
 
-export function getRelativeDayLabel(date: Date): string {
-  if (isToday(date)) return "HOY";
-  if (isYesterday(date)) return "AYER";
+export function getRelativeDayLabel(date: Date, locale: string = "es"): string {
+  const dateFnsLocale = locale === "en" ? enUS : es;
+
+  if (isToday(date)) return locale === "en" ? "TODAY" : "HOY";
+  if (isYesterday(date)) return locale === "en" ? "YESTERDAY" : "AYER";
 
   const daysAgo = differenceInDays(new Date(), date);
-  if (daysAgo <= 30) return `HACE ${daysAgo} DÍAS`;
+  if (daysAgo <= 30) {
+    return locale === "en"
+      ? `${daysAgo} DAYS AGO`
+      : `HACE ${daysAgo} DÍAS`;
+  }
 
-  return format(date, "d 'de' MMMM", { locale: es });
+  return format(date, "d 'de' MMMM", { locale: dateFnsLocale });
 }

@@ -3,12 +3,31 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TimelineView } from "@/components/timeline/TimelineView";
 import type { TimelineEvent } from "@/lib/timeline";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    // Handle both timeline.* and timeline.filters.* scoped keys
+    const translations: Record<string, string> = {
+      "title": "Línea de tiempo",
+      "empty": "Aún no hay eventos. ¡Registra tu primer cigarro o actividad positiva!",
+      "loading": "Cargando...",
+      "loadMore": "Cargar más...",
+      // TimelineFilters uses useTranslations("timeline.filters") so t("today") gets just "today"
+      "today": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes",
+      "all": "Todos",
+    };
+    return translations[key] || key;
+  },
+  useLocale: () => "es",
+}));
+
 // Mock server action
-vi.mock("@/app/dashboard/actions", () => ({
+vi.mock("@/app/[locale]/dashboard/actions", () => ({
   getTimelineEvents: vi.fn(),
 }));
 
-import { getTimelineEvents } from "@/app/dashboard/actions";
+import { getTimelineEvents } from "@/app/[locale]/dashboard/actions";
 const mockGetTimelineEvents = vi.mocked(getTimelineEvents);
 
 function makeEvent(id: string, hoursAgo = 0): TimelineEvent {

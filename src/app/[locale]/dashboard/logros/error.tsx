@@ -1,6 +1,7 @@
 "use client";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { useTranslations } from "next-intl";
 
 export default function LogrosError({
   error,
@@ -9,6 +10,8 @@ export default function LogrosError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("errors");
+
   return (
     <ErrorBoundary onReset={reset}>
       <div className="container mx-auto px-4 py-6">
@@ -17,16 +20,16 @@ export default function LogrosError({
             <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-surface-card p-8 text-center">
               <div className="mb-4 text-4xl">💔</div>
               <h3 className="mb-2 text-lg font-semibold text-text">
-                No pudimos cargar tus logros
+                {t("logrosLoad")}
               </h3>
               <p className="mb-4 text-sm text-text-muted">
-                Algo inesperado ocurrió al cargar la página de logros.
+                {t("logrosError")}
               </p>
               <button
                 onClick={reset}
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
               >
-                Intentar de nuevo
+                {t("tryAgain")}
               </button>
             </div>
           }

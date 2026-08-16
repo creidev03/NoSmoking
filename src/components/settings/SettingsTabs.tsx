@@ -7,7 +7,7 @@ import { PreferencesSection } from "./PreferencesSection";
 import { AccountSection } from "./AccountSection";
 import { DataSection } from "./DataSection";
 import { DangerZone } from "./DangerZone";
-import type { UserProfile, UserPreferences } from "@/app/dashboard/settings/actions";
+import type { UserProfile, UserPreferences } from "@/app/[locale]/dashboard/settings/actions";
 
 interface SettingsTabsProps {
   userId: string;

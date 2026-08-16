@@ -1,7 +1,34 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { RecentAchievementsWidget } from "@/components/dashboard/RecentAchievementsWidget";
 import type { Achievement } from "@/lib/achievements/types";
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    // useTranslations("dashboard.recentAchievements") scopes the namespace
+    const translations: Record<string, string> = {
+      "title": "📈 Tus últimos logros",
+      "empty": "Aún no has desbloqueado logros. ¡Sigue intentando!",
+      "viewAll": "Ver todos los logros",
+      "more": "y {count} más →",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+  useLocale: () => "es",
+}));
+
+// Mock next/link
+vi.mock("next/link", () => ({
+  default: ({ children, href, ...props }: any) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}));
 
 const baseAchievement: Achievement = {
   id: "T001",
@@ -80,7 +107,7 @@ describe("RecentAchievementsWidget", () => {
 
     const links = screen.getAllByRole("link");
     const logrosLinks = links.filter(
-      (link) => link.getAttribute("href") === "/dashboard/logros"
+      (link) => link.getAttribute("href") === "/es/dashboard/logros"
     );
     expect(logrosLinks.length).toBeGreaterThan(0);
   });

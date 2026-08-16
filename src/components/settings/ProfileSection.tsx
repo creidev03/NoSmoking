@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { updateUserProfile } from "@/app/dashboard/settings/actions";
-import type { UserProfile } from "@/app/dashboard/settings/actions";
+import { updateUserProfile } from "@/app/[locale]/dashboard/settings/actions";
+import type { UserProfile } from "@/app/[locale]/dashboard/settings/actions";
 
 interface ProfileSectionProps {
   userId: string;

@@ -7,12 +7,20 @@ import { DashboardView } from "@/components/dashboard/DashboardView";
 import { ACHIEVEMENT_SEEDS } from "@/lib/achievements/seed";
 import type { Achievement } from "@/lib/achievements/types";
 import { processMidnightReset } from "./actions";
+import { setRequestLocale } from "next-intl/server";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${locale}/sign-in`);
   }
 
   const row = await db
@@ -22,7 +30,7 @@ export default async function DashboardPage() {
     .get();
 
   if (!row) {
-    redirect("/onboarding");
+    redirect(`/${locale}/onboarding`);
   }
 
   // Process midnight reset: persists if needed + evaluates achievements

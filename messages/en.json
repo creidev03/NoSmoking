@@ -117,5 +117,245 @@
     "attempts": {
       "question": "How many previous attempts have you had?"
     }
+  },
+  "dashboard": {
+    "title": "Your Progress Today",
+    "subtitle": "Every day is an opportunity to be stronger",
+    "recoveryTitle": "💚 Recovery",
+    "recoverySubtitle": "You're in a recovery window. Don't give up!",
+    "relapseWarning": "⚠️ You've lost all your lives. You have 24 hours to recover by completing positive actions.",
+    "extraLives": "🎁 Extra lives earned: {count}/3",
+    "cigaretteRegistered": "Cigarette logged",
+    "penaltyApplied": "⚠️ Penalty: you lost 1 life",
+    "devResetLives": "🔄 Lives regenerated (dev)",
+    "devRemoveCooldown": "⚡ Cooldown removed (dev)",
+    "lives": {
+      "title": "🫀 Lives Remaining",
+      "ofTotal": "of {total} lives"
+    },
+    "cigarettes": {
+      "title": "🚬 Today's Consumption",
+      "ofAllowed": "of {threshold} allowed",
+      "remaining": "{count} remaining before penalty",
+      "penalty": "⚠️ Cycle complete! You'll lose 1 life"
+    },
+    "streak": {
+      "day": "day without smoking",
+      "days": "days without smoking",
+      "messages": [
+        { "icon": "🏅", "text": "Keep it up!" },
+        { "icon": "💪", "text": "Strong!" },
+        { "icon": "🎯", "text": "On target!" },
+        { "icon": "⭐", "text": "Amazing!" },
+        { "icon": "🏆", "text": "Champion!" },
+        { "icon": "🔥", "text": "Long streak!" }
+      ]
+    },
+    "cooldown": {
+      "nextAction": "⏱️ Next Action",
+      "ready": "Ready for the next action!",
+      "active": "Cooldown active",
+      "phase1": "Initial anxiety",
+      "phase2": "Maximum restlessness",
+      "phase3": "Anxiety decreases",
+      "phase4": "Full recovery"
+    },
+    "actions": {
+      "title": "🫁 Positive Activities",
+      "breathing": "Breathing",
+      "meditation": "Meditation",
+      "livesReward": "+0.5 lives",
+      "waitForCooldown": "⏳ Wait for the cooldown to end"
+    },
+    "upcoming": {
+      "title": "📅 Upcoming events",
+      "dailyReset": "Daily reset",
+      "cooldownActive": "Cooldown active",
+      "actionAvailable": "Action available",
+      "ready": "Ready!",
+      "currentPhase": "Current phase"
+    },
+    "recentAchievements": {
+      "title": "📈 Your recent achievements",
+      "empty": "You haven't unlocked any achievements yet. Keep trying!",
+      "viewAll": "View all achievements",
+      "more": "and {count} more →"
+    },
+    "quickActions": {
+      "title": "⚡ Quick actions",
+      "cigarette": "Log Cigarette",
+      "cigaretteDesc": "Log a smoked cigarette",
+      "breathing": "Guided Breathing",
+      "breathingDesc": "Calming breathing exercise",
+      "meditation": "Meditation",
+      "meditationDesc": "Brief meditation session",
+      "music": "Premium Music",
+      "musicDesc": "Listen to relaxing music"
+    }
+  },
+  "timeline": {
+    "title": "Timeline",
+    "empty": "No events yet. Log your first cigarette or positive activity!",
+    "loading": "Loading...",
+    "loadMore": "Load more...",
+    "filters": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "all": "All"
+    },
+    "relativeDay": {
+      "today": "TODAY",
+      "yesterday": "YESTERDAY",
+      "daysAgo": "{count} DAYS AGO"
+    },
+    "events": {
+      "cigarette": "You smoked {count} cigarette(s). Total today: {total} of 5",
+      "penalty": "You lost 1 life. You have {remaining} of 4 left",
+      "breathing": "Guided breathing completed",
+      "meditation": "Meditation completed",
+      "music": "Relaxation music completed",
+      "positiveAction": "Positive action completed",
+      "livesRecovered": "+{count} lives recovered"
+    }
+  },
+  "achievements": {
+    "title": "🏆 Your Achievements",
+    "ofTotal": "of {total} unlocked ({percent}%)",
+    "categories": {
+      "all": "All",
+      "time": "Time",
+      "progress": "Progress",
+      "actions": "Actions",
+      "challenges": "Challenges",
+      "collection": "Collections",
+      "awareness": "Awareness"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "balanced": "Balanced",
+      "medium": "Medium",
+      "hard": "Hard",
+      "extreme": "Extreme"
+    },
+    "progress": "Progress",
+    "unlocked": "Unlocked: {date}",
+    "share": "SHARE",
+    "understood": "GOT IT",
+    "shareMessage": "🏆 I unlocked \"{name}\" in No Smoking!\n\n{description}",
+    "copied": "Copied to clipboard",
+    "copiedDescription": "Paste the message to share your achievement",
+    "close": "Close",
+    "loadMore": "Load more ({visible} of {total})",
+    "emptyCategory": "No achievements in this category",
+    "noAchievements": "No achievements in this category",
+    "autoClose": "Auto-close in",
+    "seconds": "seconds"
+  },
+  "settings": {
+    "title": "⚙️ Settings",
+    "tabs": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "account": "Account",
+      "data": "Data",
+      "danger": "Danger"
+    },
+    "profile": {
+      "title": "Profile",
+      "avatarNote": "Your avatar is managed through your Clerk account",
+      "emailManaged": "Managed by Clerk",
+      "motivations": "Motivations to quit smoking",
+      "health": "Health",
+      "money": "Money",
+      "family": "Family",
+      "saving": "Saving...",
+      "save": "Save changes",
+      "saved": "✓ Saved"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "notifications": "Push notifications",
+      "notificationsDesc": "Receive reminders to quit smoking",
+      "reminderInterval": "Reminder interval",
+      "every4h": "Every 4 hours",
+      "every6h": "Every 6 hours",
+      "every8h": "Every 8 hours",
+      "every12h": "Every 12 hours",
+      "language": "Language",
+      "theme": "Theme",
+      "auto": "Automatic",
+      "light": "Light",
+      "dark": "Dark",
+      "sounds": "Sounds",
+      "soundsDesc": "Notification sounds and effects",
+      "saving": "Saving...",
+      "save": "Save preferences",
+      "saved": "✓ Saved"
+    },
+    "account": {
+      "title": "Account",
+      "email": "Email",
+      "changeEmail": "Change email",
+      "password": "Password",
+      "changePassword": "Change password",
+      "twoFactor": "Two-factor authentication",
+      "active": "✓ Active",
+      "deactivate": "Deactivate",
+      "activeSessions": "Active sessions",
+      "current": "Current",
+      "closeAllSessions": "Close all sessions"
+    },
+    "data": {
+      "title": "Data",
+      "downloading": "Downloading...",
+      "downloadData": "📥 Download my data",
+      "exportTimeline": "📊 Export timeline",
+      "privacy": "Privacy (GDPR)",
+      "privacyDesc": "You have the right to access, rectify, or delete your personal data.",
+      "requestAccess": "Request access",
+      "requestDeletion": "Request deletion"
+    },
+    "danger": {
+      "title": "⚠️ Danger zone",
+      "resetProgress": "Reset progress",
+      "resetDesc": "This will erase all your lives, days, achievements, and events. This cannot be undone.",
+      "resetButton": "Reset progress",
+      "resetDone": "✓ Progress reset successfully",
+      "deleteAccount": "Delete account",
+      "deleteDesc": "This will permanently delete your account and all your data. This cannot be undone.",
+      "deleteButton": "Delete account",
+      "resetModalTitle": "⚠️ Reset progress",
+      "resetModalDesc": "This will erase all your lives, days, achievements, and events. This action cannot be undone.",
+      "resetConfirmPrompt": "Type RESET to confirm:",
+      "cancel": "Cancel",
+      "resetting": "Resetting...",
+      "reset": "Reset",
+      "deleteModalTitle": "🗑️ Delete account",
+      "deleteModalDesc": "This will permanently delete your account and all your data. This action cannot be undone.",
+      "deleteConfirmPrompt": "Type your email to confirm:"
+    }
+  },
+  "errors": {
+    "somethingWrong": "Something went wrong",
+    "unexpected": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try again",
+    "dashboardLoad": "We couldn't load your dashboard",
+    "networkError": "It seems there's a connection problem. Check your internet.",
+    "databaseError": "We're having trouble accessing your data. Try again in a few seconds.",
+    "unexpectedError": "Something unexpected happened. Please try again.",
+    "settingsLoad": "We couldn't load the settings",
+    "logrosLoad": "We couldn't load your achievements",
+    "logrosError": "Something unexpected happened while loading the achievements page.",
+    "timelineLoad": "Could not load the timeline."
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish"
   }
 }

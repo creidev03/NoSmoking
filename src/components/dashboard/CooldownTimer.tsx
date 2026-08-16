@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 
 interface CooldownTimerProps {
   nextActionAt: string | null;
@@ -14,12 +15,12 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-function getPhaseLabel(phase: number): string {
+function getPhaseLabel(phase: number, t: (key: string) => string): string {
   const labels: Record<number, string> = {
-    1: "Ansiedad inicial",
-    2: "Inquietud máxima",
-    3: "Ansiedad disminuye",
-    4: "Recuperación completa",
+    1: t("phase1"),
+    2: t("phase2"),
+    3: t("phase3"),
+    4: t("phase4"),
   };
   return labels[phase] ?? `Fase ${phase}`;
 }
@@ -49,10 +50,9 @@ export function CooldownTimer({
   phase,
   onExpired,
 }: CooldownTimerProps) {
+  const t = useTranslations("dashboard.cooldown");
   const expiredRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  console.log("CooldownTimer props:", { nextActionAt, phase });
 
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
     if (!nextActionAt) return 0;
@@ -62,7 +62,6 @@ export function CooldownTimer({
 
   // Single effect: recalculates on nextActionAt change, runs countdown
   useEffect(() => {
-    console.log("CooldownTimer effect running, nextActionAt:", nextActionAt);
     // Clear any existing interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -72,7 +71,6 @@ export function CooldownTimer({
 
     // No cooldown active
     if (!nextActionAt) {
-      console.log("CooldownTimer: nextActionAt is null, setting remaining to 0");
       setRemainingSeconds(0);
       return;
     }
@@ -80,23 +78,19 @@ export function CooldownTimer({
     // Calculate remaining seconds from nextActionAt
     const diff = new Date(nextActionAt).getTime() - Date.now();
     const seconds = Math.max(0, Math.ceil(diff / 1000));
-    console.log("CooldownTimer: calculated seconds:", seconds);
     setRemainingSeconds(seconds);
 
     // If already expired, notify
     if (seconds <= 0) {
-      console.log("CooldownTimer: ALREADY EXPIRED, calling onExpired");
       onExpired();
       return;
     }
 
-    console.log("CooldownTimer: starting interval for", seconds, "seconds");
     // Start countdown interval
     intervalRef.current = setInterval(() => {
       setRemainingSeconds((prev) => {
         const next = prev - 1;
         if (next <= 0) {
-          console.log("CooldownTimer: interval reached 0, calling onExpired");
           if (intervalRef.current) clearInterval(intervalRef.current);
           intervalRef.current = null;
           // Call onExpired after state update
@@ -122,9 +116,9 @@ export function CooldownTimer({
   const circumference = 2 * Math.PI * 26; // 26px radius for 60px diameter
 
   return (
-    <div>
+    <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
       <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
-        ⏱️ Próxima Acción
+        {t("nextAction")}
       </h2>
 
       {!isActive ? (
@@ -152,9 +146,9 @@ export function CooldownTimer({
               className="font-medium"
               style={{ color }}
             >
-              ¡Listo para la siguiente acción!
+              {t("ready")}
             </p>
-            <p className="text-sm text-text-muted">{getPhaseLabel(phase)}</p>
+            <p className="text-sm text-text-muted">{getPhaseLabel(phase, t)}</p>
           </div>
         </div>
       ) : (
@@ -202,9 +196,9 @@ export function CooldownTimer({
               className="font-medium"
               style={{ color }}
             >
-              {getPhaseLabel(phase)}
+              {getPhaseLabel(phase, t)}
             </p>
-            <p className="text-sm text-text-muted">Cooldown activo</p>
+            <p className="text-sm text-text-muted">{t("active")}</p>
           </div>
         </div>
       )}

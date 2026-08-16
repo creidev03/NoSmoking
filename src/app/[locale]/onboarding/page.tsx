@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
+import { setRequestLocale } from "next-intl/server";
 
 async function getStep(searchParams: Promise<{ step?: string }>) {
   const params = await searchParams;
@@ -10,17 +11,18 @@ async function getStep(searchParams: Promise<{ step?: string }>) {
 
 export default async function OnboardingPage({
   searchParams,
+  params,
 }: {
   searchParams: Promise<{ step?: string }>;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const step = await getStep(searchParams);
-
-  // TODO: Check if user has completed onboarding -> redirect to /dashboard
-  // TODO: Check if user exists -> create or resume
 
   return (
     <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
-      <OnboardingWizard initialStep={step} />
+      <OnboardingWizard initialStep={step} locale={locale} />
     </Suspense>
   );
 }

@@ -6,12 +6,20 @@ import { eq } from "drizzle-orm";
 import { ACHIEVEMENT_SEEDS } from "@/lib/achievements/seed";
 import type { Achievement } from "@/lib/achievements/types";
 import { AchievementsView } from "@/components/achievements/AchievementsView";
+import { setRequestLocale } from "next-intl/server";
 
-export default async function LogrosPage() {
+export default async function LogrosPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    redirect(`/${locale}/sign-in`);
   }
 
   // Get all achievements from seed data
