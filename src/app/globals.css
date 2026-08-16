@@ -332,3 +332,18 @@ img[style*="pixelated"] {
 @media (pointer: coarse) {
   .landing-shell .landing-flash { display: none !important; }
 }
+
+/* Hide Clerk branding — "Secured by Clerk" + "Development mode" */
+.cl-internal-footer,
+.cl-internal-poweredByClerk,
+.cl-footer,
+[data-clerk-footer],
+.clerk-dev-mode-banner,
+.dev-mode-banner,
+[class*="PoweredBy"],
+[class*="poweredBy"],
+[class*="DevelopmentMode"],
+.cl-internal development-mode,
+.dev-mode {
+  display: none !important;
+}

@@ -1,124 +1,159 @@
 import type { Appearance } from "@clerk/nextjs";
 
 /**
- * Clerk appearance config — matches No Smoking's design system.
- * Primary: Verde Esperanza #10B981
+ * Clerk appearance config — No Smoking design system.
+ * Minimal, clean, no Clerk branding.
  */
 export const clerkAppearance: Appearance = {
   variables: {
     colorPrimary: "#10B981",
     colorBackground: "#ffffff",
     colorText: "#1F2937",
-    colorInputBackground: "#ffffff",
+    colorInputBackground: "#F9FAFB",
     colorInputText: "#1F2937",
-    borderRadius: "0.625rem",
+    colorTextSecondary: "#6B7280",
+    borderRadius: "0.75rem",
     fontFamily: "var(--font-sans), system-ui, sans-serif",
   },
   elements: {
-    // Card wrapper
+    // Card — clean, minimal shadow
     card: {
-      boxShadow: "0 4px 24px rgba(0, 0, 0, 0.08)",
-      border: "1px solid #E5E7EB",
-      padding: "2rem",
+      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.06)",
+      border: "none",
+      padding: "2.5rem 2rem",
+      borderRadius: "1rem",
     },
-    // Header (logo + title)
+    // Header
     headerTitle: {
-      fontSize: "1.5rem",
-      fontWeight: "700",
-      color: "#1F2937",
+      fontSize: "1.25rem",
+      fontWeight: "600",
+      color: "#111827",
+      letterSpacing: "-0.01em",
     },
     headerSubtitle: {
-      fontSize: "0.875rem",
-      color: "#6B7280",
+      fontSize: "0.8125rem",
+      color: "#9CA3AF",
+      marginTop: "0.25rem",
     },
     // Form fields
     formFieldLabel: {
-      fontSize: "0.875rem",
+      fontSize: "0.8125rem",
       fontWeight: "500",
       color: "#374151",
+      marginBottom: "0.375rem",
     },
     formFieldInput: {
-      borderRadius: "0.5rem",
-      border: "1px solid #E5E7EB",
-      padding: "0.625rem 0.75rem",
+      borderRadius: "0.625rem",
+      border: "1.5px solid #E5E7EB",
+      backgroundColor: "#F9FAFB",
+      padding: "0.75rem 1rem",
       fontSize: "0.875rem",
-      transition: "border-color 0.15s, box-shadow 0.15s",
+      transition: "all 0.15s ease",
       "&:focus": {
         borderColor: "#10B981",
-        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.15)",
+        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.1)",
+        backgroundColor: "#ffffff",
       },
     },
-    // Primary button (Sign in, Continue, etc.)
+    // Primary button — full width, rounded, no arrow
     formButtonPrimary: {
       backgroundColor: "#10B981",
       fontSize: "0.875rem",
       fontWeight: "600",
-      padding: "0.625rem 1.5rem",
-      borderRadius: "0.5rem",
-      transition: "background-color 0.15s, transform 0.1s",
+      padding: "0.75rem 1.5rem",
+      borderRadius: "0.625rem",
+      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+      transition: "all 0.15s ease",
       "&:hover": {
         backgroundColor: "#059669",
+        boxShadow: "0 2px 8px rgba(16, 185, 129, 0.25)",
         transform: "translateY(-1px)",
       },
       "&:active": {
         transform: "translateY(0)",
+        boxShadow: "none",
       },
     },
-    // Social buttons (Google, etc.)
+    // Social buttons — outline style
     socialButtonsBlockButton: {
-      border: "1px solid #E5E7EB",
-      borderRadius: "0.5rem",
+      border: "1.5px solid #E5E7EB",
+      borderRadius: "0.625rem",
       fontSize: "0.875rem",
       fontWeight: "500",
-      padding: "0.5rem 1rem",
-      transition: "background-color 0.15s, border-color 0.15s",
+      padding: "0.625rem 1rem",
+      backgroundColor: "#ffffff",
+      transition: "all 0.15s ease",
       "&:hover": {
         backgroundColor: "#F9FAFB",
         borderColor: "#D1D5DB",
+        boxShadow: "0 1px 4px rgba(0, 0, 0, 0.06)",
       },
     },
-    // Links (Forgot password, Sign up)
+    // Links
     footerActionLink: {
       color: "#10B981",
       fontWeight: "500",
-      fontSize: "0.875rem",
+      fontSize: "0.8125rem",
       "&:hover": {
         color: "#059669",
       },
     },
-    // Divider line
+    footerActionText: {
+      fontSize: "0.8125rem",
+      color: "#9CA3AF",
+    },
+    // Divider
     dividerLine: {
-      backgroundColor: "#E5E7EB",
+      backgroundColor: "#F3F4F6",
+      height: "1px",
     },
     dividerText: {
-      color: "#6B7280",
+      color: "#D1D5DB",
       fontSize: "0.75rem",
+      fontWeight: "400",
     },
-    // Error messages
+    // Errors
     formFieldErrorText: {
       color: "#EF4444",
       fontSize: "0.75rem",
       marginTop: "0.25rem",
     },
-    // Success state
+    // Success
     formFieldSuccessText: {
       color: "#10B981",
     },
-    // OTP input
+    // OTP
     otpInputField: {
-      borderRadius: "0.5rem",
-      border: "1px solid #E5E7EB",
-      fontSize: "1rem",
+      borderRadius: "0.625rem",
+      border: "1.5px solid #E5E7EB",
+      backgroundColor: "#F9FAFB",
+      fontSize: "1.125rem",
+      fontWeight: "500",
       "&:focus": {
         borderColor: "#10B981",
-        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.15)",
+        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.1)",
+        backgroundColor: "#ffffff",
       },
+    },
+    // HIDE CLERK BRANDING
+    footer: {
+      display: "none",
+    },
+    badge: {
+      display: "none",
+    },
+    // Also hide "Development mode" banner
+    developmentMode: {
+      display: "none",
+    },
+    poweredByClerk: {
+      display: "none",
     },
   },
 };
 
 /**
- * Dark mode variant — applied when .dark class is present
+ * Dark mode variant
  */
 export const clerkAppearanceDark: Appearance = {
   variables: {
@@ -127,52 +162,76 @@ export const clerkAppearanceDark: Appearance = {
     colorText: "#F3F4F6",
     colorInputBackground: "#1F2937",
     colorInputText: "#F3F4F6",
-    borderRadius: "0.625rem",
+    colorTextSecondary: "#9CA3AF",
+    borderRadius: "0.75rem",
     fontFamily: "var(--font-sans), system-ui, sans-serif",
   },
   elements: {
     card: {
       backgroundColor: "#1F2937",
-      boxShadow: "0 4px 24px rgba(0, 0, 0, 0.3)",
-      border: "1px solid #374151",
+      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+      border: "none",
     },
     headerTitle: {
-      color: "#F3F4F6",
+      color: "#F9FAFB",
     },
     headerSubtitle: {
-      color: "#9CA3AF",
+      color: "#6B7280",
     },
     formFieldLabel: {
       color: "#D1D5DB",
     },
     formFieldInput: {
       backgroundColor: "#111827",
-      border: "1px solid #374151",
+      border: "1.5px solid #374151",
       color: "#F3F4F6",
       "&:focus": {
         borderColor: "#10B981",
-        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.2)",
+        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.15)",
+        backgroundColor: "#1a2332",
       },
     },
     socialButtonsBlockButton: {
-      backgroundColor: "#1F2937",
-      border: "1px solid #374151",
+      backgroundColor: "#111827",
+      border: "1.5px solid #374151",
       color: "#F3F4F6",
       "&:hover": {
-        backgroundColor: "#374151",
+        backgroundColor: "#1F2937",
         borderColor: "#4B5563",
       },
+    },
+    footerActionLink: {
+      color: "#10B981",
+      "&:hover": {
+        color: "#34D399",
+      },
+    },
+    footerActionText: {
+      color: "#6B7280",
     },
     dividerLine: {
       backgroundColor: "#374151",
     },
     dividerText: {
-      color: "#9CA3AF",
+      color: "#4B5563",
     },
     otpInputField: {
       backgroundColor: "#111827",
-      border: "1px solid #374151",
+      border: "1.5px solid #374151",
       color: "#F3F4F6",
+    },
+    // Hide branding in dark mode too
+    footer: {
+      display: "none",
+    },
+    badge: {
+      display: "none",
+    },
+    developmentMode: {
+      display: "none",
+    },
+    poweredByClerk: {
+      display: "none",
     },
   },
 };
