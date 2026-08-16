@@ -93,6 +93,13 @@
     },
     "heartButton": {
       "ariaLabel": "See a sign of progress"
+    },
+    "credits": {
+      "builtBy": "Built by",
+      "github": "GitHub",
+      "email": "Email",
+      "settingsTitle": "Credits",
+      "settingsDesc": "Application built by Carlos Reina"
     }
   },
   "onboarding": {

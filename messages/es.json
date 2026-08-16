@@ -93,6 +93,13 @@
     },
     "heartButton": {
       "ariaLabel": "Ver una señal de avance"
+    },
+    "credits": {
+      "builtBy": "Desarrollado por",
+      "github": "GitHub",
+      "email": "Email",
+      "settingsTitle": "Créditos",
+      "settingsDesc": "Aplicación desarrollada por Carlos Reina"
     }
   },
   "onboarding": {
