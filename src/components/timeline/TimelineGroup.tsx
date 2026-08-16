@@ -32,9 +32,13 @@ export function TimelineGroup({ dateKey, events }: TimelineGroupProps) {
       </div>
 
       {/* Events */}
-      <div className="divide-y divide-border">
-        {events.map((event) => (
-          <TimelineItem key={event.id} event={event} />
+      <div>
+        {events.map((event, index) => (
+          <TimelineItem
+            key={event.id}
+            event={event}
+            isLast={index === events.length - 1}
+          />
         ))}
       </div>
     </div>

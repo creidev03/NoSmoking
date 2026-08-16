@@ -40,7 +40,7 @@ function makeEvent(id: string, hoursAgo = 0): TimelineEvent {
     timestamp: ts,
     data: {},
     message: `Event ${id}`,
-    icon: "🚬",
+    icon: "fumar",
     color: "orange",
   };
 }
@@ -109,7 +109,11 @@ describe("TimelineView", () => {
     fireEvent.click(screen.getByText("Hoy"));
 
     await waitFor(() => {
-      expect(mockGetTimelineEvents).toHaveBeenCalledWith("u1", "today", 0, 20);
+      expect(mockGetTimelineEvents).toHaveBeenCalledWith(
+        "u1", "today", 0, 20,
+        expect.any(String),
+        expect.any(Number),
+      );
     });
 
     await waitFor(() => {
@@ -135,7 +139,11 @@ describe("TimelineView", () => {
     fireEvent.click(screen.getByText("Cargar más..."));
 
     await waitFor(() => {
-      expect(mockGetTimelineEvents).toHaveBeenCalledWith("u1", "all", 1, 20);
+      expect(mockGetTimelineEvents).toHaveBeenCalledWith(
+        "u1", "all", 1, 20,
+        expect.any(String),
+        expect.any(Number),
+      );
     });
 
     await waitFor(() => {

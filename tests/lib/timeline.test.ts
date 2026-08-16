@@ -26,7 +26,7 @@ describe("timeline", () => {
       const result = normalizeEvent(raw);
       expect(result).not.toBeNull();
       expect(result!.type).toBe("cigarette");
-      expect(result!.icon).toBe("🚬");
+      expect(result!.icon).toBe("fumar");
       expect(result!.color).toBe("orange");
       expect(result!.message).toContain("Fumaste 1 cigarro(s)");
       expect(result!.message).toContain("Total hoy: 3 de 5");
@@ -48,7 +48,7 @@ describe("timeline", () => {
       const result = normalizeEvent(raw);
       expect(result).not.toBeNull();
       expect(result!.type).toBe("positive_action");
-      expect(result!.icon).toBe("🫁");
+      expect(result!.icon).toBe("respiracion");
       expect(result!.color).toBe("green");
       expect(result!.message).toContain("Respiración guiada completada");
       expect(result!.message).toContain("+0.5 vidas recuperadas");
@@ -67,7 +67,7 @@ describe("timeline", () => {
 
       const result = normalizeEvent(raw);
       expect(result).not.toBeNull();
-      expect(result!.icon).toBe("🧘");
+      expect(result!.icon).toBe("meditacion");
       expect(result!.message).toContain("Meditación completada");
     });
 
@@ -84,7 +84,7 @@ describe("timeline", () => {
 
       const result = normalizeEvent(raw);
       expect(result).not.toBeNull();
-      expect(result!.icon).toBe("🎵");
+      expect(result!.icon).toBe("musica");
       expect(result!.message).toContain("Música de relajación completada");
     });
 
@@ -133,7 +133,7 @@ describe("timeline", () => {
       expect(results).toHaveLength(2);
       expect(results[0].type).toBe("cigarette");
       expect(results[1].type).toBe("penalty");
-      expect(results[1].icon).toBe("⚠️");
+      expect(results[1].icon).toBe("penalty");
       expect(results[1].color).toBe("red");
       expect(results[1].message).toContain("Perdiste 1 vida");
       expect(results[1].message).toContain("Te quedan 1 de 4");
@@ -183,7 +183,7 @@ describe("timeline", () => {
           timestamp: today,
           data: {},
           message: "m1",
-          icon: "🚬",
+          icon: "fumar",
           color: "orange" as const,
         },
         {
@@ -193,7 +193,7 @@ describe("timeline", () => {
           timestamp: yesterday,
           data: {},
           message: "m2",
-          icon: "🚬",
+          icon: "fumar",
           color: "orange" as const,
         },
         {
@@ -203,7 +203,7 @@ describe("timeline", () => {
           timestamp: today,
           data: {},
           message: "m3",
-          icon: "🧘",
+          icon: "meditacion",
           color: "green" as const,
         },
       ];

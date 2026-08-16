@@ -52,7 +52,7 @@ export function normalizeEvent(
         message: t
           ? t("events.cigarette", { count: cantidad, total: cigarrillos_totales_hoy })
           : `Fumaste ${cantidad} cigarro(s). Total hoy: ${cigarrillos_totales_hoy} de 5`,
-        icon: "🚬",
+        icon: "fumar",
         color: "orange",
       };
     }
@@ -64,13 +64,13 @@ export function normalizeEvent(
         string,
         { icon: string; label: string; key: string }
       > = {
-        respiracion: { icon: "🫁", label: "Respiración guiada completada", key: "events.breathing" },
-        meditacion: { icon: "🧘", label: "Meditación completada", key: "events.meditation" },
-        musica: { icon: "🎵", label: "Música de relajación completada", key: "events.music" },
+        respiracion: { icon: "respiracion", label: "Respiración guiada completada", key: "events.breathing" },
+        meditacion: { icon: "meditacion", label: "Meditación completada", key: "events.meditation" },
+        musica: { icon: "musica", label: "Música de relajación completada", key: "events.music" },
       };
 
       const config = subtipoConfig[subtipos] || {
-        icon: "✨",
+        icon: "positive_action",
         label: "Acción positiva completada",
         key: "events.positiveAction",
       };
@@ -119,7 +119,7 @@ export function normalizeEventWithPenalty(
         timestamp: new Date(event.createdAt),
         data: detail,
         message: penaltyMessage,
-        icon: "⚠️",
+        icon: "penalty",
         color: "red",
       });
     }

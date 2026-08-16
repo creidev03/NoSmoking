@@ -27,12 +27,14 @@ export function TimelineView({
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const timezoneOffset = new Date().getTimezoneOffset();
+
   const handleFilterChange = useCallback(
     async (filter: TimelineFilter) => {
       setActiveFilter(filter);
       setLoading(true);
       try {
-        const result = await getTimelineEvents(userId, filter, 0, 20, locale);
+        const result = await getTimelineEvents(userId, filter, 0, 20, locale, timezoneOffset);
         setEvents(result.events);
         setHasMore(result.hasMore);
         setPage(0);
@@ -40,7 +42,7 @@ export function TimelineView({
         setLoading(false);
       }
     },
-    [userId]
+    [userId, locale, timezoneOffset]
   );
 
   const loadMore = useCallback(async () => {
@@ -48,14 +50,14 @@ export function TimelineView({
     setLoading(true);
     try {
       const nextPage = page + 1;
-      const result = await getTimelineEvents(userId, activeFilter, nextPage, 20, locale);
+      const result = await getTimelineEvents(userId, activeFilter, nextPage, 20, locale, timezoneOffset);
       setEvents((prev) => [...prev, ...result.events]);
       setHasMore(result.hasMore);
       setPage(nextPage);
     } finally {
       setLoading(false);
     }
-  }, [userId, activeFilter, page, loading]);
+  }, [userId, activeFilter, page, loading, locale, timezoneOffset]);
 
   const grouped = groupEventsByDay(events);
 

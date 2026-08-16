@@ -493,7 +493,8 @@ export async function getTimelineEvents(
   filter: TimelineFilter = "all",
   page: number = 0,
   limit: number = 20,
-  locale: string = "es"
+  locale: string = "es",
+  timezoneOffset?: number
 ): Promise<{ events: TimelineEvent[]; hasMore: boolean; total: number }> {
   const gs = await db
     .select()
@@ -506,16 +507,18 @@ export async function getTimelineEvents(
   }
 
   // Date filter boundaries (ISO strings for SQLite comparison)
+  // Apply client timezone offset to compute local midnight
   let sinceDate: string | null = null;
   const now = new Date();
+  const clientNow = new Date(now.getTime() - (timezoneOffset ?? 0) * 60_000);
   if (filter === "today") {
-    sinceDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    sinceDate = new Date(clientNow.getFullYear(), clientNow.getMonth(), clientNow.getDate()).toISOString();
   } else if (filter === "week") {
-    const d = new Date(now);
+    const d = new Date(clientNow);
     d.setDate(d.getDate() - 7);
     sinceDate = d.toISOString();
   } else if (filter === "month") {
-    const d = new Date(now);
+    const d = new Date(clientNow);
     d.setDate(d.getDate() - 30);
     sinceDate = d.toISOString();
   }
