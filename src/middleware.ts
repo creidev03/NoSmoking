@@ -1,39 +1,15 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 
 /**
- * Middleware that enforces Clerk auth when configured,
- * or passes through all requests when Clerk keys are placeholders.
+ * Middleware that handles locale routing via next-intl,
+ * then enforces Clerk auth when configured.
  */
-export function middleware(request: NextRequest) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-  // Skip auth when Clerk is not configured (placeholder keys)
-  if (!publishableKey || publishableKey.includes("placeholder")) {
-    return NextResponse.next();
-  }
-
-  // Clerk is configured — use its middleware dynamically
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { clerkMiddleware, createRouteMatcher } = require("@clerk/nextjs/server");
-  const isPublicRoute = createRouteMatcher([
-    "/",
-    "/sign-in(.*)",
-    "/sign-up(.*)",
-    "/es/sign-in(.*)",
-    "/es/sign-up(.*)",
-    "/onboarding(.*)",
-  ]);
-
-  return clerkMiddleware(async (auth: any) => {
-    if (!isPublicRoute(request)) {
-      await auth.protect();
-    }
-  })(request, {} as any);
-}
+export const middleware = createMiddleware(routing);
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Next-intl handles all routes except API, _next, Vercel internals, and static files
+    "/((?!api|_next|_vercel|.*\\..*).*)",
   ],
 };
