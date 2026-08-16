@@ -23,27 +23,15 @@ import { RelapseModal } from "./RelapseModal";
 
 const CACHE_KEY = "dashboard-game-state";
 
-interface Badge {
-  key: string;
-  unlockedAt: string;
-}
-
 interface UserAchievement {
   achievementId: string;
   unlockedAt: string;
 }
 
-interface AchievementProgress {
-  achievementId: string;
-  currentValue: number;
-}
-
 interface DashboardViewProps {
   gameState: GameState;
-  badges?: Badge[];
   achievements?: Achievement[];
   userAchievements?: UserAchievement[];
-  progress?: AchievementProgress[];
 }
 
 const CIGARETTE_THRESHOLD = 5;
@@ -74,10 +62,8 @@ function saveCachedState(gameState: GameState) {
 
 export function DashboardView({
   gameState,
-  badges = [],
   achievements = [],
   userAchievements = [],
-  progress = [],
 }: DashboardViewProps) {
   const [state, setState] = useState(() => {
     const cached = loadCachedState();
@@ -85,7 +71,6 @@ export function DashboardView({
   });
 
   const [userAchievementsState, setUserAchievementsState] = useState<UserAchievement[]>(userAchievements);
-  const [progressState, setProgressState] = useState<AchievementProgress[]>(progress);
 
   // Queue for unlocked achievements to show modals
   const [unlockQueue, setUnlockQueue] = useState<Achievement[]>([]);
@@ -364,7 +349,6 @@ export function DashboardView({
           <AchievementGallery
             achievements={achievements}
             userAchievements={userAchievementsState}
-            progress={progressState}
             onAchievementClick={openAchievementModal}
           />
 

@@ -18,7 +18,7 @@ interface AchievementProgress {
 interface AchievementGalleryProps {
   achievements: Achievement[];
   userAchievements: UserAchievement[];
-  progress: AchievementProgress[];
+  progress?: AchievementProgress[];
   onAchievementClick?: (achievement: Achievement, unlockedAt?: Date) => void;
 }
 
@@ -48,7 +48,7 @@ export function AchievementGallery({
   );
 
   const progressMap = new Map(
-    progress.map((p) => [p.achievementId, p.currentValue])
+    (progress ?? []).map((p) => [p.achievementId, p.currentValue])
   );
 
   // Filter achievements by category
