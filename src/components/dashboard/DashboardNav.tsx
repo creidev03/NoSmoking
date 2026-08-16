@@ -5,16 +5,17 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useLocale } from "next-intl";
+import { Home, Trophy, BarChart3, Settings, ShieldOff } from "lucide-react";
 
 export function DashboardNav() {
   const pathname = usePathname();
   const locale = useLocale();
 
   const navItems = [
-    { href: `/${locale}/dashboard`, label: "Home", icon: "🏠" },
-    { href: `/${locale}/dashboard/logros`, label: "Logros", icon: "🏆" },
-    { href: `/${locale}/dashboard/timeline`, label: "Timeline", icon: "📊" },
-    { href: `/${locale}/dashboard/settings`, label: "Configuración", icon: "⚙️" },
+    { href: `/${locale}/dashboard`, label: "Home", icon: Home },
+    { href: `/${locale}/dashboard/logros`, label: "Logros", icon: Trophy },
+    { href: `/${locale}/dashboard/timeline`, label: "Timeline", icon: BarChart3 },
+    { href: `/${locale}/dashboard/settings`, label: "Configuración", icon: Settings },
   ];
 
   return (
@@ -24,7 +25,7 @@ export function DashboardNav() {
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0 px-4 mb-8">
-            <span className="text-2xl">🚭</span>
+            <ShieldOff className="h-6 w-6" />
             <span className="ml-2 text-xl font-bold text-text">No Smoking</span>
           </div>
 
@@ -47,7 +48,7 @@ export function DashboardNav() {
                       : "text-text-muted hover:bg-accent hover:text-text"
                   )}
                 >
-                  <span className="text-lg">{item.icon}</span>
+                  <item.icon className="h-5 w-5" />
                   {item.label}
                 </Link>
               );
@@ -87,7 +88,7 @@ export function DashboardNav() {
                     : "text-text-muted"
                 )}
               >
-                <span className="text-xl">{item.icon}</span>
+                <item.icon className="h-5 w-5" />
                 <span>{item.label}</span>
               </Link>
             );
