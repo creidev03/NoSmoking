@@ -1,4 +1,8 @@
 import "@testing-library/jest-dom/vitest";
+import { vi } from "vitest";
+
+// Mock "server-only" so server actions can be imported in tests
+vi.mock("server-only", () => ({}));
 
 // Mock localStorage
 const localStorageMock = (() => {
