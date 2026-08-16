@@ -40,9 +40,9 @@ export function ProfileSection({ userId, profile, onboarding, userEmail }: Profi
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateUserProfile(userId, { motivations });
+      await updateUserProfile({ motivations });
       if (onboarding?.motivation) {
-        await updateOnboardingMotivation(userId, motivations.join(", "));
+        await updateOnboardingMotivation(motivations.join(", "));
       }
       setSaved(true);
     } finally {

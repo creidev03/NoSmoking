@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { RelapseModal } from "@/components/dashboard/RelapseModal";
 import type { GameState } from "@/lib/game-state";
@@ -75,7 +75,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={vi.fn()}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
     expect(screen.getByText("⚠️ RECAÍDA DETECTADA")).toBeInTheDocument();
@@ -88,7 +87,6 @@ describe("RelapseModal", () => {
         isOpen={false}
         onClose={vi.fn()}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
     expect(container.querySelector('[class*="fixed"]')).toBeNull();
@@ -100,7 +98,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={vi.fn()}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
     expect(screen.getByTestId("relapse-countdown")).toBeInTheDocument();
@@ -113,7 +110,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={vi.fn()}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
     expect(screen.getByTestId("action-breathing")).toBeInTheDocument();
@@ -134,7 +130,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={vi.fn()}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
 
@@ -142,7 +137,7 @@ describe("RelapseModal", () => {
       fireEvent.click(screen.getByTestId("action-breathing"));
     });
 
-    expect(mockRegisterPositiveAction).toHaveBeenCalledWith("u-1", "breathing");
+    expect(mockRegisterPositiveAction).toHaveBeenCalledWith("breathing");
   });
 
   it("auto-closes when life is recovered", async () => {
@@ -159,7 +154,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={onClose}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
 
@@ -177,7 +171,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={onClose}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
 
@@ -191,7 +184,6 @@ describe("RelapseModal", () => {
         isOpen={true}
         onClose={vi.fn()}
         gameState={baseGameState}
-        userId="u-1"
       />
     );
 

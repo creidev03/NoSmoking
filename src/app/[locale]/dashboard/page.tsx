@@ -34,7 +34,7 @@ export default async function DashboardPage({
   }
 
   // Process midnight reset: persists if needed + evaluates achievements
-  const { gameState } = await processMidnightReset(row.userId);
+  const { gameState } = await processMidnightReset();
 
   const achievementSeeds = ACHIEVEMENT_SEEDS.map((seed) => ({
     ...seed,

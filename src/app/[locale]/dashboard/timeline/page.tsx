@@ -31,12 +31,11 @@ export default async function TimelinePage({
     redirect(`/${locale}/onboarding`);
   }
 
-  const initialData = await getTimelineEvents(row.userId, "all", 0, 20, locale);
+  const initialData = await getTimelineEvents("all", 0, 20, locale);
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <TimelineView
-        userId={row.userId}
         initialEvents={initialData.events}
         initialHasMore={initialData.hasMore}
       />

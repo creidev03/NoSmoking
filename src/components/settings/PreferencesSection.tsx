@@ -56,7 +56,7 @@ export function PreferencesSection({ userId, preferences }: PreferencesSectionPr
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateUserPreferences(userId, {
+      await updateUserPreferences({
         notificationsEnabled: notifications,
         reminderInterval,
         language,

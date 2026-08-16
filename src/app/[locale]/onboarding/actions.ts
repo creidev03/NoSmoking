@@ -14,6 +14,7 @@ import {
   clampQuitAttempts,
 } from "@/lib/clamp";
 import { randomUUID } from "crypto";
+import { requireAuth } from "@/lib/auth-guard";
 
 const VALID_STEPS = [1, 2, 3, 4] as const;
 
@@ -24,10 +25,10 @@ function validateStep(step: number): asserts step is (typeof VALID_STEPS)[number
 }
 
 export async function submitStep(
-  userId: string,
   step: number,
   data: FormData
 ): Promise<{ nextStep: number }> {
+  const { userId } = await requireAuth();
   validateStep(step);
 
   // Check or create user
@@ -140,8 +141,10 @@ export async function submitStep(
 }
 
 export async function completeOnboarding(
-  userId: string
+  locale: string
 ): Promise<{ redirect: string }> {
+  const { userId } = await requireAuth();
+
   const response = await db
     .select()
     .from(onboardingResponses)
@@ -195,5 +198,5 @@ export async function completeOnboarding(
     });
   }
 
-  redirect("/es/dashboard");
+  redirect(`/${locale}/dashboard`);
 }

@@ -43,6 +43,8 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/app/[locale]/dashboard/settings/actions", () => ({
   getUserProfile: vi.fn(() => Promise.resolve(null)),
   getUserPreferences: vi.fn(() => Promise.resolve(null)),
+  getOnboardingResponses: vi.fn(() => Promise.resolve(null)),
+  getUserEmail: vi.fn(() => Promise.resolve({ email: null })),
 }));
 
 // Mock redirect

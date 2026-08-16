@@ -17,10 +17,10 @@ export default async function SettingsPage({
   if (!userId) redirect(`/${locale}/sign-in`);
 
   const [profile, preferences, onboarding, userEmail] = await Promise.all([
-    getUserProfile(userId),
-    getUserPreferences(userId),
-    getOnboardingResponses(userId),
-    getUserEmail(userId),
+    getUserProfile(),
+    getUserPreferences(),
+    getOnboardingResponses(),
+    getUserEmail(),
   ]);
 
   const tc = await getTranslations("landing.credits");

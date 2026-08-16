@@ -124,7 +124,7 @@ export function DashboardView({
   const handleAction = useCallback(
     async (actionType: "breathing" | "meditation") => {
       try {
-        const result = await registerPositiveAction(state.userId, actionType);
+        const result = await registerPositiveAction(actionType);
         console.log("ActionResult:", result);
         if (!result.error) {
           console.log("Updating gameState with nextActionAvailableAt:", result.gameState.nextActionAvailableAt);
@@ -136,7 +136,7 @@ export function DashboardView({
         console.error(`Action failed: ${actionType}`, err);
       }
     },
-    [state.userId, processUnlockedAchievements]
+    [processUnlockedAchievements]
   );
 
   const handleCooldownExpired = useCallback(() => {
@@ -148,7 +148,7 @@ export function DashboardView({
 
   const handleRegisterCigarette = useCallback(async () => {
     try {
-      const result = await registerCigarette(state.userId);
+      const result = await registerCigarette();
       setState(result.gameState);
       saveCachedState(result.gameState);
       processUnlockedAchievements(result.unlockedAchievements);
@@ -162,11 +162,11 @@ export function DashboardView({
     } catch (err) {
       console.error("Failed to register cigarette", err);
     }
-  }, [state.userId, processUnlockedAchievements]);
+  }, [processUnlockedAchievements]);
 
   const handleDevResetLives = useCallback(async () => {
     try {
-      const newGameState = await devResetLives(state.userId);
+      const newGameState = await devResetLives();
       setState(newGameState);
       saveCachedState(newGameState);
       setToast({ message: t("devResetLives"), type: "success" });
@@ -174,11 +174,11 @@ export function DashboardView({
     } catch (err) {
       console.error("Failed to reset lives", err);
     }
-  }, [state.userId]);
+  }, []);
 
   const handleDevRemoveCooldown = useCallback(async () => {
     try {
-      const newGameState = await devRemoveCooldown(state.userId);
+      const newGameState = await devRemoveCooldown();
       setState(newGameState);
       saveCachedState(newGameState);
       setToast({ message: t("devRemoveCooldown"), type: "success" });
@@ -186,7 +186,7 @@ export function DashboardView({
     } catch (err) {
       console.error("Failed to remove cooldown", err);
     }
-  }, [state.userId]);
+  }, []);
 
   const isDev = process.env.NODE_ENV === "development";
 
@@ -363,7 +363,6 @@ export function DashboardView({
         isOpen={showRelapseModal}
         onClose={() => setShowRelapseModal(false)}
         gameState={state}
-        userId={state.userId}
         onGameStateUpdate={(newGameState) => {
           setState(newGameState);
           saveCachedState(newGameState);

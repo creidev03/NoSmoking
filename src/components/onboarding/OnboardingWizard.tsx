@@ -21,9 +21,9 @@ export function OnboardingWizard({ initialStep, locale }: OnboardingWizardProps)
     setError(null);
     startTransition(async () => {
       try {
-        const result = await submitStep("stub-user-id", currentStep, formData);
+        const result = await submitStep(currentStep, formData);
         if (result.nextStep > 4) {
-          await completeOnboarding("stub-user-id");
+          await completeOnboarding(locale);
           router.push(`/${locale}/dashboard`);
         } else {
           setCurrentStep(result.nextStep);

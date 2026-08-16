@@ -23,7 +23,7 @@ export function DangerZone({ userId }: DangerZoneProps) {
     if (resetConfirm !== "REINICIAR") return;
     setResetting(true);
     try {
-      await resetProgress(userId);
+      await resetProgress();
       setResetDone(true);
       setShowResetModal(false);
       setResetConfirm("");

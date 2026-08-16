@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
+// Mock auth guard BEFORE any other modules
+const { mockRequireAuth } = vi.hoisted(() => ({
+  mockRequireAuth: vi.fn().mockResolvedValue({ userId: "user-1" }),
+}));
+vi.mock("@/lib/auth-guard", () => ({
+  requireAuth: mockRequireAuth,
+}));
+
 // Mock achievements BEFORE any other modules
 const { mockEvaluateAchievements } = vi.hoisted(() => ({
   mockEvaluateAchievements: vi.fn().mockResolvedValue({ unlocked: [] }),
@@ -157,7 +165,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.penaltyApplied).toBe(false);
     expect(result.newCycle).toBe(false);
@@ -169,7 +177,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.penaltyApplied).toBe(true);
     expect(result.newCycle).toBe(true);
@@ -182,7 +190,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.gameState.status).toBe("relapse");
     expect(result.gameState.remainingLives).toBe(0);
@@ -194,7 +202,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerCigarette("user-1");
+    await registerCigarette();
 
     expect(mockTx.insert).toHaveBeenCalled();
   });
@@ -204,7 +212,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerCigarette("user-1");
+    await registerCigarette();
 
     const insertedValues = mockTx.insert.mock.results[0].value.values.mock.calls[0][0];
     expect(insertedValues.type).toBe("fumar");
@@ -223,7 +231,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerCigarette("user-1");
+    await registerCigarette();
 
     const insertedValues = mockTx.insert.mock.results[0].value.values.mock.calls[0][0];
     const detail = JSON.parse(insertedValues.detail);
@@ -241,7 +249,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.gameState).toBeDefined();
     expect(result.gameState.id).toBe("gs-1");
@@ -252,7 +260,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.gameState.status).toBe("active");
     expect(result.gameState.remainingLives).toBe(1);
@@ -263,7 +271,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.penaltyApplied).toBe(false);
     expect(result.gameState.cigarettesToday).toBe(1);
@@ -274,7 +282,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.penaltyApplied).toBe(false);
     expect(result.gameState.cigarettesToday).toBe(4);
@@ -285,7 +293,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.gameState.remainingLives).toBe(0);
     expect(result.gameState.status).toBe("relapse");
@@ -296,7 +304,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerCigarette("user-1");
+    await registerCigarette();
 
     expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
   });
@@ -307,7 +315,7 @@ describe("registerCigarette", () => {
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
     mockEvaluateAchievements.mockResolvedValueOnce({ unlocked: ["achievement-1", "achievement-2"] });
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.unlockedAchievements).toEqual(["achievement-1", "achievement-2"]);
   });
@@ -317,7 +325,7 @@ describe("registerCigarette", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerCigarette("user-1");
+    const result = await registerCigarette();
 
     expect(result.unlockedAchievements).toEqual([]);
   });
@@ -342,7 +350,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.gameState).toBeDefined();
     expect(result.cooldownMinutes).toBe(20);
@@ -358,7 +366,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.error).toBe("Cooldown active");
     expect(result.cooldownMinutes).toBe(0);
@@ -374,7 +382,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "meditation");
+    const result = await registerPositiveAction("meditation");
 
     expect(result.error).toBeUndefined();
     expect(result.gameState.remainingLives).toBe(6.5);
@@ -390,7 +398,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.error).toBeUndefined();
     expect(result.gameState.remainingLives).toBe(6.5);
@@ -406,7 +414,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "music");
+    const result = await registerPositiveAction("music");
 
     expect(result.error).toBeUndefined();
     expect(result.gameState.remainingLives).toBe(6.5);
@@ -423,7 +431,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "meditation");
+    const result = await registerPositiveAction("meditation");
 
     expect(result.gameState.remainingLives).toBe(4);
     expect(result.gameState.totalPoints).toBe(3);
@@ -437,7 +445,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerPositiveAction("user-1", "music");
+    await registerPositiveAction("music");
 
     expect(mockTx.insert).toHaveBeenCalled();
   });
@@ -452,7 +460,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerPositiveAction("user-1", "meditation");
+    await registerPositiveAction("meditation");
 
     const insertedValues = mockTx.insert.mock.results[0].value.values.mock.calls[0][0];
     expect(insertedValues.type).toBe("accion_positiva");
@@ -472,21 +480,21 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const breathing = await registerPositiveAction("user-1", "breathing");
+    const breathing = await registerPositiveAction("breathing");
     expect(breathing.error).toBeUndefined();
 
     vi.clearAllMocks();
     const mockTx2 = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx2));
 
-    const meditation = await registerPositiveAction("user-1", "meditation");
+    const meditation = await registerPositiveAction("meditation");
     expect(meditation.error).toBeUndefined();
 
     vi.clearAllMocks();
     const mockTx3 = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx3));
 
-    const music = await registerPositiveAction("user-1", "music");
+    const music = await registerPositiveAction("music");
     expect(music.error).toBeUndefined();
   });
 
@@ -499,7 +507,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.error).toBe("Cooldown active");
     expect(result.cooldownMinutes).toBe(0);
@@ -513,7 +521,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.cooldownMinutes).toBe(15);
   });
@@ -526,7 +534,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "meditation");
+    const result = await registerPositiveAction("meditation");
 
     expect(result.cooldownMinutes).toBe(45);
   });
@@ -539,7 +547,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "music");
+    const result = await registerPositiveAction("music");
 
     expect(result.cooldownMinutes).toBe(60);
   });
@@ -554,7 +562,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.gameState.remainingLives).toBe(6);
     expect(result.error).toBe("Cooldown active");
@@ -568,7 +576,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerPositiveAction("user-1", "breathing");
+    await registerPositiveAction("breathing");
 
     expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
   });
@@ -582,7 +590,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    await registerPositiveAction("user-1", "breathing");
+    await registerPositiveAction("breathing");
 
     expect(mockEvaluateAchievements).not.toHaveBeenCalled();
   });
@@ -596,7 +604,7 @@ describe("registerPositiveAction", () => {
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
     mockEvaluateAchievements.mockResolvedValueOnce({ unlocked: ["meditation-master"] });
 
-    const result = await registerPositiveAction("user-1", "meditation");
+    const result = await registerPositiveAction("meditation");
 
     expect(result.unlockedAchievements).toEqual(["meditation-master"]);
   });
@@ -610,7 +618,7 @@ describe("registerPositiveAction", () => {
     const mockTx = mockTransactionWithGameState(gameState);
     mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-    const result = await registerPositiveAction("user-1", "breathing");
+    const result = await registerPositiveAction("breathing");
 
     expect(result.unlockedAchievements).toEqual([]);
   });
@@ -646,7 +654,7 @@ describe("getUserAchievements", () => {
       }),
     });
 
-    const result = await getUserAchievements("user-1");
+    const result = await getUserAchievements();
 
     expect(result.userAchievements).toEqual([
       { achievementId: "ach-1", unlockedAt: "2026-01-10T00:00:00.000Z" },
@@ -674,7 +682,7 @@ describe("getUserAchievements", () => {
       }),
     });
 
-    const result = await getUserAchievements("user-1");
+    const result = await getUserAchievements();
 
     expect(result.userAchievements).toEqual([]);
     expect(result.progress).toEqual([]);
@@ -734,7 +742,7 @@ describe("getTimelineEvents", () => {
       { all: [] },
     ]);
 
-    const result = await getTimelineEvents("user-1", "today", 0, 20, "es", 300);
+    const result = await getTimelineEvents("today", 0, 20, "es", 300);
 
     expect(result.events).toHaveLength(0);
   });
@@ -757,7 +765,7 @@ describe("getTimelineEvents", () => {
       { all: [event] },
     ]);
 
-    const result = await getTimelineEvents("user-1", "today", 0, 20, "es");
+    const result = await getTimelineEvents("today", 0, 20, "es");
 
     expect(result.events).toHaveLength(1);
     expect(result.events[0].id).toBe("evt-1");
@@ -784,7 +792,7 @@ describe("getTimelineEvents", () => {
       { all: [event] },
     ]);
 
-    const result = await getTimelineEvents("user-1", "week", 0, 20, "es", 300);
+    const result = await getTimelineEvents("week", 0, 20, "es", 300);
 
     // With offset, sinceDate shifts earlier → event is now within range
     expect(result.events).toHaveLength(1);
@@ -812,7 +820,7 @@ describe("getTimelineEvents", () => {
       { all: [event] },
     ]);
 
-    const result = await getTimelineEvents("user-1", "month", 0, 20, "es", 300);
+    const result = await getTimelineEvents("month", 0, 20, "es", 300);
 
     // With offset, sinceDate shifts earlier → event is now within range
     expect(result.events).toHaveLength(1);

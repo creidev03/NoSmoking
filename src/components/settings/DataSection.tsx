@@ -18,7 +18,7 @@ export function DataSection({ userId }: DataSectionProps) {
   const handleDownloadJson = async () => {
     setDownloading(true);
     try {
-      const { data } = await downloadUserData(userId);
+      const { data } = await downloadUserData();
       const blob = new Blob([data], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

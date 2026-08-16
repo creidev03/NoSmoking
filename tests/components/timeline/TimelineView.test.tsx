@@ -55,7 +55,6 @@ describe("TimelineView", () => {
   it("renders initial events", () => {
     render(
       <TimelineView
-        userId="u1"
         initialEvents={initialEvents}
         initialHasMore={false}
       />
@@ -69,7 +68,6 @@ describe("TimelineView", () => {
   it("renders filter tabs", () => {
     render(
       <TimelineView
-        userId="u1"
         initialEvents={initialEvents}
         initialHasMore={false}
       />
@@ -83,7 +81,7 @@ describe("TimelineView", () => {
 
   it("shows empty state when no events", () => {
     render(
-      <TimelineView userId="u1" initialEvents={[]} initialHasMore={false} />
+      <TimelineView initialEvents={[]} initialHasMore={false} />
     );
 
     expect(
@@ -100,7 +98,6 @@ describe("TimelineView", () => {
 
     render(
       <TimelineView
-        userId="u1"
         initialEvents={initialEvents}
         initialHasMore={false}
       />
@@ -110,7 +107,7 @@ describe("TimelineView", () => {
 
     await waitFor(() => {
       expect(mockGetTimelineEvents).toHaveBeenCalledWith(
-        "u1", "today", 0, 20,
+        "today", 0, 20,
         expect.any(String),
         expect.any(Number),
       );
@@ -130,7 +127,6 @@ describe("TimelineView", () => {
 
     render(
       <TimelineView
-        userId="u1"
         initialEvents={initialEvents}
         initialHasMore={true}
       />
@@ -140,7 +136,7 @@ describe("TimelineView", () => {
 
     await waitFor(() => {
       expect(mockGetTimelineEvents).toHaveBeenCalledWith(
-        "u1", "all", 1, 20,
+        "all", 1, 20,
         expect.any(String),
         expect.any(Number),
       );

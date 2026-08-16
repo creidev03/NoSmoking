@@ -9,13 +9,11 @@ import { TimelineGroup } from "./TimelineGroup";
 import { useTranslations, useLocale } from "next-intl";
 
 interface TimelineViewProps {
-  userId: string;
   initialEvents: TimelineEvent[];
   initialHasMore: boolean;
 }
 
 export function TimelineView({
-  userId,
   initialEvents,
   initialHasMore,
 }: TimelineViewProps) {
@@ -34,7 +32,7 @@ export function TimelineView({
       setActiveFilter(filter);
       setLoading(true);
       try {
-        const result = await getTimelineEvents(userId, filter, 0, 20, locale, timezoneOffset);
+        const result = await getTimelineEvents(filter, 0, 20, locale, timezoneOffset);
         setEvents(result.events);
         setHasMore(result.hasMore);
         setPage(0);
@@ -42,7 +40,7 @@ export function TimelineView({
         setLoading(false);
       }
     },
-    [userId, locale, timezoneOffset]
+    [locale, timezoneOffset]
   );
 
   const loadMore = useCallback(async () => {
@@ -50,14 +48,14 @@ export function TimelineView({
     setLoading(true);
     try {
       const nextPage = page + 1;
-      const result = await getTimelineEvents(userId, activeFilter, nextPage, 20, locale, timezoneOffset);
+      const result = await getTimelineEvents(activeFilter, nextPage, 20, locale, timezoneOffset);
       setEvents((prev) => [...prev, ...result.events]);
       setHasMore(result.hasMore);
       setPage(nextPage);
     } finally {
       setLoading(false);
     }
-  }, [userId, activeFilter, page, loading, locale, timezoneOffset]);
+  }, [activeFilter, page, loading, locale, timezoneOffset]);
 
   const grouped = groupEventsByDay(events);
 

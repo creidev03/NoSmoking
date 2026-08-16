@@ -7,6 +7,7 @@ import { checkMidnightReset, type GameState } from "@/lib/game-state";
 import { getPhase, getNextActionAvailableAt, isCooldownActive } from "@/lib/cooldown";
 import { randomUUID } from "crypto";
 import { evaluateAchievements } from "@/lib/achievements";
+import { requireAuth } from "@/lib/auth-guard";
 import { normalizeEventWithPenalty, type TimelineEvent, type TimelineFilter, type TranslationFn } from "@/lib/timeline";
 import type { Achievement } from "@/lib/achievements/types";
 import enMessages from "../../../../messages/en.json";
@@ -123,7 +124,9 @@ function mapGameState(row: any): GameState {
   };
 }
 
-export async function registerCigarette(userId: string): Promise<CigaretteResult> {
+export async function registerCigarette(): Promise<CigaretteResult> {
+  const { userId } = await requireAuth();
+
   const transactionResult = await db.transaction(async (tx) => {
     const row = await tx
       .select()
@@ -215,18 +218,20 @@ export async function registerCigarette(userId: string): Promise<CigaretteResult
       createdAt: now,
     });
 
-    return { gameState, penaltyApplied, newCycle };
+    // Evaluate achievements inside transaction for atomicity
+    const { unlocked } = await evaluateAchievements(userId);
+
+    return { gameState, penaltyApplied, newCycle, unlockedAchievements: unlocked };
   });
 
-  // Evaluate achievements after transaction commits
-  const { unlocked } = await evaluateAchievements(userId);
-  return { ...transactionResult, unlockedAchievements: unlocked };
+  return transactionResult;
 }
 
 export async function registerPositiveAction(
-  userId: string,
   actionType: ActionType
 ): Promise<ActionResult> {
+  const { userId } = await requireAuth();
+
   const transactionResult = await db.transaction(async (tx) => {
     const row = await tx
       .select()
@@ -252,6 +257,7 @@ export async function registerPositiveAction(
         cooldownMinutes: 0,
         nextActionAvailableAt: gameState.nextActionAvailableAt!,
         error: "Cooldown active",
+        unlockedAchievements: [],
       };
     }
 
@@ -310,24 +316,24 @@ export async function registerPositiveAction(
       updatedAt: nowISO,
     };
 
+    // Evaluate achievements inside transaction for atomicity
+    const { unlocked } = await evaluateAchievements(userId);
+
     return {
       gameState,
       cooldownMinutes,
       nextActionAvailableAt: nextAvailable,
+      unlockedAchievements: unlocked,
     };
   });
 
-  // Only evaluate achievements if the action was successful (no cooldown error)
-  if (transactionResult.error) {
-    return { ...transactionResult, unlockedAchievements: [] };
-  }
-
-  const { unlocked } = await evaluateAchievements(userId);
-  return { ...transactionResult, unlockedAchievements: unlocked };
+  return transactionResult;
 }
 
 // DEV ONLY: Reset all lives to full
-export async function devResetLives(userId: string): Promise<GameState> {
+export async function devResetLives(): Promise<GameState> {
+  const { userId } = await requireAuth();
+
   if (process.env.NODE_ENV !== "development") {
     throw new Error("This action is only available in development");
   }
@@ -368,7 +374,9 @@ export async function devResetLives(userId: string): Promise<GameState> {
 }
 
 // DEV ONLY: Remove cooldown
-export async function devRemoveCooldown(userId: string): Promise<GameState> {
+export async function devRemoveCooldown(): Promise<GameState> {
+  const { userId } = await requireAuth();
+
   if (process.env.NODE_ENV !== "development") {
     throw new Error("This action is only available in development");
   }
@@ -405,11 +413,13 @@ export async function devRemoveCooldown(userId: string): Promise<GameState> {
  * then evaluate achievements so streak-based ones (T001-T008) are
  * checked daily. Returns the updated game state + achievement data.
  */
-export async function processMidnightReset(userId: string): Promise<{
+export async function processMidnightReset(): Promise<{
   gameState: GameState;
   newBadges: string[];
   achievements: UserAchievementData;
 }> {
+  const { userId } = await requireAuth();
+
   const transactionResult = await db.transaction(async (tx) => {
     const row = await tx
       .select()
@@ -448,22 +458,24 @@ export async function processMidnightReset(userId: string): Promise<{
       await insertNewBadges(tx, gameState.id, resetResult.newBadges, now);
     }
 
+    // Evaluate achievements inside transaction for atomicity
+    await evaluateAchievements(userId);
+
     return {
       gameState: resetResult.gameState,
       newBadges: resetResult.newBadges,
     };
   });
 
-  // Evaluate achievements after reset is persisted
-  await evaluateAchievements(userId);
-
   // Return fresh achievement data
-  const achievements = await getUserAchievements(userId);
+  const achievements = await getUserAchievements();
 
   return { ...transactionResult, achievements };
 }
 
-export async function getUserAchievements(userId: string): Promise<UserAchievementData> {
+export async function getUserAchievements(): Promise<UserAchievementData> {
+  const { userId } = await requireAuth();
+
   const userAchievementRows = await db
     .select()
     .from(userAchievements)
@@ -489,13 +501,14 @@ export async function getUserAchievements(userId: string): Promise<UserAchieveme
 }
 
 export async function getTimelineEvents(
-  userId: string,
   filter: TimelineFilter = "all",
   page: number = 0,
   limit: number = 20,
   locale: string = "es",
   timezoneOffset?: number
 ): Promise<{ events: TimelineEvent[]; hasMore: boolean; total: number }> {
+  const { userId } = await requireAuth();
+
   const gs = await db
     .select()
     .from(game_state)
@@ -523,29 +536,29 @@ export async function getTimelineEvents(
     sinceDate = d.toISOString();
   }
 
-  // Total count
+  // Total count and paginated events in parallel
   const whereClause = sinceDate
     ? and(eq(events.gameStateId, gs.id), gte(events.createdAt, sinceDate))
     : eq(events.gameStateId, gs.id);
 
-  const [totalRow] = await db
-    .select({ cnt: count() })
-    .from(events)
-    .where(whereClause)
-    .all();
+  const offset = page * limit;
+  const [[totalRow], rows] = await Promise.all([
+    db
+      .select({ cnt: count() })
+      .from(events)
+      .where(whereClause)
+      .all(),
+    db
+      .select()
+      .from(events)
+      .where(whereClause)
+      .orderBy(sql`${events.createdAt} DESC`)
+      .limit(limit)
+      .offset(offset)
+      .all(),
+  ]);
 
   const total = totalRow?.cnt ?? 0;
-
-  // Paginated events
-  const offset = page * limit;
-  const rows = await db
-    .select()
-    .from(events)
-    .where(whereClause)
-    .orderBy(sql`${events.createdAt} DESC`)
-    .limit(limit)
-    .offset(offset)
-    .all();
 
   const t = createTranslationFn(locale, "timeline");
   const timelineEvents: TimelineEvent[] = [];
@@ -573,12 +586,14 @@ export async function getTimelineEvents(
  * Check the current relapse status for a user.
  * Returns whether the user is in relapse, time remaining, and recovery progress.
  */
-export async function checkRelapseStatus(userId: string): Promise<{
+export async function checkRelapseStatus(): Promise<{
   isRelapsed: boolean;
   timeRemaining: number;
   livesRecovered: number;
   livesNeeded: number;
 }> {
+  const { userId } = await requireAuth();
+
   const row = await db
     .select()
     .from(game_state)
@@ -628,9 +643,12 @@ export async function checkRelapseStatus(userId: string): Promise<{
  * This is used by the logros page to display all achievements.
  */
 export async function getAllAchievements(): Promise<Achievement[]> {
+  await requireAuth();
+
   const rows = await db
     .select()
     .from(achievements)
+    .limit(100)
     .all();
 
   return rows.map((row) => ({

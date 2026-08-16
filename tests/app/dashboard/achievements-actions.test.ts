@@ -1,4 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+
+// Mock auth guard
+vi.mock("@/lib/auth-guard", () => ({
+  requireAuth: vi.fn().mockResolvedValue({ userId: "user-1" }),
+}));
 
 // Mock evaluateAchievements
 vi.mock("@/lib/achievements", () => ({
@@ -157,7 +162,7 @@ describe("Achievements integration in actions", () => {
       const mockTx = mockTransactionWithGameState(gameState);
       mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-      await registerCigarette("user-1");
+      await registerCigarette();
 
       expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
     });
@@ -169,7 +174,7 @@ describe("Achievements integration in actions", () => {
 
       mockEvaluateAchievements.mockResolvedValue({ unlocked: ["T001", "A001"] });
 
-      const result = await registerCigarette("user-1");
+      const result = await registerCigarette();
 
       expect(result.unlockedAchievements).toEqual(["T001", "A001"]);
     });
@@ -179,7 +184,7 @@ describe("Achievements integration in actions", () => {
       const mockTx = mockTransactionWithGameState(gameState);
       mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-      const result = await registerCigarette("user-1");
+      const result = await registerCigarette();
 
       expect(result.unlockedAchievements).toEqual([]);
     });
@@ -191,7 +196,7 @@ describe("Achievements integration in actions", () => {
 
       mockEvaluateAchievements.mockResolvedValue({ unlocked: ["T001"] });
 
-      const result = await registerCigarette("user-1");
+      const result = await registerCigarette();
 
       expect(result.penaltyApplied).toBe(true);
       expect(result.gameState.cigarettesToday).toBe(0);
@@ -208,7 +213,7 @@ describe("Achievements integration in actions", () => {
       const mockTx = mockTransactionWithGameState(gameState);
       mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-      await registerPositiveAction("user-1", "breathing");
+      await registerPositiveAction("breathing");
 
       expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
     });
@@ -223,7 +228,7 @@ describe("Achievements integration in actions", () => {
 
       mockEvaluateAchievements.mockResolvedValue({ unlocked: ["A001"] });
 
-      const result = await registerPositiveAction("user-1", "breathing");
+      const result = await registerPositiveAction("breathing");
 
       expect(result.unlockedAchievements).toEqual(["A001"]);
     });
@@ -236,7 +241,7 @@ describe("Achievements integration in actions", () => {
       const mockTx = mockTransactionWithGameState(gameState);
       mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-      const result = await registerPositiveAction("user-1", "breathing");
+      const result = await registerPositiveAction("breathing");
 
       expect(result.unlockedAchievements).toEqual([]);
     });
@@ -250,7 +255,7 @@ describe("Achievements integration in actions", () => {
       const mockTx = mockTransactionWithGameState(gameState);
       mockDb.transaction.mockImplementation((fn: any) => fn(mockTx));
 
-      await registerPositiveAction("user-1", "breathing");
+      await registerPositiveAction("breathing");
 
       expect(mockEvaluateAchievements).not.toHaveBeenCalled();
     });
@@ -265,7 +270,7 @@ describe("Achievements integration in actions", () => {
 
       mockEvaluateAchievements.mockResolvedValue({ unlocked: ["A001", "A002"] });
 
-      const result = await registerPositiveAction("user-1", "breathing");
+      const result = await registerPositiveAction("breathing");
 
       expect(result.cooldownMinutes).toBe(20);
       expect(result.unlockedAchievements).toEqual(["A001", "A002"]);
@@ -312,7 +317,7 @@ describe("getUserAchievements", () => {
       }),
     } as any);
 
-    const result = await getUserAchievements("user-1");
+    const result = await getUserAchievements();
 
     expect(result.userAchievements).toEqual(mockUserAchievements);
     expect(result.progress).toEqual(mockProgress);
@@ -335,7 +340,7 @@ describe("getUserAchievements", () => {
       }),
     } as any);
 
-    const result = await getUserAchievements("user-1");
+    const result = await getUserAchievements();
 
     expect(result.userAchievements).toEqual([]);
     expect(result.progress).toEqual([]);
@@ -358,7 +363,7 @@ describe("getUserAchievements", () => {
       }),
     } as any);
 
-    await getUserAchievements("user-1");
+    await getUserAchievements();
 
     expect(mockDb.select).toHaveBeenCalledTimes(2);
   });

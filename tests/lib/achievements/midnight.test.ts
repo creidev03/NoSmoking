@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Mock auth guard
+vi.mock("@/lib/auth-guard", () => ({
+  requireAuth: vi.fn().mockResolvedValue({ userId: "user-1" }),
+}));
+
 // Mock evaluateAchievements at the top level
 const { mockEvaluateAchievements } = vi.hoisted(() => ({
   mockEvaluateAchievements: vi.fn().mockResolvedValue({ unlocked: [] }),
@@ -155,7 +160,7 @@ describe("Midnight reset + achievement evaluation integration", () => {
 
     mockDb.transaction.mockImplementation((fn: any) => fn(gameState));
 
-    await processMidnightReset("user-1");
+    await processMidnightReset();
 
     expect(mockEvaluateAchievements).toHaveBeenCalledWith("user-1");
 
@@ -184,7 +189,7 @@ describe("Midnight reset + achievement evaluation integration", () => {
 
     mockDb.transaction.mockImplementation((fn: any) => fn(gameState));
 
-    const result = await processMidnightReset("user-1");
+    const result = await processMidnightReset();
 
     expect(result).toHaveProperty("gameState");
     expect(result).toHaveProperty("achievements");
@@ -216,7 +221,7 @@ describe("Midnight reset + achievement evaluation integration", () => {
 
     mockDb.transaction.mockImplementation((fn: any) => fn(gameState));
 
-    const result = await processMidnightReset("user-1");
+    const result = await processMidnightReset();
 
     // Streak should be incremented (6 → 7)
     expect(result.gameState.streakDays).toBe(7);
@@ -248,7 +253,7 @@ describe("Midnight reset + achievement evaluation integration", () => {
 
     mockDb.transaction.mockImplementation((fn: any) => fn(gameState));
 
-    const result = await processMidnightReset("user-1");
+    const result = await processMidnightReset();
 
     // No change — streak stays the same
     expect(result.gameState.streakDays).toBe(7);

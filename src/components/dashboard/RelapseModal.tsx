@@ -16,7 +16,6 @@ interface RelapseModalProps {
   isOpen: boolean;
   onClose: () => void;
   gameState: GameState;
-  userId: string;
   onGameStateUpdate?: (newGameState: GameState) => void;
 }
 
@@ -37,7 +36,6 @@ export function RelapseModal({
   isOpen,
   onClose,
   gameState,
-  userId,
   onGameStateUpdate,
 }: RelapseModalProps) {
   const t = useTranslations("relapse");
@@ -49,7 +47,7 @@ export function RelapseModal({
     async (actionType: "breathing" | "meditation") => {
       setLoadingAction(actionType);
       try {
-        const result = await registerPositiveAction(userId, actionType);
+        const result = await registerPositiveAction(actionType);
         if (result.error) {
           toast.error(t("modal.errorRegister"));
           return;
@@ -66,7 +64,7 @@ export function RelapseModal({
         setLoadingAction(null);
       }
     },
-    [userId, onClose, onGameStateUpdate]
+    [onClose, onGameStateUpdate]
   );
 
   const getCooldownMinutes = useCallback(
