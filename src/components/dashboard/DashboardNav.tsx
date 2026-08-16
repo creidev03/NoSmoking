@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
-import { Home, Trophy, BarChart3, Settings, ShieldOff } from "lucide-react";
+import { Home, Trophy, BarChart3, Settings } from "lucide-react";
 
 export function DashboardNav() {
   const pathname = usePathname();
@@ -26,7 +26,7 @@ export function DashboardNav() {
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0 px-4 mb-8">
-            <ShieldOff className="h-6 w-6" />
+            <img src="/logo.svg" alt="" className="h-6 w-6" aria-hidden="true" />
             <span className="ml-2 text-xl font-bold text-text">No Smoking</span>
           </div>
 

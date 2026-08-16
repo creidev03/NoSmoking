@@ -54,7 +54,10 @@ export default async function Home({
       <LandingMotion>
         <header className="landing-header border-b border-border/60 bg-background/90">
           <div className="landing-container flex items-center justify-between gap-2">
-            <span className="landing-heading text-lg font-bold tracking-tight text-foreground">No Smoking</span>
+            <div className="flex items-center gap-2">
+              <span className="landing-heading text-lg font-bold tracking-tight text-foreground sm:hidden">No Smoking</span>
+              <img src="/logo.svg" alt="" className="h-5 w-5 sm:h-8 sm:w-8" aria-hidden="true" />
+            </div>
             <nav className="flex items-center gap-1" aria-label="Header actions">
               <LanguageToggle />
               <ThemeToggle />
@@ -198,6 +201,16 @@ export default async function Home({
               <Link href={`/${locale}/onboarding`} className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{t("finalCta.cta")}</Link>
             </div>
           </section>
+
+          {/* Footer Credits */}
+          <footer className="border-t border-border/60 bg-muted/30 px-4 py-8 text-center sm:px-6">
+            <p className="text-sm text-muted-foreground">
+              {t("credits.builtBy")}{" "}
+              <a href="https://github.com/Crei03" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground transition-colors">Carlos Reina</a>
+              {" · "}
+              <a href="mailto:creidev03@gmail.com" className="underline underline-offset-2 hover:text-foreground transition-colors">creidev03@gmail.com</a>
+            </p>
+          </footer>
         </main>
       </LandingMotion>
     </div>
