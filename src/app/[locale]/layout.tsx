@@ -1,7 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Toaster } from "sonner";
 import { Geist, Lora, Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -49,11 +48,15 @@ export default async function LocaleLayout({
         )}
         suppressHydrationWarning
       >
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()`,
+            }}
+          />
+        </head>
         <body>
           <NextIntlClientProvider messages={messages}>
-            <header className="fixed top-4 right-4 z-50">
-              <ThemeToggle />
-            </header>
             {children}
             <Toaster richColors position="top-center" />
           </NextIntlClientProvider>

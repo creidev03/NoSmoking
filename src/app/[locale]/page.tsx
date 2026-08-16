@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LandingMotion } from "@/components/landing/LandingMotion";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageToggle } from "@/components/ui/language-toggle";
 import { routing } from "@/i18n/routing";
 
 export function generateStaticParams() {
@@ -51,9 +53,13 @@ export default async function Home({
     <div className="landing-shell">
       <LandingMotion>
         <header className="landing-header border-b border-border/60 bg-background/90">
-          <div className="landing-container flex items-center justify-between">
+          <div className="landing-container flex items-center justify-between gap-2">
             <span className="landing-heading text-lg font-bold tracking-tight text-foreground">No Smoking</span>
-            <Link href={`/${locale}/onboarding`} className="landing-header-link inline-flex min-h-12 items-center px-3 text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{t("header.cta")}</Link>
+            <nav className="flex items-center gap-1" aria-label="Header actions">
+              <LanguageToggle />
+              <ThemeToggle />
+              <Link href={`/${locale}/onboarding`} className="landing-header-link inline-flex min-h-12 items-center px-3 text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{t("header.cta")}</Link>
+            </nav>
           </div>
         </header>
         <main>

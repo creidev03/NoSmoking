@@ -84,4 +84,63 @@ describe("useTheme", () => {
 
     expect(localStorage.getItem("theme")).toBe("dark");
   });
+
+  // --- New tests for shared state ---
+
+  it("initialTheme syncs global state on mount", () => {
+    localStorage.setItem("theme", "light");
+
+    const { result } = renderHook(() => useTheme("dark"));
+
+    act(() => {
+      // Allow useEffect to run
+    });
+
+    expect(result.current.theme).toBe("dark");
+    expect(result.current.resolvedTheme).toBe("dark");
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    expect(localStorage.getItem("theme")).toBe("dark");
+  });
+
+  it("two hook instances share state via subscribers", () => {
+    const { result: instance1 } = renderHook(() => useTheme());
+    const { result: instance2 } = renderHook(() => useTheme());
+
+    act(() => {
+      // Allow useEffect to run
+    });
+
+    // Set theme on first instance
+    act(() => {
+      instance1.current.setTheme("dark");
+    });
+
+    // Both instances should reflect the change
+    expect(instance1.current.theme).toBe("dark");
+    expect(instance2.current.theme).toBe("dark");
+    expect(instance1.current.resolvedTheme).toBe("dark");
+    expect(instance2.current.resolvedTheme).toBe("dark");
+  });
+
+  it("subscriber notification on setTheme", () => {
+    const { result: instance1 } = renderHook(() => useTheme());
+    const { result: instance2 } = renderHook(() => useTheme());
+
+    act(() => {
+      // Allow useEffect to run
+    });
+
+    // Initially both are system
+    expect(instance1.current.theme).toBe("system");
+    expect(instance2.current.theme).toBe("system");
+
+    // Change via first instance
+    act(() => {
+      instance1.current.setTheme("light");
+    });
+
+    // Second instance picks up the change
+    expect(instance2.current.theme).toBe("light");
+    expect(instance2.current.resolvedTheme).toBe("light");
+  });
 });

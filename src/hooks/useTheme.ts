@@ -1,8 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 type Theme = "light" | "dark" | "system";
+
+// Module-level shared state
+let globalTheme: Theme = "system";
+let globalResolved: "light" | "dark" = "light";
+const subscribers = new Set<() => void>();
 
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
@@ -25,56 +30,100 @@ function applyTheme(theme: "light" | "dark") {
   }
 }
 
-export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
-  const [mounted, setMounted] = useState(false);
+function syncTheme(newTheme: Theme) {
+  if (typeof window === "undefined") return;
 
+  localStorage.setItem("theme", newTheme);
+  globalTheme = newTheme;
+
+  const resolved = newTheme === "system" ? getSystemTheme() : newTheme;
+  globalResolved = resolved;
+  applyTheme(resolved);
+
+  for (const subscriber of subscribers) {
+    subscriber();
+  }
+}
+
+export function useTheme(initialTheme?: Theme) {
+  const [, forceRender] = useState(0);
+  const lastInitialRef = useRef<Theme | undefined>(undefined);
+
+  // Apply stored theme on every mount (navigation resets module state)
   useEffect(() => {
-    const stored = getStoredTheme();
-    const resolved = stored === "system" ? getSystemTheme() : stored;
+    const themeToUse = initialTheme ?? getStoredTheme();
+    const resolved = themeToUse === "system" ? getSystemTheme() : themeToUse;
 
-    setThemeState(stored);
-    setResolvedTheme(resolved);
+    localStorage.setItem("theme", themeToUse);
+    lastInitialRef.current = initialTheme;
+    globalTheme = themeToUse;
+    globalResolved = resolved;
     applyTheme(resolved);
-    setMounted(true);
+    forceRender((n) => n + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Re-apply when initialTheme changes (e.g., DB loads after first render)
   useEffect(() => {
-    if (!mounted) return;
+    if (initialTheme === lastInitialRef.current) return;
+    lastInitialRef.current = initialTheme;
 
+    const themeToUse = initialTheme ?? getStoredTheme();
+    const resolved = themeToUse === "system" ? getSystemTheme() : themeToUse;
+
+    localStorage.setItem("theme", themeToUse);
+    globalTheme = themeToUse;
+    globalResolved = resolved;
+    applyTheme(resolved);
+    forceRender((n) => n + 1);
+  }, [initialTheme]);
+
+  // Subscribe to changes from other useTheme instances
+  useEffect(() => {
+    const bump = () => forceRender((n) => n + 1);
+    subscribers.add(bump);
+    return () => {
+      subscribers.delete(bump);
+    };
+  }, []);
+
+  // OS preference listener
+  useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      if (getStoredTheme() === "system") {
+      if (globalTheme === "system") {
         const newResolved = getSystemTheme();
-        setResolvedTheme(newResolved);
+        globalResolved = newResolved;
         applyTheme(newResolved);
+        for (const subscriber of subscribers) {
+          subscriber();
+        }
       }
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [mounted]);
+  }, []);
 
   const setTheme = useCallback((newTheme: Theme) => {
-    localStorage.setItem("theme", newTheme);
-    setThemeState(newTheme);
-
-    const resolved = newTheme === "system" ? getSystemTheme() : newTheme;
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
+    syncTheme(newTheme);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const next = resolvedTheme === "light" ? "dark" : "light";
-    setTheme(next);
-  }, [resolvedTheme, setTheme]);
+    const next = globalResolved === "light" ? "dark" : "light";
+    syncTheme(next);
+  }, []);
+
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+  }, []);
 
   return {
-    theme,
-    resolvedTheme,
+    theme: globalTheme,
+    resolvedTheme: globalResolved,
     setTheme,
     toggleTheme,
-    mounted,
+    mounted: mounted.current,
   };
 }
