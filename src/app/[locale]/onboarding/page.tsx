@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import { setRequestLocale } from "next-intl/server";
 
@@ -17,6 +18,12 @@ export default async function OnboardingPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
+  const { userId } = await auth();
+  if (!userId) {
+    redirect(`/${locale}/sign-in`);
+  }
+
   setRequestLocale(locale);
   const step = await getStep(searchParams);
 

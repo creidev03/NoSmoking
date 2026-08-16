@@ -11,8 +11,6 @@ const isPublicRoute = createRouteMatcher([
   "/es/sign-up(.*)",
   "/en/sign-in(.*)",
   "/en/sign-up(.*)",
-  "/es/onboarding(.*)",
-  "/en/onboarding(.*)",
   "/:locale",
   "/",
 ]);

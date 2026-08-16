@@ -61,7 +61,7 @@ export default async function Home({
             <nav className="flex items-center gap-1" aria-label="Header actions">
               <LanguageToggle />
               <ThemeToggle />
-              <Link href={`/${locale}/onboarding`} className="landing-header-link inline-flex min-h-12 items-center px-3 text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{t("header.cta")}</Link>
+              <Link href={`/${locale}/sign-in`} className="landing-header-link inline-flex min-h-12 items-center px-3 text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{t("header.cta")}</Link>
             </nav>
           </div>
         </header>
@@ -81,7 +81,7 @@ export default async function Home({
                 <p className="mt-6 max-w-lg text-lg leading-8 text-muted-foreground">
                   {t("hero.description")}
                 </p>
-                <Link href={`/${locale}/onboarding`} className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{t("hero.cta")}</Link>
+                <Link href={`/${locale}/sign-in`} className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{t("hero.cta")}</Link>
               </div>
               <div className="landing-hero-proof" data-motion-reveal>
                 <div className="landing-phone-frame">
@@ -198,7 +198,7 @@ export default async function Home({
             <div className="landing-container mx-auto max-w-2xl">
               <h2 className="landing-heading text-3xl font-bold tracking-tight text-foreground sm:text-5xl">{t("finalCta.title")}</h2>
               <p className="mx-auto mt-5 max-w-lg text-lg leading-8 text-muted-foreground">{t("finalCta.description")}</p>
-              <Link href={`/${locale}/onboarding`} className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{t("finalCta.cta")}</Link>
+              <Link href={`/${locale}/sign-in`} className="mt-8 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-8 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{t("finalCta.cta")}</Link>
             </div>
           </section>
 

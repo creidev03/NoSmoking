@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { users, onboardingResponses, game_state } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
 import { computeInitialLives as computeLives } from "@/lib/game-state";
 import { computeDifficulty } from "@/lib/difficulty";
 import { shouldEnableNotifications } from "@/lib/notifications";
@@ -37,9 +38,12 @@ export async function submitStep(
     .get();
 
   if (!existingUser) {
+    const clerkUser = await currentUser();
+    const email = clerkUser?.emailAddresses?.[0]?.emailAddress ?? null;
+
     await db.insert(users).values({
       id: userId,
-      email: `${userId}@placeholder.com`,
+      email,
       createdAt: new Date().toISOString(),
     });
   }
