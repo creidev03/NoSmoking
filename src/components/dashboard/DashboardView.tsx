@@ -264,11 +264,27 @@ export function DashboardView({
 
         {/* Main content - single column on mobile */}
         <div className="space-y-3">
+
+
+          {/* Streak - full width card */}
+          <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+            <StreakDisplay streakDays={state.streakDays} />
+          </div>
+
           {/* Lives - full width card */}
           <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
             <LivesDisplay
               total={state.totalLives}
               remaining={state.remainingLives}
+            />
+          </div>
+
+          {/* Cigarette button */}
+          <div className="flex justify-center rounded-xl border border-border bg-gradient-to-b from-surface-card to-surface py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:from-surface-card dark:to-surface">
+            <CigaretteButton
+              currentCount={state.cigarettesToday}
+              threshold={CIGARETTE_THRESHOLD}
+              onRegister={handleRegisterCigarette}
             />
           </div>
 
@@ -283,11 +299,6 @@ export function DashboardView({
               count={state.cigarettesToday}
               threshold={CIGARETTE_THRESHOLD}
             />
-          </div>
-
-          {/* Streak - full width card */}
-          <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
-            <StreakDisplay streakDays={state.streakDays} />
           </div>
 
           {state.totalPoints > 0 && (
@@ -305,15 +316,6 @@ export function DashboardView({
             isCooldownActive={cooldownActive}
             gameState={state}
           />
-
-          {/* Cigarette button */}
-          <div className="flex justify-center rounded-xl border border-border bg-gradient-to-b from-surface-card to-surface py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:from-surface-card dark:to-surface">
-            <CigaretteButton
-              currentCount={state.cigarettesToday}
-              threshold={CIGARETTE_THRESHOLD}
-              onRegister={handleRegisterCigarette}
-            />
-          </div>
 
           {/* Upcoming events */}
           <UpcomingEventsWidget gameState={state} />

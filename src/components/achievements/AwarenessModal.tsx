@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/lib/achievements/types";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export function AwarenessModal({
   onClose,
   message,
 }: AwarenessModalProps) {
+  const t = useTranslations("achievements");
   const [secondsLeft, setSecondsLeft] = useState(AUTO_DISMISS_SECONDS);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -86,21 +88,21 @@ export function AwarenessModal({
         {/* Countdown + manual dismiss */}
         <div className="mt-6 flex flex-col items-center gap-3">
           <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
-            <span>Auto-cierre en</span>
+            <span>{t("autoClose")}</span>
             <span
               className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-200 text-xs font-bold text-amber-900 dark:bg-amber-800 dark:text-amber-100"
               aria-live="polite"
             >
               {secondsLeft}
             </span>
-            <span>segundos</span>
+            <span>{t("seconds")}</span>
           </div>
           <Button
             variant="outline"
             className="border-amber-400 bg-amber-100 text-amber-900 hover:bg-amber-200 dark:border-amber-600 dark:bg-amber-900 dark:text-amber-200 dark:hover:bg-amber-800"
             onClick={onClose}
           >
-            ENTENDIDO
+            {t("understood")}
           </Button>
         </div>
       </div>

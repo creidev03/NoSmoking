@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/lib/achievements/types";
 import { AchievementCard } from "./AchievementCard";
@@ -24,15 +25,7 @@ interface AchievementGalleryProps {
 
 type CategoryFilter = "all" | "time" | "progress" | "actions" | "challenges" | "collection" | "awareness";
 
-const categoryTabs: { id: CategoryFilter; label: string }[] = [
-  { id: "all", label: "Todos" },
-  { id: "time", label: "Tiempo" },
-  { id: "progress", label: "Progreso" },
-  { id: "actions", label: "Acciones" },
-  { id: "challenges", label: "Desafíos" },
-  { id: "collection", label: "Colecciones" },
-  { id: "awareness", label: "Consciencia" },
-];
+const categoryIds: CategoryFilter[] = ["all", "time", "progress", "actions", "challenges", "collection", "awareness"];
 
 export function AchievementGallery({
   achievements,
@@ -40,6 +33,7 @@ export function AchievementGallery({
   progress,
   onAchievementClick,
 }: AchievementGalleryProps) {
+  const t = useTranslations("achievements");
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
 
   // Create lookup maps for performance
@@ -65,29 +59,29 @@ export function AchievementGallery({
       {/* Header */}
       <div className="mb-4">
         <h2 className="text-xs font-medium uppercase tracking-wide text-text-muted">
-          🏆 Logros
+          {t("title")}
         </h2>
         <p className="mt-1 text-sm text-text dark:text-text">
-          {totalUnlocked} de {achievements.length} logros desbloqueados
+          {t("count", { n: totalUnlocked, total: achievements.length })}
         </p>
       </div>
 
       {/* Category tabs */}
       <div className="mb-4 flex flex-wrap gap-1" role="tablist">
-        {categoryTabs.map((tab) => (
+        {categoryIds.map((id) => (
           <button
-            key={tab.id}
+            key={id}
             role="tab"
-            aria-selected={activeCategory === tab.id}
-            onClick={() => setActiveCategory(tab.id)}
+            aria-selected={activeCategory === id}
+            onClick={() => setActiveCategory(id)}
             className={cn(
               "rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-              activeCategory === tab.id
+              activeCategory === id
                 ? "bg-success text-white dark:bg-success"
                 : "bg-border text-text-muted hover:bg-surface dark:bg-border dark:text-text-muted dark:hover:bg-surface"
             )}
           >
-            {tab.label}
+            {t(`categories.${id}`)}
           </button>
         ))}
       </div>
@@ -133,7 +127,7 @@ export function AchievementGallery({
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <span className="mb-2 text-4xl opacity-30">🎯</span>
           <p className="text-sm text-text-muted">
-            No hay logros en esta categoría
+            {t("emptyCategory")}
           </p>
         </div>
       )}

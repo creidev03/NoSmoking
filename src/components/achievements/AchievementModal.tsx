@@ -1,18 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations, useFormatter } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/lib/achievements/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-const difficultyLabels: Record<string, string> = {
-  easy: "Fácil",
-  balanced: "Equilibrado",
-  medium: "Medio",
-  hard: "Difícil",
-  extreme: "Extremo",
-};
 
 const difficultyStars: Record<string, number> = {
   easy: 1,
@@ -35,6 +28,8 @@ export function AchievementModal({
   onClose,
   unlockedAt,
 }: AchievementModalProps) {
+  const t = useTranslations("achievements");
+  const format = useFormatter();
   const dialogRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape key
@@ -50,6 +45,13 @@ export function AchievementModal({
   if (!isOpen || !achievement) return null;
 
   const stars = difficultyStars[achievement.difficulty] ?? 1;
+  const translatedName = t(`${achievement.id}.name`);
+  const translatedDesc = t(`${achievement.id}.description`);
+  const displayName = translatedName !== `${achievement.id}.name` ? translatedName : achievement.name;
+  const displayDesc = translatedDesc !== `${achievement.id}.description` ? translatedDesc : achievement.description;
+  const difficultyLabel = t(`difficulty.${achievement.difficulty}`) !== `difficulty.${achievement.difficulty}`
+    ? t(`difficulty.${achievement.difficulty}`)
+    : achievement.difficulty;
 
   return (
     <div
@@ -61,7 +63,7 @@ export function AchievementModal({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label={achievement.name}
+        aria-label={displayName}
         onClick={(e) => e.stopPropagation()}
         className={cn(
           "relative mx-4 w-full max-w-sm rounded-2xl border p-8 shadow-xl",
@@ -73,7 +75,7 @@ export function AchievementModal({
         <button
           onClick={onClose}
           className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          aria-label="Cerrar"
+          aria-label={t("close")}
         >
           ✕
         </button>
@@ -96,18 +98,18 @@ export function AchievementModal({
 
         {/* Name */}
         <h2 className="text-center text-xl font-bold text-gray-900 dark:text-gray-100">
-          {achievement.name}
+          {displayName}
         </h2>
 
         {/* Description */}
         <p className="mt-3 text-center text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-          {achievement.description}
+          {displayDesc}
         </p>
 
         {/* Difficulty stars */}
         <div className="mt-4 flex items-center justify-center gap-1">
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {difficultyLabels[achievement.difficulty]}
+            {difficultyLabel}
           </span>
           <span aria-label={`${stars} de 5`} className="ml-1">
             {Array.from({ length: stars })
@@ -119,7 +121,7 @@ export function AchievementModal({
         {/* Unlocked date */}
         {unlockedAt && (
           <p className="mt-4 text-center text-xs text-gray-400 dark:text-gray-500">
-            Desbloqueado: {unlockedAt.toLocaleDateString("es-ES")}
+            {t("unlocked", { date: format.dateTime(unlockedAt, { dateStyle: "medium" }) })}
           </p>
         )}
 
@@ -129,25 +131,25 @@ export function AchievementModal({
             variant="outline"
             className="flex-1"
             onClick={async () => {
-              const text = `🏆 ¡Desbloqueé "${achievement.name}" en No Smoking!\n\n${achievement.description}`;
+              const text = t("shareMessage", { name: displayName, description: displayDesc });
               try {
                 if (navigator.share) {
-                  await navigator.share({ title: achievement.name, text });
+                  await navigator.share({ title: displayName, text });
                 } else {
                   throw new Error("no share");
                 }
               } catch {
                 await navigator.clipboard.writeText(text);
-                toast.success("Copiado al portapapeles", {
-                  description: "Pega el mensaje para compartir tu logro",
+                toast.success(t("copied"), {
+                  description: t("copiedDescription"),
                 });
               }
             }}
           >
-            COMPARTIR
+            {t("share")}
           </Button>
           <Button variant="default" className="flex-1" onClick={onClose}>
-            ENTENDIDO
+            {t("understood")}
           </Button>
         </div>
       </div>

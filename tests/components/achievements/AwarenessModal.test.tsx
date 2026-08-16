@@ -8,6 +8,23 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      "autoClose": "Auto-cierre en",
+      "seconds": "segundos",
+      "understood": "ENTENDIDO",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+}));
+
 const awarenessAchievement: Achievement = {
   id: "B001",
   name: "Primer Paso",

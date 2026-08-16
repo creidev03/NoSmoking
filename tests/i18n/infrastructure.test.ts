@@ -24,7 +24,8 @@ describe("middleware (next-intl)", () => {
       join(process.cwd(), "src/middleware.ts"),
       "utf-8"
     );
-    expect(source).toMatch(/export\s+(const|function)\s+middleware/);
+    // Supports both `export function middleware` and `export default clerkMiddleware(...)`
+    expect(source).toMatch(/export\s+(default\s+clerkMiddleware|const\s+middleware|function\s+middleware)/);
   });
 
   it("exports config with matcher", () => {

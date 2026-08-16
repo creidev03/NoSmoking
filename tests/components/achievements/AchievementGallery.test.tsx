@@ -1,7 +1,37 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { AchievementGallery } from "@/components/achievements/AchievementGallery";
 import type { Achievement } from "@/lib/achievements/types";
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      "title": "🏆 Logros",
+      "count": "{n} de {total} logros desbloqueados",
+      "categories.all": "Todos",
+      "categories.time": "Tiempo",
+      "categories.progress": "Progreso",
+      "categories.actions": "Acciones",
+      "categories.challenges": "Desafíos",
+      "categories.collection": "Colecciones",
+      "categories.awareness": "Consciencia",
+      "emptyCategory": "No hay logros en esta categoría",
+      "progress": "Progreso",
+      "unlocked": "Desbloqueado: {date}",
+      "difficulty.easy": "Fácil",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+  useFormatter: () => ({
+    dateTime: (value: Date) => value.toLocaleDateString("es-ES"),
+  }),
+}));
 
 const achievements: Achievement[] = [
   {

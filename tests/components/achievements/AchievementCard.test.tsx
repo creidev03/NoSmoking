@@ -1,7 +1,35 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AchievementCard } from "@/components/achievements/AchievementCard";
 import type { Achievement } from "@/lib/achievements/types";
+
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      "T001.name": "Primera Semana",
+      "T001.description": "7 días sin fumar — ¡la primera semana completa!",
+      "A005.name": "Acción Secreta",
+      "A005.description": "Completa una acción exactamente a medianoche",
+      "difficulty.easy": "Fácil",
+      "difficulty.balanced": "Equilibrado",
+      "difficulty.medium": "Medio",
+      "difficulty.hard": "Difícil",
+      "difficulty.extreme": "Extremo",
+      "progress": "Progreso",
+      "unlocked": "Desbloqueado: {date}",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+  useFormatter: () => ({
+    dateTime: (value: Date) => value.toLocaleDateString("es-ES"),
+  }),
+}));
 
 const baseAchievement: Achievement = {
   id: "T001",
@@ -185,7 +213,7 @@ describe("AchievementCard", () => {
   });
 
   describe("difficulty badge", () => {
-    it("renders difficulty level in Spanish", () => {
+    it("renders translated difficulty level", () => {
       render(
         <AchievementCard
           achievement={baseAchievement}

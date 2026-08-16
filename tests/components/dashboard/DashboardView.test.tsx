@@ -5,8 +5,9 @@ import type { GameState } from "@/lib/game-state";
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string, params?: Record<string, string | number>) => {
-    // useTranslations("dashboard") scopes the namespace
+    // useTranslations("dashboard") and useTranslations("awareness") scopes the namespace
     const translations: Record<string, string> = {
+      // dashboard namespace
       "title": "Tu Progreso Hoy",
       "subtitle": "Cada día es una oportunidad para ser más fuerte",
       "recoveryTitle": "💚 Recuperación",
@@ -17,6 +18,18 @@ vi.mock("next-intl", () => ({
       "penaltyApplied": "⚠️ Penalización: perdiste 1 vida",
       "devResetLives": "🔄 Vidas regeneradas (dev)",
       "devRemoveCooldown": "⚡ Cooldown eliminado (dev)",
+      // awareness namespace
+      "awareness.packs.one": "1.0 cajetilla",
+      "awareness.packs.other": "{n} cajetillas",
+      "awareness.cigarettes.one": "1 cigarro",
+      "awareness.cigarettes.other": "{n} cigarros",
+      "awareness.summary": "Has fumado {cigarettes} ({packs}). {encouragement}",
+      "awareness.messages.5": "Es un buen momento para reflexionar. Cada paso cuenta.",
+      "awareness.messages.20": "Tu cuerpo merece una oportunidad. Tú puedes con esto.",
+      "awareness.messages.50": "Vas por buen camino al reconocerlo. Cada día es una nueva posibilidad.",
+      "awareness.messages.100": "El cambio empieza con la consciencia. No estás solo en esto.",
+      "awareness.messages.200": "Reconocer el problema es el primer paso. Estás más fuerte de lo que crees.",
+      "awareness.messages.default": "Cada cigarro que dejas es una victoria. Empieza hoy, un día a la vez.",
     };
     let value = translations[key] || key;
     if (params) {
@@ -26,6 +39,9 @@ vi.mock("next-intl", () => ({
     }
     return value;
   },
+  useFormatter: () => ({
+    dateTime: (value: Date) => value.toLocaleDateString("es-ES"),
+  }),
 }));
 
 // Mock server actions

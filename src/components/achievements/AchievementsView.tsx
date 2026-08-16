@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/lib/achievements/types";
 import { AchievementCard } from "./AchievementCard";
@@ -31,15 +32,7 @@ type CategoryFilter =
   | "collection"
   | "awareness";
 
-const categoryTabs: { id: CategoryFilter; label: string }[] = [
-  { id: "all", label: "Todos" },
-  { id: "time", label: "Tiempo" },
-  { id: "progress", label: "Progreso" },
-  { id: "actions", label: "Acciones" },
-  { id: "challenges", label: "Desafíos" },
-  { id: "collection", label: "Colecciones" },
-  { id: "awareness", label: "Consciencia" },
-];
+const categoryIds: CategoryFilter[] = ["all", "time", "progress", "actions", "challenges", "collection", "awareness"];
 
 const ITEMS_PER_PAGE = 12;
 
@@ -48,6 +41,7 @@ export function AchievementsView({
   userAchievements,
   userId,
 }: AchievementsViewProps) {
+  const t = useTranslations("achievements");
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
@@ -91,32 +85,32 @@ export function AchievementsView({
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-text dark:text-text">
-          🏆 Tus Logros
+          {t("title")}
         </h1>
         <p className="mt-1 text-sm text-text-muted">
-          {totalUnlocked} de {achievements.length} desbloqueados ({percentage}%)
+          {t("ofTotal", { n: totalUnlocked, total: achievements.length, percent: percentage })}
         </p>
       </div>
 
       {/* Category tabs */}
       <div className="flex flex-wrap gap-2" role="tablist">
-        {categoryTabs.map((tab) => (
+        {categoryIds.map((id) => (
           <button
-            key={tab.id}
+            key={id}
             role="tab"
-            aria-selected={activeCategory === tab.id}
+            aria-selected={activeCategory === id}
             onClick={() => {
-              setActiveCategory(tab.id);
+              setActiveCategory(id);
               setVisibleCount(ITEMS_PER_PAGE);
             }}
             className={cn(
               "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-              activeCategory === tab.id
+              activeCategory === id
                 ? "bg-primary text-white"
                 : "bg-border text-text-muted hover:bg-surface dark:bg-border dark:text-text-muted dark:hover:bg-surface"
             )}
           >
-            {tab.label}
+            {t(`categories.${id}`)}
           </button>
         ))}
       </div>
@@ -159,7 +153,7 @@ export function AchievementsView({
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <span className="mb-3 text-5xl opacity-30">🎯</span>
           <p className="text-sm text-text-muted">
-            No hay logros en esta categoría
+            {t("emptyCategory")}
           </p>
         </div>
       )}
@@ -171,7 +165,7 @@ export function AchievementsView({
             onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
             className="rounded-lg border border-border px-6 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-surface dark:border-border dark:text-text-muted dark:hover:bg-surface"
           >
-            Cargar más ({visibleCount} de {filteredAchievements.length})
+            {t("loadMore", { visible: visibleCount, total: filteredAchievements.length })}
           </button>
         </div>
       )}

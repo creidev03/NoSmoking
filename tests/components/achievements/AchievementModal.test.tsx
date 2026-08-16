@@ -4,6 +4,33 @@ import userEvent from "@testing-library/user-event";
 import { AchievementModal } from "@/components/achievements/AchievementModal";
 import type { Achievement } from "@/lib/achievements/types";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      "T001.name": "Primera Semana",
+      "T001.description": "7 días sin fumar — ¡la primera semana completa!",
+      "difficulty.easy": "Fácil",
+      "unlocked": "Desbloqueado: {date}",
+      "share": "COMPARTIR",
+      "understood": "ENTENDIDO",
+      "shareMessage": "🏆 ¡Desbloqueé \"{name}\" en No Smoking!\n\n{description}",
+      "copied": "Copiado al portapapeles",
+      "copiedDescription": "Pega el mensaje para compartir tu logro",
+      "close": "Cerrar",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+  useFormatter: () => ({
+    dateTime: (value: Date) => value.toLocaleDateString("es-ES"),
+  }),
+}));
+
 const baseAchievement: Achievement = {
   id: "T001",
   name: "Primera Semana",

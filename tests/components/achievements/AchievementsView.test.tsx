@@ -9,6 +9,41 @@ vi.mock("@/components/achievements/AchievementModal", () => ({
     isOpen ? <div data-testid="achievement-modal" /> : null,
 }));
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      "title": "🏆 Tus Logros",
+      "ofTotal": "{n} de {total} desbloqueados ({percent}%)",
+      "categories.all": "Todos",
+      "categories.time": "Tiempo",
+      "categories.progress": "Progreso",
+      "categories.actions": "Acciones",
+      "categories.challenges": "Desafíos",
+      "categories.collection": "Colecciones",
+      "categories.awareness": "Consciencia",
+      "emptyCategory": "No hay logros en esta categoría",
+      "loadMore": "Cargar más ({visible} de {total})",
+      "T001.name": "Primera Semana",
+      "P001.name": "Primer Cigarrillo Evitado",
+      "A001.name": "Primera Acción Positiva",
+      "T008.name": "Un Año",
+      "progress": "Progreso",
+      "unlocked": "Desbloqueado: {date}",
+      "difficulty.easy": "Fácil",
+    };
+    let value = translations[key] || key;
+    if (params) {
+      for (const [param, val] of Object.entries(params)) {
+        value = value.replace(`{${param}}`, String(val));
+      }
+    }
+    return value;
+  },
+  useFormatter: () => ({
+    dateTime: (value: Date) => value.toLocaleDateString("es-ES"),
+  }),
+}));
+
 const baseAchievement: Achievement = {
   id: "T001",
   name: "Primera Semana",

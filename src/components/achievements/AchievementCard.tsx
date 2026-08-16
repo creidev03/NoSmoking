@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations, useFormatter } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/lib/achievements/types";
 
@@ -44,14 +45,6 @@ const categoryColors: Record<string, { bg: string; border: string; text: string 
   },
 };
 
-const difficultyLabels: Record<string, string> = {
-  easy: "Fácil",
-  balanced: "Equilibrado",
-  medium: "Medio",
-  hard: "Difícil",
-  extreme: "Extremo",
-};
-
 export function AchievementCard({
   achievement,
   isUnlocked,
@@ -59,10 +52,21 @@ export function AchievementCard({
   unlockedAt,
   onClick,
 }: AchievementCardProps) {
+  const t = useTranslations("achievements");
+  const format = useFormatter();
   const colors = categoryColors[achievement.category] ?? categoryColors.time;
   const showSecret = !achievement.isSecret || isUnlocked;
-  const displayName = showSecret ? achievement.name : "???";
-  const displayDescription = showSecret ? achievement.description : "";
+  const translatedName = t(`${achievement.id}.name`);
+  const translatedDesc = t(`${achievement.id}.description`);
+  const displayName = showSecret
+    ? (translatedName !== `${achievement.id}.name` ? translatedName : achievement.name)
+    : "???";
+  const displayDescription = showSecret
+    ? (translatedDesc !== `${achievement.id}.description` ? translatedDesc : achievement.description)
+    : "";
+  const difficultyLabel = t(`difficulty.${achievement.difficulty}`) !== `difficulty.${achievement.difficulty}`
+    ? t(`difficulty.${achievement.difficulty}`)
+    : achievement.difficulty;
 
   return (
     <div
@@ -101,7 +105,7 @@ export function AchievementCard({
               : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
           )}
         >
-          {difficultyLabels[achievement.difficulty] ?? achievement.difficulty}
+          {difficultyLabel}
         </span>
       </div>
 
@@ -128,7 +132,7 @@ export function AchievementCard({
       {!isUnlocked && progress > 0 && (
         <div className="mt-3">
           <div className="mb-1 flex items-center justify-between text-[10px] text-gray-500">
-            <span>Progreso</span>
+            <span>{t("progress")}</span>
             <span>{Math.min(progress, 100)}%</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
@@ -147,7 +151,7 @@ export function AchievementCard({
       {/* Unlock date */}
       {isUnlocked && unlockedAt && (
         <p className="mt-2 text-[10px] text-gray-400 dark:text-gray-500">
-          Desbloqueado: {unlockedAt.toLocaleDateString("es-ES")}
+          {t("unlocked", { date: format.dateTime(unlockedAt, { dateStyle: "medium" }) })}
         </p>
       )}
     </div>
