@@ -1,9 +1,25 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { userProfile, preferences, game_state, events, userAchievements, achievementProgress } from "@/db/schema";
+import { userProfile, preferences, game_state, events, userAchievements, achievementProgress, users, onboardingResponses } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
 import { randomUUID } from "crypto";
+
+export interface OnboardingData {
+  id: string;
+  userId: string;
+  cigarettesPerDay: number | null;
+  smokingYears: number | null;
+  motivation: string | null;
+  quitAttempts: number | null;
+  notificationEnabled: boolean | null;
+  completedAt: string | null;
+}
+
+export interface UserEmail {
+  email: string | null;
+}
 
 export interface UserProfile {
   id: string;
@@ -231,4 +247,74 @@ export async function downloadUserData(userId: string): Promise<{ data: string }
   };
 
   return { data: JSON.stringify(exportData, null, 2) };
+}
+
+export async function getOnboardingResponses(userId: string): Promise<OnboardingData | null> {
+  const row = await db
+    .select()
+    .from(onboardingResponses)
+    .where(eq(onboardingResponses.userId, userId))
+    .get();
+
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    userId: row.userId,
+    cigarettesPerDay: row.cigarettesPerDay,
+    smokingYears: row.smokingYears,
+    motivation: row.motivation,
+    quitAttempts: row.quitAttempts,
+    notificationEnabled: row.notificationEnabled,
+    completedAt: row.completedAt,
+  };
+}
+
+export async function getUserEmail(userId: string): Promise<UserEmail> {
+  const row = await db
+    .select({ email: users.email })
+    .from(users)
+    .where(eq(users.id, userId))
+    .get();
+
+  const storedEmail = row?.email;
+
+  // If the stored email is missing or looks like a placeholder, fetch from Clerk
+  if (!storedEmail || storedEmail.endsWith("@placeholder.com")) {
+    const clerkUser = await currentUser();
+    const realEmail = clerkUser?.emailAddresses?.[0]?.emailAddress ?? null;
+
+    // Backfill the real email into the DB for future reads
+    if (realEmail && storedEmail !== realEmail) {
+      await db
+        .update(users)
+        .set({ email: realEmail })
+        .where(eq(users.id, userId));
+    }
+
+    return { email: realEmail };
+  }
+
+  return { email: storedEmail };
+}
+
+export async function updateOnboardingMotivation(
+  userId: string,
+  motivation: string
+): Promise<{ success: boolean }> {
+  const now = new Date().toISOString();
+  const existing = await db
+    .select()
+    .from(onboardingResponses)
+    .where(eq(onboardingResponses.userId, userId))
+    .get();
+
+  if (existing) {
+    await db
+      .update(onboardingResponses)
+      .set({ motivation })
+      .where(eq(onboardingResponses.userId, userId));
+  }
+
+  return { success: true };
 }
