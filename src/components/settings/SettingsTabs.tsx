@@ -2,11 +2,12 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { User, Bell, Database } from "lucide-react";
+import { User, Bell, Database, MessageSquare } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ProfileSection } from "./ProfileSection";
 import { PreferencesSection } from "./PreferencesSection";
 import { DataSection } from "./DataSection";
+import { FeedbackSection } from "./FeedbackSection";
 import type { UserProfile, UserPreferences, OnboardingData } from "@/app/[locale]/dashboard/settings/actions";
 
 interface SettingsTabsProps {
@@ -17,13 +18,13 @@ interface SettingsTabsProps {
   userEmail: string | null;
 }
 
-type TabId = "profile" | "preferences" | "data";
+type TabId = "profile" | "preferences" | "data" | "feedback";
 
 function getTabFromURL(): TabId {
   if (typeof window === "undefined") return "profile";
   const params = new URLSearchParams(window.location.search);
   const tab = params.get("tab");
-  if (tab && ["profile", "preferences", "data"].includes(tab)) return tab as TabId;
+  if (tab && ["profile", "preferences", "data", "feedback"].includes(tab)) return tab as TabId;
   return "profile";
 }
 
@@ -35,6 +36,7 @@ export function SettingsTabs({ userId, profile, preferences, onboarding, userEma
     { id: "profile" as const, label: t("tabs.profile"), Icon: User },
     { id: "preferences" as const, label: t("tabs.preferences"), Icon: Bell },
     { id: "data" as const, label: t("tabs.data"), Icon: Database },
+    { id: "feedback" as const, label: t("tabs.feedback"), Icon: MessageSquare },
   ];
 
   // Read tab from URL on mount
@@ -86,6 +88,9 @@ export function SettingsTabs({ userId, profile, preferences, onboarding, userEma
         )}
         {activeTab === "data" && (
           <DataSection userId={userId} />
+        )}
+        {activeTab === "feedback" && (
+          <FeedbackSection />
         )}
       </div>
     </div>

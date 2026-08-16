@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, unique } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, unique, index } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
@@ -53,7 +53,9 @@ export const events = sqliteTable("events", {
   type: text("type").notNull(),
   detail: text("detail"),
   createdAt: text("created_at").notNull(),
-});
+}, (t) => ({
+  idxEventsGameCreated: index("idx_events_game_created").on(t.gameStateId, t.createdAt),
+}));
 
 // @deprecated — replaced by achievements system (userAchievements table). Remove after 30 days.
 export const badges = sqliteTable("badges", {
@@ -63,7 +65,9 @@ export const badges = sqliteTable("badges", {
     .references(() => game_state.id),
   badgeKey: text("badge_key").notNull(),
   unlockedAt: text("unlocked_at").notNull(),
-});
+}, (t) => ({
+  idxBadgesGame: index("idx_badges_game").on(t.gameStateId),
+}));
 
 export const achievements = sqliteTable("achievements", {
   id: text("id").primaryKey(),
@@ -140,4 +144,19 @@ export const preferences = sqliteTable("preferences", {
   theme: text("theme").notNull().default("auto"),
   soundsEnabled: integer("sounds_enabled", { mode: "boolean" }).notNull().default(true),
   updatedAt: text("updated_at").notNull(),
+});
+
+// --- Feedback table ---
+
+export const feedback = sqliteTable("feedback", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  type: text("type").notNull(), // "bug" | "improvement"
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("pending"), // "pending" | "sent" | "failed"
+  sentAt: text("sent_at"),
+  createdAt: text("created_at").notNull(),
 });

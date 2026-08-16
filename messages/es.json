@@ -358,7 +358,8 @@
     "tabs": {
       "profile": "Perfil",
       "preferences": "Preferencias",
-      "data": "Datos"
+      "data": "Datos",
+      "feedback": "Comentarios"
     },
     "profile": {
       "title": "Perfil",
@@ -437,6 +438,31 @@
       "deleteModalTitle": "Eliminar cuenta",
       "deleteModalDesc": "Esto eliminará permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.",
       "deleteConfirmPrompt": "Escribe tu email para confirmar:"
+    },
+    "feedback": {
+      "title": "Enviar Comentarios",
+      "type": {
+        "label": "Tipo de Comentario",
+        "bug": "Reporte de Error",
+        "improvement": "Mejora"
+      },
+      "subject": {
+        "label": "Asunto",
+        "placeholder": "Descripción breve..."
+      },
+      "message": {
+        "label": "Mensaje",
+        "placeholder": "Cuéntanos qué pasó..."
+      },
+      "submit": "Enviar Comentarios",
+      "success": "¡Comentarios enviados! Gracias.",
+      "error": {
+        "generic": "Error al enviar comentarios.",
+        "subject_required": "El asunto es requerido.",
+        "message_required": "El mensaje es requerido.",
+        "subject_too_long": "El asunto debe tener 200 caracteres o menos.",
+        "message_too_long": "El mensaje debe tener 2000 caracteres o menos."
+      }
     }
   },
   "errors": {

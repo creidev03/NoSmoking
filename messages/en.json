@@ -358,7 +358,8 @@
     "tabs": {
       "profile": "Profile",
       "preferences": "Preferences",
-      "data": "Data"
+      "data": "Data",
+      "feedback": "Feedback"
     },
     "profile": {
       "title": "Profile",
@@ -437,6 +438,31 @@
       "deleteModalTitle": "Delete account",
       "deleteModalDesc": "This will permanently delete your account and all your data. This action cannot be undone.",
       "deleteConfirmPrompt": "Type your email to confirm:"
+    },
+    "feedback": {
+      "title": "Send Feedback",
+      "type": {
+        "label": "Feedback Type",
+        "bug": "Bug Report",
+        "improvement": "Improvement"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Brief description..."
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Tell us what happened..."
+      },
+      "submit": "Submit Feedback",
+      "success": "Feedback sent! Thank you.",
+      "error": {
+        "generic": "Failed to send feedback.",
+        "subject_required": "Subject is required.",
+        "message_required": "Message is required.",
+        "subject_too_long": "Subject must be 200 characters or less.",
+        "message_too_long": "Message must be 2000 characters or less."
+      }
     }
   },
   "errors": {
