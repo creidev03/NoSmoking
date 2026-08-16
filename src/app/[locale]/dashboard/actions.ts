@@ -26,10 +26,11 @@ function getNestedValue(obj: any, path: string): string | undefined {
   return typeof current === "string" ? current : undefined;
 }
 
-function createTranslationFn(locale: string): TranslationFn {
+function createTranslationFn(locale: string, namespace?: string): TranslationFn {
   const msgs = messages[locale as "en" | "es"] || messages.es;
   return (key: string, params?: Record<string, any>): string => {
-    let value = getNestedValue(msgs, key);
+    const fullKey = namespace ? `${namespace}.${key}` : key;
+    let value = getNestedValue(msgs, fullKey);
     if (value === undefined) return key;
     if (params) {
       for (const [paramKey, paramValue] of Object.entries(params)) {
@@ -543,7 +544,7 @@ export async function getTimelineEvents(
     .offset(offset)
     .all();
 
-  const t = createTranslationFn(locale);
+  const t = createTranslationFn(locale, "timeline");
   const timelineEvents: TimelineEvent[] = [];
   for (const row of rows) {
     const normalized = normalizeEventWithPenalty({
