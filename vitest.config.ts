@@ -3,6 +3,8 @@ import path from "path";
 
 const alias = {
   "@": path.resolve(__dirname, "./src"),
+  // Mock "server-only" so Clerk's currentUser works in tests
+  "server-only": path.resolve(__dirname, "./server-only-mock.ts"),
 };
 
 export default defineConfig({
@@ -13,10 +15,6 @@ export default defineConfig({
   test: {
     globals: true,
     include: ["src/**/*.test.ts", "src/**/*.test.tsx", "tests/**/*.test.ts", "tests/**/*.test.tsx"],
-    // Redirect "server-only" to our mock so Clerk's currentUser works in tests
-    moduleNameMapper: {
-      "^server-only$": path.resolve(__dirname, "./server-only-mock.ts"),
-    },
     projects: [
       {
         resolve: { alias },
