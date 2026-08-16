@@ -49,7 +49,20 @@ export function RecentAchievementsWidget({
                 key={ua.achievementId}
                 className="flex items-center gap-3 rounded-lg border border-border p-3 bg-surface dark:border-border dark:bg-surface"
               >
-                <span className="text-xl">{achievement.icon}</span>
+                {achievement.icon.startsWith("/") ? (
+                  <img
+                    src={achievement.icon}
+                    alt={achievement.name}
+                    className="h-8 w-8"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/achievements/default.svg";
+                    }}
+                  />
+                ) : (
+                  <span className="text-xl" aria-hidden="true">
+                    {achievement.icon}
+                  </span>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text dark:text-text truncate">
                     {achievement.name}
