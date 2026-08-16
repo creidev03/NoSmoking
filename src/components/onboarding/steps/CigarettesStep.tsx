@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const CIGARETTE_RANGES = [
@@ -17,11 +18,12 @@ interface CigarettesStepProps {
 }
 
 export function CigarettesStep({ onSubmit, disabled }: CigarettesStepProps) {
+  const t = useTranslations("onboarding");
   return (
     <div className="flex flex-col items-center gap-6 text-center">
       <div className="text-4xl">🚬</div>
       <h2 className="text-xl font-semibold text-foreground">
-        ¿Cuántos cigarrillos fumas al día en promedio?
+        {t("cigarettes.question")}
       </h2>
       <div className="grid grid-cols-3 gap-3">
         {CIGARETTE_RANGES.map((range) => (

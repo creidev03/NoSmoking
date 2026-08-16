@@ -3,13 +3,37 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StepForm } from "@/components/onboarding/StepForm";
 
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      onboarding: {
+        "cigarettes.question": "¿Cuántos cigarrillos fumas al día en promedio?",
+        "years.question": "¿Hace cuánto tiempo fumas?",
+        "years.under1Year": "< 1 año",
+        "years.1to5Years": "1-5 años",
+        "years.5to10Years": "5-10 años",
+        "years.over10Years": "10+ años",
+        "motivation.question": "¿Qué te motiva a dejar de fumar?",
+        "motivation.health": "Salud",
+        "motivation.family": "Familia",
+        "motivation.money": "Dinero",
+        "motivation.appearance": "Apariencia",
+        "motivation.other": "Otro",
+        "attempts.question": "¿Cuántos intentos previos has tenido?",
+      },
+    };
+    const ns = translations[namespace] || {};
+    return (key: string) => ns[key] || `${namespace}.${key}`;
+  },
+}));
+
 describe("StepForm", () => {
   it("renders CigarettesStep for step 1", () => {
     render(
       <StepForm currentStep={1} onSubmit={vi.fn()} isPending={false} />
     );
     expect(
-      screen.getByText(/cuántos cigarrillos fumas/i)
+      screen.getByText("¿Cuántos cigarrillos fumas al día en promedio?")
     ).toBeInTheDocument();
   });
 
@@ -18,7 +42,7 @@ describe("StepForm", () => {
       <StepForm currentStep={2} onSubmit={vi.fn()} isPending={false} />
     );
     expect(
-      screen.getByText(/cuánto tiempo fumas/i)
+      screen.getByText("¿Hace cuánto tiempo fumas?")
     ).toBeInTheDocument();
   });
 
@@ -27,7 +51,7 @@ describe("StepForm", () => {
       <StepForm currentStep={3} onSubmit={vi.fn()} isPending={false} />
     );
     expect(
-      screen.getByText(/qué te motiva/i)
+      screen.getByText("¿Qué te motiva a dejar de fumar?")
     ).toBeInTheDocument();
   });
 
@@ -36,7 +60,7 @@ describe("StepForm", () => {
       <StepForm currentStep={4} onSubmit={vi.fn()} isPending={false} />
     );
     expect(
-      screen.getByText(/intentos previos/i)
+      screen.getByText("¿Cuántos intentos previos has tenido?")
     ).toBeInTheDocument();
   });
 

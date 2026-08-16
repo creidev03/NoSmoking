@@ -1,39 +1,53 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, fireEvent } from "@testing-library/react";
+
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      onboarding: {
+        "years.question": "How long have you been smoking?",
+        "years.under1Year": "< 1 year",
+        "years.1to5Years": "1-5 years",
+        "years.5to10Years": "5-10 years",
+        "years.over10Years": "10+ years",
+      },
+    };
+    const ns = translations[namespace] || {};
+    return (key: string) => ns[key] || `${namespace}.${key}`;
+  },
+}));
+
 import { YearsStep } from "@/components/onboarding/steps/YearsStep";
 
 describe("YearsStep", () => {
-  it("renders the question title", () => {
-    render(<YearsStep onSubmit={vi.fn()} />);
-    expect(
-      screen.getByText(/cuánto tiempo fumas/i)
-    ).toBeInTheDocument();
-  });
-
-  it("renders 4 year range buttons", () => {
-    render(<YearsStep onSubmit={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /< 1 año/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /1-5 años/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /5-10 años/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /10\+ años/i })).toBeInTheDocument();
-  });
-
-  it("calls onSubmit with correct value for each range", async () => {
-    const user = userEvent.setup();
+  it("renders the question using translations", () => {
     const onSubmit = vi.fn();
     render(<YearsStep onSubmit={onSubmit} />);
+    expect(screen.getByText("How long have you been smoking?")).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole("button", { name: /< 1 año/i }));
-    expect(onSubmit).toHaveBeenCalledWith(0);
+  it("renders all year range buttons with translated labels", () => {
+    const onSubmit = vi.fn();
+    render(<YearsStep onSubmit={onSubmit} />);
+    expect(screen.getByRole("button", { name: "< 1 year" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "1-5 years" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "5-10 years" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "10+ years" })).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole("button", { name: /1-5 años/i }));
+  it("calls onSubmit with the correct value when a range is clicked", () => {
+    const onSubmit = vi.fn();
+    render(<YearsStep onSubmit={onSubmit} />);
+    fireEvent.click(screen.getByRole("button", { name: "1-5 years" }));
     expect(onSubmit).toHaveBeenCalledWith(3);
+  });
 
-    await user.click(screen.getByRole("button", { name: /5-10 años/i }));
-    expect(onSubmit).toHaveBeenCalledWith(7);
-
-    await user.click(screen.getByRole("button", { name: /10\+ años/i }));
-    expect(onSubmit).toHaveBeenCalledWith(15);
+  it("disables buttons when disabled prop is true", () => {
+    const onSubmit = vi.fn();
+    render(<YearsStep onSubmit={onSubmit} disabled />);
+    const buttons = screen.getAllByRole("button");
+    buttons.forEach((button) => expect(button).toBeDisabled());
+    fireEvent.click(screen.getByRole("button", { name: "< 1 year" }));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

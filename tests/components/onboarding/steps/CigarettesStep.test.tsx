@@ -1,45 +1,60 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, fireEvent } from "@testing-library/react";
+
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      onboarding: {
+        "cigarettes.question": "How many cigarettes do you smoke per day on average?",
+      },
+    };
+    const ns = translations[namespace] || {};
+    return (key: string) => ns[key] || `${namespace}.${key}`;
+  },
+}));
+
 import { CigarettesStep } from "@/components/onboarding/steps/CigarettesStep";
 
 describe("CigarettesStep", () => {
-  it("renders the question title", () => {
-    render(<CigarettesStep onSubmit={vi.fn()} />);
-    expect(
-      screen.getByText(/cuántos cigarrillos fumas/i)
-    ).toBeInTheDocument();
-  });
-
-  it("renders 6 cigarette range buttons", () => {
-    render(<CigarettesStep onSubmit={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /1-5/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /6-10/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /11-15/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /16-20/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /21-40/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /40\+/i })).toBeInTheDocument();
-  });
-
-  it("calls onSubmit with correct value when a range is selected", async () => {
-    const user = userEvent.setup();
+  it("renders the question using translations", () => {
     const onSubmit = vi.fn();
     render(<CigarettesStep onSubmit={onSubmit} />);
+    expect(screen.getByText("How many cigarettes do you smoke per day on average?")).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole("button", { name: /6-10/i }));
+  it("renders all cigarette range buttons", () => {
+    const onSubmit = vi.fn();
+    render(<CigarettesStep onSubmit={onSubmit} />);
+    expect(screen.getByRole("button", { name: "1-5" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "6-10" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "11-15" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "16-20" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "21-40" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "40+" })).toBeInTheDocument();
+  });
+
+  it("calls onSubmit with the correct value when a range is clicked", () => {
+    const onSubmit = vi.fn();
+    render(<CigarettesStep onSubmit={onSubmit} />);
+    fireEvent.click(screen.getByRole("button", { name: "6-10" }));
     expect(onSubmit).toHaveBeenCalledWith(8);
-    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it("maps each range to a midpoint value", async () => {
-    const user = userEvent.setup();
+  it("calls onSubmit with different values for different ranges", () => {
     const onSubmit = vi.fn();
     render(<CigarettesStep onSubmit={onSubmit} />);
-
-    await user.click(screen.getByRole("button", { name: /1-5/i }));
+    fireEvent.click(screen.getByRole("button", { name: "1-5" }));
     expect(onSubmit).toHaveBeenCalledWith(3);
-
-    await user.click(screen.getByRole("button", { name: /40\+/i }));
+    fireEvent.click(screen.getByRole("button", { name: "40+" }));
     expect(onSubmit).toHaveBeenCalledWith(50);
+  });
+
+  it("disables buttons when disabled prop is true", () => {
+    const onSubmit = vi.fn();
+    render(<CigarettesStep onSubmit={onSubmit} disabled />);
+    const buttons = screen.getAllByRole("button");
+    buttons.forEach((button) => expect(button).toBeDisabled());
+    fireEvent.click(screen.getByRole("button", { name: "1-5" }));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

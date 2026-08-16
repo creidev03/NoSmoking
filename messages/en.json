@@ -1,4 +1,121 @@
 {
-  "es": {},
-  "en": {}
+  "landing": {
+    "steps": {
+      "step1": {
+        "title": "Know where you stand",
+        "description": "Set up your profile in a few minutes and choose the reason you want to keep in mind."
+      },
+      "step2": {
+        "title": "Move forward one day at a time",
+        "description": "Track your smoke-free days and find small tools to sustain your decision."
+      },
+      "step3": {
+        "title": "Recognize what you're building",
+        "description": "See your consistency clearly and celebrate every milestone without comparing yourself to anyone."
+      }
+    },
+    "benefits": {
+      "clarity": {
+        "title": "More clarity",
+        "description": "A simple record helps you see your process, even on difficult days."
+      },
+      "support": {
+        "title": "More support",
+        "description": "Reminders and resources designed to accompany you, not judge you."
+      },
+      "confidence": {
+        "title": "More confidence",
+        "description": "Every day you choose to take care of yourself becomes a sign of progress."
+      }
+    },
+    "achievements": {
+      "firstWeek": "First Week",
+      "tenLives": "10 Lives Saved",
+      "fiftyActions": "50 Actions",
+      "hidden": "Hidden Achievement"
+    },
+    "hero": {
+      "eyebrow": "A space to choose yourself again",
+      "titlePart1": "Quitting isn't a moment.",
+      "titlePart2": "It's a journey.",
+      "description": "No Smoking helps you turn an important decision into small, visible, possible steps. No guilt. No pressure. At your own pace.",
+      "cta": "Get Started",
+      "imageAlt": "Preview of the progress dashboard inside the No Smoking app",
+      "proof": "This is what your progress looks like, straight from the app."
+    },
+    "howItWorks": {
+      "eyebrow": "A process that fits your life",
+      "title": "A gentle path to begin",
+      "description": "The tool adapts to your decision: it gives you context, tracking, and encouragement to keep moving forward."
+    },
+    "system": {
+      "eyebrow": "A simple map to get started",
+      "title": "Three ideas to understand the journey",
+      "life": {
+        "title": "One life",
+        "description": "Your life represents the margin of care you're building; every decision counts, without turning the process into a judgment."
+      },
+      "cigarette": {
+        "title": "Log a cigarette",
+        "description": "When you smoke, you log that cigarette with the button so the cycle stays visible and you can understand your progress."
+      },
+      "positiveActions": {
+        "title": "Add positive actions",
+        "description": "You can also add positive actions: small decisions that help you sustain your journey."
+      }
+    },
+    "benefitsSection": {
+      "eyebrow": "What you gain by quitting",
+      "title": "Your effort deserves a place to grow."
+    },
+    "progress": {
+      "eyebrow": "A signal, not a demand",
+      "title": "An example of progress",
+      "description": "Numbers can help you recognize what you're already doing. This example is illustrative: your process will always be yours.",
+      "daysWithoutSmoke": "Days without smoke",
+      "heartFull": "Full heart",
+      "heartHalf": "Half heart",
+      "heartGray": "Gray heart",
+      "cycleDescription": "Each logged cigarette adds one to the cycle. When you reach the fifth logged cigarette, you lose a life and the cigarette cycle resets."
+    },
+    "achievementsSection": {
+      "eyebrow": "Small milestones, big signals",
+      "title": "A map of recognitions you're building",
+      "description": "These milestones are an invitation to recognize your consistency, not a promise of perfection. They are a public illustrative preview; they don't indicate unlocked achievements."
+    },
+    "finalCta": {
+      "title": "Today counts too.",
+      "description": "Start with a kind decision toward yourself. The rest can be built step by step.",
+      "cta": "Get Started"
+    },
+    "header": {
+      "cta": "Get Started"
+    },
+    "heartButton": {
+      "ariaLabel": "See a sign of progress"
+    }
+  },
+  "onboarding": {
+    "cigarettes": {
+      "question": "How many cigarettes do you smoke per day on average?"
+    },
+    "years": {
+      "question": "How long have you been smoking?",
+      "under1Year": "< 1 year",
+      "1to5Years": "1-5 years",
+      "5to10Years": "5-10 years",
+      "over10Years": "10+ years"
+    },
+    "motivation": {
+      "question": "What motivates you to quit smoking?",
+      "health": "Health",
+      "family": "Family",
+      "money": "Money",
+      "appearance": "Appearance",
+      "other": "Other"
+    },
+    "attempts": {
+      "question": "How many previous attempts have you had?"
+    }
+  }
 }

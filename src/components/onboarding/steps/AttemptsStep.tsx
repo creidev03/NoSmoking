@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const ATTEMPT_RANGES = [
@@ -15,11 +16,12 @@ interface AttemptsStepProps {
 }
 
 export function AttemptsStep({ onSubmit, disabled }: AttemptsStepProps) {
+  const t = useTranslations("onboarding");
   return (
     <div className="flex flex-col items-center gap-6 text-center">
       <div className="text-4xl">🔄</div>
       <h2 className="text-xl font-semibold text-foreground">
-        ¿Cuántos intentos previos has tenido?
+        {t("attempts.question")}
       </h2>
       <div className="grid grid-cols-2 gap-3">
         {ATTEMPT_RANGES.map((range) => (

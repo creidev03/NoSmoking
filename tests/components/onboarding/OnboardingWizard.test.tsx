@@ -4,6 +4,30 @@ import userEvent from "@testing-library/user-event";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 import * as actions from "@/app/onboarding/actions";
 
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      onboarding: {
+        "cigarettes.question": "¿Cuántos cigarrillos fumas al día en promedio?",
+        "years.question": "¿Hace cuánto tiempo fumas?",
+        "years.under1Year": "< 1 año",
+        "years.1to5Years": "1-5 años",
+        "years.5to10Years": "5-10 años",
+        "years.over10Years": "10+ años",
+        "motivation.question": "¿Qué te motiva a dejar de fumar?",
+        "motivation.health": "Salud",
+        "motivation.family": "Familia",
+        "motivation.money": "Dinero",
+        "motivation.appearance": "Apariencia",
+        "motivation.other": "Otro",
+        "attempts.question": "¿Cuántos intentos previos has tenido?",
+      },
+    };
+    const ns = translations[namespace] || {};
+    return (key: string) => ns[key] || `${namespace}.${key}`;
+  },
+}));
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -24,7 +48,7 @@ describe("OnboardingWizard", () => {
   it("renders step 1 by default", () => {
     render(<OnboardingWizard initialStep={1} />);
     expect(
-      screen.getByText(/cuántos cigarrillos fumas/i)
+      screen.getByText("¿Cuántos cigarrillos fumas al día en promedio?")
     ).toBeInTheDocument();
   });
 
@@ -37,21 +61,21 @@ describe("OnboardingWizard", () => {
   it("renders step 2 when initialStep is 2", () => {
     render(<OnboardingWizard initialStep={2} />);
     expect(
-      screen.getByText(/cuánto tiempo fumas/i)
+      screen.getByText("¿Hace cuánto tiempo fumas?")
     ).toBeInTheDocument();
   });
 
   it("renders step 3 when initialStep is 3", () => {
     render(<OnboardingWizard initialStep={3} />);
     expect(
-      screen.getByText(/qué te motiva/i)
+      screen.getByText("¿Qué te motiva a dejar de fumar?")
     ).toBeInTheDocument();
   });
 
   it("renders step 4 when initialStep is 4", () => {
     render(<OnboardingWizard initialStep={4} />);
     expect(
-      screen.getByText(/intentos previos/i)
+      screen.getByText("¿Cuántos intentos previos has tenido?")
     ).toBeInTheDocument();
   });
 

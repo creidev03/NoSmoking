@@ -1,12 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const YEAR_RANGES = [
-  { label: "< 1 año", value: 0 },
-  { label: "1-5 años", value: 3 },
-  { label: "5-10 años", value: 7 },
-  { label: "10+ años", value: 15 },
+  { translationKey: "under1Year", value: 0 },
+  { translationKey: "1to5Years", value: 3 },
+  { translationKey: "5to10Years", value: 7 },
+  { translationKey: "over10Years", value: 15 },
 ] as const;
 
 interface YearsStepProps {
@@ -15,11 +16,12 @@ interface YearsStepProps {
 }
 
 export function YearsStep({ onSubmit, disabled }: YearsStepProps) {
+  const t = useTranslations("onboarding");
   return (
     <div className="flex flex-col items-center gap-6 text-center">
       <div className="text-4xl">⏳</div>
       <h2 className="text-xl font-semibold text-foreground">
-        ¿Hace cuánto tiempo fumas?
+        {t("years.question")}
       </h2>
       <div className="grid grid-cols-2 gap-3">
         {YEAR_RANGES.map((range) => (
@@ -30,7 +32,7 @@ export function YearsStep({ onSubmit, disabled }: YearsStepProps) {
             className="h-12 rounded-lg text-base transition-all hover:bg-accent hover:text-accent-foreground active:scale-95"
             onClick={() => onSubmit(range.value)}
           >
-            {range.label}
+            {t(`years.${range.translationKey}`)}
           </Button>
         ))}
       </div>

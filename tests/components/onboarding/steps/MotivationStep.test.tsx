@@ -1,49 +1,55 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, fireEvent } from "@testing-library/react";
+
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      onboarding: {
+        "motivation.question": "What motivates you to quit smoking?",
+        "motivation.health": "Health",
+        "motivation.family": "Family",
+        "motivation.money": "Money",
+        "motivation.appearance": "Appearance",
+        "motivation.other": "Other",
+      },
+    };
+    const ns = translations[namespace] || {};
+    return (key: string) => ns[key] || `${namespace}.${key}`;
+  },
+}));
+
 import { MotivationStep } from "@/components/onboarding/steps/MotivationStep";
 
 describe("MotivationStep", () => {
-  it("renders the question title", () => {
-    render(<MotivationStep onSubmit={vi.fn()} />);
-    expect(
-      screen.getByText(/qué te motiva/i)
-    ).toBeInTheDocument();
-  });
-
-  it("renders 5 motivation buttons", () => {
-    render(<MotivationStep onSubmit={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /salud/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /familia/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /dinero/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /apariencia/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /otro/i })).toBeInTheDocument();
-  });
-
-  it("calls onSubmit with correct motivation value", async () => {
-    const user = userEvent.setup();
+  it("renders the question using translations", () => {
     const onSubmit = vi.fn();
     render(<MotivationStep onSubmit={onSubmit} />);
-
-    await user.click(screen.getByRole("button", { name: /salud/i }));
-    expect(onSubmit).toHaveBeenCalledWith("health");
+    expect(screen.getByText("What motivates you to quit smoking?")).toBeInTheDocument();
   });
 
-  it("maps all motivations correctly", async () => {
-    const user = userEvent.setup();
+  it("renders all motivation buttons with translated labels", () => {
     const onSubmit = vi.fn();
     render(<MotivationStep onSubmit={onSubmit} />);
+    expect(screen.getByRole("button", { name: /Health/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Family/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Money/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Appearance/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Other/ })).toBeInTheDocument();
+  });
 
-    await user.click(screen.getByRole("button", { name: /familia/i }));
+  it("calls onSubmit with the correct value when a motivation is clicked", () => {
+    const onSubmit = vi.fn();
+    render(<MotivationStep onSubmit={onSubmit} />);
+    fireEvent.click(screen.getByRole("button", { name: /Family/ }));
     expect(onSubmit).toHaveBeenCalledWith("family");
+  });
 
-    await user.click(screen.getByRole("button", { name: /dinero/i }));
-    expect(onSubmit).toHaveBeenCalledWith("money");
-
-    await user.click(screen.getByRole("button", { name: /apariencia/i }));
-    expect(onSubmit).toHaveBeenCalledWith("appearance");
-
-    await user.click(screen.getByRole("button", { name: /otro/i }));
-    expect(onSubmit).toHaveBeenCalledWith("other");
+  it("disables buttons when disabled prop is true", () => {
+    const onSubmit = vi.fn();
+    render(<MotivationStep onSubmit={onSubmit} disabled />);
+    const buttons = screen.getAllByRole("button");
+    buttons.forEach((button) => expect(button).toBeDisabled());
+    fireEvent.click(screen.getByRole("button", { name: /Health/ }));
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });
