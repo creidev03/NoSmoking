@@ -270,13 +270,17 @@ export function DashboardView({
             />
           </div>
 
-          {/* Stats grid - 2 columns mobile, 3 columns desktop */}
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+          {/* Stats grid - 2 columns */}
+          <div className="grid grid-cols-2 gap-3">
             <StreakDisplay streakDays={state.streakDays} />
             <CigarettesToday
               count={state.cigarettesToday}
               threshold={CIGARETTE_THRESHOLD}
             />
+          </div>
+
+          {/* Next action - full width card */}
+          <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
             <CooldownTimer
               nextActionAt={state.nextActionAvailableAt}
               phase={phase}

@@ -122,7 +122,7 @@ export function CooldownTimer({
   const circumference = 2 * Math.PI * 26; // 26px radius for 60px diameter
 
   return (
-    <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:bg-surface-card">
+    <div>
       <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-text-muted">
         ⏱️ Próxima Acción
       </h2>
