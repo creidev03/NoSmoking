@@ -58,6 +58,7 @@ export function DashboardView({
   achievements = [],
 }: DashboardViewProps) {
   const t = useTranslations("dashboard");
+  const tAwareness = useTranslations("awareness");
   const [state, setState] = useState(() => {
     const cached = loadCachedState();
     return cached ?? gameState;
@@ -273,20 +274,20 @@ export function DashboardView({
 
           {/* Stats grid - 2 columns */}
           <div className="grid grid-cols-2 gap-3">
-            <StreakDisplay streakDays={state.streakDays} />
+            <CooldownTimer
+              nextActionAt={state.nextActionAvailableAt}
+              phase={phase}
+              onExpired={handleCooldownExpired}
+            />
             <CigarettesToday
               count={state.cigarettesToday}
               threshold={CIGARETTE_THRESHOLD}
             />
           </div>
 
-          {/* Next action - full width card */}
+          {/* Streak - full width card */}
           <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
-            <CooldownTimer
-              nextActionAt={state.nextActionAvailableAt}
-              phase={phase}
-              onExpired={handleCooldownExpired}
-            />
+            <StreakDisplay streakDays={state.streakDays} />
           </div>
 
           {state.totalPoints > 0 && (
@@ -334,7 +335,7 @@ export function DashboardView({
         onClose={handleModalClose}
         message={
           selectedAchievement
-            ? generateAwarenessMessage(state.cigarettesToday || 1)
+            ? generateAwarenessMessage(state.cigarettesToday || 1, tAwareness)
             : ""
         }
       />
