@@ -56,7 +56,6 @@ export function DashboardNav() {
         {/* User menu at bottom */}
         <div className="flex-shrink-0 flex border-t border-border p-4">
           <UserButton
-            afterSignOutUrl="/"
             appearance={{
               elements: {
                 avatarBox: "h-10 w-10",

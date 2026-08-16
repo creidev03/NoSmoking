@@ -49,6 +49,10 @@ export const clerkAppearance: Appearance = {
       padding: "0.75rem 1rem",
       fontSize: "0.875rem",
       transition: "all 0.15s ease",
+      "&::placeholder": {
+        color: "#9CA3AF",
+        fontSize: "0.875rem",
+      },
       "&:focus": {
         borderColor: "#10B981",
         boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.1)",
@@ -185,6 +189,10 @@ export const clerkAppearanceDark: Appearance = {
       backgroundColor: "#111827",
       border: "1.5px solid #374151",
       color: "#F3F4F6",
+      "&::placeholder": {
+        color: "#6B7280",
+        fontSize: "0.875rem",
+      },
       "&:focus": {
         borderColor: "#10B981",
         boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.15)",
