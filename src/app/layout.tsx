@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ClerkProvider, esMX } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Geist, Lora, Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -21,11 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      afterSignOutUrl="/"
-      localization={esMX}
-    >
-      <html lang="es" className={cn("font-sans", geist.variable, poppins.variable, lora.variable)} suppressHydrationWarning>
+    <ClerkProvider afterSignOutUrl="/">
+      <html lang="en" className={cn("font-sans", geist.variable, poppins.variable, lora.variable)} suppressHydrationWarning>
         <body>
           <header className="fixed top-4 right-4 z-50">
             <ThemeToggle />

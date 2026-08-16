@@ -12,13 +12,12 @@ export default function SignInPage() {
       <div className="w-full max-w-sm">
         <SignIn appearance={appearance} routing="hash" />
 
-        {/* Language toggle */}
         <p className="mt-4 text-center text-xs text-muted-foreground">
           <Link
-            href="/sign-in/en"
+            href="/es/sign-in"
             className="text-primary hover:text-primary/80 transition-colors"
           >
-            English version
+            Versión en español
           </Link>
         </p>
       </div>

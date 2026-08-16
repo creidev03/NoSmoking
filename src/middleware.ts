@@ -20,6 +20,8 @@ export function middleware(request: NextRequest) {
     "/",
     "/sign-in(.*)",
     "/sign-up(.*)",
+    "/es/sign-in(.*)",
+    "/es/sign-up(.*)",
     "/onboarding(.*)",
   ]);
 

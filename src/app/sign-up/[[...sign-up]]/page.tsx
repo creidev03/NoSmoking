@@ -12,13 +12,12 @@ export default function SignUpPage() {
       <div className="w-full max-w-sm">
         <SignUp appearance={appearance} routing="hash" />
 
-        {/* Language toggle */}
         <p className="mt-4 text-center text-xs text-muted-foreground">
           <Link
-            href="/sign-up/en"
+            href="/es/sign-up"
             className="text-primary hover:text-primary/80 transition-colors"
           >
-            English version
+            Versión en español
           </Link>
         </p>
       </div>
