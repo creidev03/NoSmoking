@@ -26,7 +26,7 @@ export function DashboardNav() {
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0 px-4 mb-8">
-            <img src="/logo.svg" alt="" className="h-6 w-6" aria-hidden="true" />
+            <img src="/logo.svg" alt="" className="h-2 w-2" aria-hidden="true" />
             <span className="ml-2 text-xl font-bold text-text">No Smoking</span>
           </div>
 

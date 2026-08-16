@@ -2,7 +2,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-[#FFFFFF] dark:bg-[#111827]">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="mb-6">
           <div className="h-8 w-48 animate-pulse rounded bg-muted" />

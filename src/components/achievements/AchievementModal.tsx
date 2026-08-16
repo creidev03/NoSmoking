@@ -127,28 +127,30 @@ export function AchievementModal({
 
         {/* Buttons */}
         <div className="mt-8 flex gap-3">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={async () => {
-              const text = t("shareMessage", { name: displayName, description: displayDesc });
-              try {
-                if (navigator.share) {
-                  await navigator.share({ title: displayName, text });
-                } else {
-                  throw new Error("no share");
+          {unlockedAt && (
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={async () => {
+                const text = t("shareMessage", { name: displayName, description: displayDesc });
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title: displayName, text });
+                  } else {
+                    throw new Error("no share");
+                  }
+                } catch {
+                  await navigator.clipboard.writeText(text);
+                  toast.success(t("copied"), {
+                    description: t("copiedDescription"),
+                  });
                 }
-              } catch {
-                await navigator.clipboard.writeText(text);
-                toast.success(t("copied"), {
-                  description: t("copiedDescription"),
-                });
-              }
-            }}
-          >
-            {t("share")}
-          </Button>
-          <Button variant="default" className="flex-1" onClick={onClose}>
+              }}
+            >
+              {t("share")}
+            </Button>
+          )}
+          <Button variant="default" className={cn("flex-1", !unlockedAt && "w-full")} onClick={onClose}>
             {t("understood")}
           </Button>
         </div>

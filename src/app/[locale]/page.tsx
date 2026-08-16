@@ -56,7 +56,7 @@ export default async function Home({
           <div className="landing-container flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="landing-heading text-lg font-bold tracking-tight text-foreground sm:hidden">No Smoking</span>
-              <img src="/logo.svg" alt="" className="h-5 w-5 sm:h-8 sm:w-8" aria-hidden="true" />
+              <img src="/logo.svg" alt="" className="h-2 w-2" aria-hidden="true" />
             </div>
             <nav className="flex items-center gap-1" aria-label="Header actions">
               <LanguageToggle />

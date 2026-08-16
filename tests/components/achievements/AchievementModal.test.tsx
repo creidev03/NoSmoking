@@ -125,12 +125,24 @@ describe("AchievementModal", () => {
     expect(screen.getByText(/15\/1\/2026/)).toBeInTheDocument();
   });
 
-  it("renders COMPARTIR button", () => {
+  it("hides COMPARTIR button when achievement is locked", () => {
     render(
       <AchievementModal
         achievement={baseAchievement}
         isOpen={true}
         onClose={vi.fn()}
+      />
+    );
+    expect(screen.queryByText("COMPARTIR")).not.toBeInTheDocument();
+  });
+
+  it("shows COMPARTIR button when achievement is unlocked", () => {
+    render(
+      <AchievementModal
+        achievement={baseAchievement}
+        isOpen={true}
+        onClose={vi.fn()}
+        unlockedAt={new Date("2026-01-15T10:00:00Z")}
       />
     );
     expect(screen.getByText("COMPARTIR")).toBeInTheDocument();
