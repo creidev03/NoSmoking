@@ -79,6 +79,7 @@ import {
   registerCigarette,
   registerPositiveAction,
   getUserAchievements,
+  getTimelineEvents,
 } from "@/app/[locale]/dashboard/actions";
 import { db } from "@/lib/db";
 
@@ -677,5 +678,144 @@ describe("getUserAchievements", () => {
 
     expect(result.userAchievements).toEqual([]);
     expect(result.progress).toEqual([]);
+  });
+});
+
+describe("getTimelineEvents", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-15T10:00:00.000Z"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // Helper: each call to db.select() gets its own independent mock chain
+  function mockSelectChains(chains: Array<{ get?: any; all?: any }>) {
+    let callIndex = 0;
+    mockDb.select.mockImplementation(() => {
+      const chain = chains[callIndex++];
+      if (chain.get) {
+        return {
+          from: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({
+              get: vi.fn().mockResolvedValue(chain.get),
+            }),
+          }),
+        };
+      }
+      return {
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            all: vi.fn().mockResolvedValue(chain.all),
+            orderBy: chain.all !== undefined ? vi.fn().mockReturnValue({
+              limit: vi.fn().mockReturnValue({
+                offset: vi.fn().mockReturnValue({
+                  all: vi.fn().mockResolvedValue(chain.all),
+                }),
+              }),
+            }) : undefined,
+          }),
+        }),
+      };
+    });
+  }
+
+  it("uses client local midnight for 'today' filter when timezoneOffset=300 (UTC-5)", async () => {
+    // System time: 2026-01-15T10:00:00.000Z (15:00 UTC-5)
+    // Offset 300 → clientNow = 2026-01-15T05:00:00Z → local midnight = 2026-01-15T05:00:00Z
+    // Event at 04:30 UTC is BEFORE local midnight → excluded
+    const gameState = createGameState();
+    mockSelectChains([
+      { get: gameState },
+      { all: [{ cnt: 1 }] },
+      { all: [] },
+    ]);
+
+    const result = await getTimelineEvents("user-1", "today", 0, 20, "es", 300);
+
+    expect(result.events).toHaveLength(0);
+  });
+
+  it("falls back to UTC when timezoneOffset is undefined (backward compatible)", async () => {
+    // System time: 2026-01-15T10:00:00.000Z
+    // No offset → clientNow = UTC → midnight = 2026-01-15T00:00:00Z
+    // Event at 04:30 UTC is AFTER midnight → included
+    const gameState = createGameState();
+    const event = {
+      id: "evt-1",
+      gameStateId: "gs-1",
+      type: "fumar",
+      detail: JSON.stringify({ cantidad: 1, cigarrillos_totales_hoy: 1, penalizacion: false }),
+      createdAt: "2026-01-15T04:30:00.000Z",
+    };
+    mockSelectChains([
+      { get: gameState },
+      { all: [{ cnt: 1 }] },
+      { all: [event] },
+    ]);
+
+    const result = await getTimelineEvents("user-1", "today", 0, 20, "es");
+
+    expect(result.events).toHaveLength(1);
+    expect(result.events[0].id).toBe("evt-1");
+  });
+
+  it("applies timezone offset correctly for week filter", async () => {
+    // System time: 2026-01-15T10:00:00.000Z
+    // Offset 300 → clientNow = 2026-01-15T05:00:00Z
+    // Week without offset: sinceDate = 2026-01-08T10:00:00Z
+    // Week with offset: sinceDate = 2026-01-08T05:00:00Z
+    // Event at 07:00 UTC Jan 8: AFTER offset cutoff (05:00) but BEFORE non-offset cutoff (10:00)
+    // → included with offset, excluded without → proves offset is applied
+    const gameState = createGameState();
+    const event = {
+      id: "evt-week",
+      gameStateId: "gs-1",
+      type: "fumar",
+      detail: JSON.stringify({ cantidad: 1, cigarrillos_totales_hoy: 1, penalizacion: false }),
+      createdAt: "2026-01-08T07:00:00.000Z",
+    };
+    mockSelectChains([
+      { get: gameState },
+      { all: [{ cnt: 1 }] },
+      { all: [event] },
+    ]);
+
+    const result = await getTimelineEvents("user-1", "week", 0, 20, "es", 300);
+
+    // With offset, sinceDate shifts earlier → event is now within range
+    expect(result.events).toHaveLength(1);
+    expect(result.events[0].id).toBe("evt-week");
+  });
+
+  it("applies timezone offset correctly for month filter", async () => {
+    // System time: 2026-01-15T10:00:00.000Z
+    // Offset 300 → clientNow = 2026-01-15T05:00:00Z
+    // Month without offset: sinceDate = 2025-12-16T10:00:00Z
+    // Month with offset: sinceDate = 2025-12-16T05:00:00Z
+    // Event at 07:00 UTC Dec 16: AFTER offset cutoff (05:00) but BEFORE non-offset cutoff (10:00)
+    // → included with offset, excluded without → proves offset is applied
+    const gameState = createGameState();
+    const event = {
+      id: "evt-month",
+      gameStateId: "gs-1",
+      type: "fumar",
+      detail: JSON.stringify({ cantidad: 1, cigarrillos_totales_hoy: 1, penalizacion: false }),
+      createdAt: "2025-12-16T07:00:00.000Z",
+    };
+    mockSelectChains([
+      { get: gameState },
+      { all: [{ cnt: 1 }] },
+      { all: [event] },
+    ]);
+
+    const result = await getTimelineEvents("user-1", "month", 0, 20, "es", 300);
+
+    // With offset, sinceDate shifts earlier → event is now within range
+    expect(result.events).toHaveLength(1);
+    expect(result.events[0].id).toBe("evt-month");
   });
 });

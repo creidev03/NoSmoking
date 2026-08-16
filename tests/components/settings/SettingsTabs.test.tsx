@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SettingsTabs } from "@/components/settings/SettingsTabs";
@@ -16,40 +16,41 @@ vi.mock("@/components/settings/PreferencesSection", () => ({
   ),
 }));
 
-vi.mock("@/components/settings/AccountSection", () => ({
-  AccountSection: ({ userId }: { userId: string }) => (
-    <div data-testid="account-section">Account for {userId}</div>
-  ),
-}));
-
 vi.mock("@/components/settings/DataSection", () => ({
   DataSection: ({ userId }: { userId: string }) => (
     <div data-testid="data-section">Data for {userId}</div>
   ),
 }));
 
-vi.mock("@/components/settings/DangerZone", () => ({
-  DangerZone: ({ userId }: { userId: string }) => (
-    <div data-testid="danger-section">Danger for {userId}</div>
-  ),
-}));
-
 describe("SettingsTabs", () => {
-  it("renders all tabs", () => {
+  it("renders visible tabs", () => {
     render(
-      <SettingsTabs userId="user-1" profile={null} preferences={null} />
+      <SettingsTabs
+        userId="user-1"
+        profile={null}
+        preferences={null}
+        onboarding={null}
+        userEmail={null}
+      />
     );
 
     expect(screen.getByText("Perfil")).toBeInTheDocument();
     expect(screen.getByText("Preferencias")).toBeInTheDocument();
-    expect(screen.getByText("Cuenta")).toBeInTheDocument();
     expect(screen.getByText("Datos")).toBeInTheDocument();
-    expect(screen.getByText("Peligro")).toBeInTheDocument();
+    // Account and Danger tabs should NOT be rendered
+    expect(screen.queryByText("Cuenta")).not.toBeInTheDocument();
+    expect(screen.queryByText("Peligro")).not.toBeInTheDocument();
   });
 
   it("defaults to profile tab", () => {
     render(
-      <SettingsTabs userId="user-1" profile={null} preferences={null} />
+      <SettingsTabs
+        userId="user-1"
+        profile={null}
+        preferences={null}
+        onboarding={null}
+        userEmail={null}
+      />
     );
 
     expect(screen.getByTestId("profile-section")).toBeInTheDocument();
@@ -60,43 +61,54 @@ describe("SettingsTabs", () => {
     const user = userEvent.setup();
 
     render(
-      <SettingsTabs userId="user-1" profile={null} preferences={null} />
+      <SettingsTabs
+        userId="user-1"
+        profile={null}
+        preferences={null}
+        onboarding={null}
+        userEmail={null}
+      />
     );
 
     await user.click(screen.getByText("Preferencias"));
     expect(screen.getByTestId("preferences-section")).toBeInTheDocument();
     expect(screen.queryByTestId("profile-section")).not.toBeInTheDocument();
 
-    await user.click(screen.getByText("Cuenta"));
-    expect(screen.getByTestId("account-section")).toBeInTheDocument();
-
     await user.click(screen.getByText("Datos"));
     expect(screen.getByTestId("data-section")).toBeInTheDocument();
-
-    await user.click(screen.getByText("Peligro"));
-    expect(screen.getByTestId("danger-section")).toBeInTheDocument();
   });
 
   it("passes userId to child sections", async () => {
     const user = userEvent.setup();
 
     render(
-      <SettingsTabs userId="user-1" profile={null} preferences={null} />
+      <SettingsTabs
+        userId="user-1"
+        profile={null}
+        preferences={null}
+        onboarding={null}
+        userEmail={null}
+      />
     );
 
     await user.click(screen.getByText("Preferencias"));
     expect(screen.getByTestId("preferences-section")).toHaveTextContent("user-1");
   });
 
-  it("renders tab icons", () => {
+  it("renders Lucide icons instead of emojis", () => {
     render(
-      <SettingsTabs userId="user-1" profile={null} preferences={null} />
+      <SettingsTabs
+        userId="user-1"
+        profile={null}
+        preferences={null}
+        onboarding={null}
+        userEmail={null}
+      />
     );
 
-    expect(screen.getByText("👤")).toBeInTheDocument();
-    expect(screen.getByText("🔔")).toBeInTheDocument();
-    expect(screen.getByText("🔐")).toBeInTheDocument();
-    expect(screen.getByText("📦")).toBeInTheDocument();
-    expect(screen.getByText("⚠️")).toBeInTheDocument();
+    // Should not have emoji spans
+    expect(screen.queryByText("👤")).not.toBeInTheDocument();
+    expect(screen.queryByText("🔔")).not.toBeInTheDocument();
+    expect(screen.queryByText("📦")).not.toBeInTheDocument();
   });
 });
