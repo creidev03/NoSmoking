@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { game_state } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -14,10 +15,16 @@ export default async function TimelinePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect(`/${locale}/sign-in`);
+  }
+
   const row = await db
     .select()
     .from(game_state)
-    .where(eq(game_state.userId, "stub-user-id"))
+    .where(eq(game_state.userId, userId))
     .get();
 
   if (!row) {
