@@ -9,29 +9,21 @@ import { StreakDisplay } from "./StreakDisplay";
 import { CigarettesToday } from "./CigarettesToday";
 import { CooldownTimer } from "./CooldownTimer";
 import { ActionButtons } from "./ActionButtons";
-import { AchievementGallery } from "@/components/achievements/AchievementGallery";
 import { AchievementModal } from "@/components/achievements/AchievementModal";
 import { AwarenessModal } from "@/components/achievements/AwarenessModal";
 import { generateAwarenessMessage } from "@/lib/achievements/awareness-messages";
 import type { Achievement } from "@/lib/achievements/types";
 import { CigaretteButton } from "./CigaretteButton";
-import { RecentAchievementsWidget } from "./RecentAchievementsWidget";
-import { QuickActionsGrid } from "./QuickActionsGrid";
+
 import { UpcomingEventsWidget } from "./UpcomingEventsWidget";
 import { RelapseModal } from "./RelapseModal";
 
 
 const CACHE_KEY = "dashboard-game-state";
 
-interface UserAchievement {
-  achievementId: string;
-  unlockedAt: string;
-}
-
 interface DashboardViewProps {
   gameState: GameState;
   achievements?: Achievement[];
-  userAchievements?: UserAchievement[];
 }
 
 const CIGARETTE_THRESHOLD = 5;
@@ -63,18 +55,11 @@ function saveCachedState(gameState: GameState) {
 export function DashboardView({
   gameState,
   achievements = [],
-  userAchievements = [],
 }: DashboardViewProps) {
   const [state, setState] = useState(() => {
     const cached = loadCachedState();
     return cached ?? gameState;
   });
-
-  const [userAchievementsState, setUserAchievementsState] = useState<UserAchievement[]>(userAchievements);
-
-  // Queue for unlocked achievements to show modals
-  const [unlockQueue, setUnlockQueue] = useState<Achievement[]>([]);
-  const [isProcessingQueue, setIsProcessingQueue] = useState(false);
 
   // Sync server state to cache on mount
   useEffect(() => {
@@ -112,40 +97,24 @@ export function DashboardView({
     setModalUnlockedAt(undefined);
   }, []);
 
-  // Process newly unlocked achievements - add to state and queue modals
+  // Process newly unlocked achievements - queue modals
   const processUnlockedAchievements = useCallback((unlockedIds: string[]) => {
     if (unlockedIds.length === 0) return;
-
-    const now = new Date().toISOString();
-    const newAchievements: UserAchievement[] = unlockedIds.map((id) => ({
-      achievementId: id,
-      unlockedAt: now,
-    }));
-
-    setUserAchievementsState((prev) => [...prev, ...newAchievements]);
 
     // Find achievement details and add to modal queue
     const newAchievementDetails = unlockedIds
       .map((id) => achievements.find((a) => a.id === id))
       .filter((a): a is Achievement => a !== undefined);
 
-    setUnlockQueue((prev) => [...prev, ...newAchievementDetails]);
-  }, [achievements]);
+    if (newAchievementDetails.length > 0) {
+      // Show first achievement modal immediately
+      openAchievementModal(newAchievementDetails[0], new Date());
+    }
+  }, [achievements, openAchievementModal]);
 
-  // Process modal queue
-  useEffect(() => {
-    if (isProcessingQueue || unlockQueue.length === 0) return;
-
-    setIsProcessingQueue(true);
-    const nextAchievement = unlockQueue[0];
-    openAchievementModal(nextAchievement, new Date());
-  }, [unlockQueue, isProcessingQueue, openAchievementModal]);
-
-  // Handle modal close - process next in queue
+  // Handle modal close
   const handleModalClose = useCallback(() => {
     closeModal();
-    setUnlockQueue((prev) => prev.slice(1));
-    setIsProcessingQueue(false);
   }, [closeModal]);
 
   const handleAction = useCallback(
@@ -293,13 +262,17 @@ export function DashboardView({
 
         {/* Main content - single column on mobile */}
         <div className="space-y-3">
-          {/* Stats grid - 2 columns mobile, 4 columns desktop */}
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StreakDisplay streakDays={state.streakDays} />
+          {/* Lives - full width card */}
+          <div className="rounded-xl border border-border bg-surface-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
             <LivesDisplay
               total={state.totalLives}
               remaining={state.remainingLives}
             />
+          </div>
+
+          {/* Stats grid - 2 columns mobile, 3 columns desktop */}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+            <StreakDisplay streakDays={state.streakDays} />
             <CigarettesToday
               count={state.cigarettesToday}
               threshold={CIGARETTE_THRESHOLD}
@@ -320,6 +293,13 @@ export function DashboardView({
             </p>
           )}
 
+          {/* Action buttons (legacy) */}
+          <ActionButtons
+            onAction={handleAction}
+            isCooldownActive={cooldownActive}
+            gameState={state}
+          />
+
           {/* Cigarette button */}
           <div className="flex justify-center rounded-xl border border-border bg-gradient-to-b from-surface-card to-surface py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:border-border dark:from-surface-card dark:to-surface">
             <CigaretteButton
@@ -329,35 +309,8 @@ export function DashboardView({
             />
           </div>
 
-          {/* Recent achievements */}
-          <RecentAchievementsWidget
-            achievements={achievements}
-            userAchievements={userAchievementsState}
-          />
-
-          {/* Quick actions */}
-          <QuickActionsGrid
-            userId={state.userId}
-            onAction={handleAction}
-            isCooldownActive={cooldownActive}
-          />
-
           {/* Upcoming events */}
           <UpcomingEventsWidget gameState={state} />
-
-          {/* Full achievement gallery */}
-          <AchievementGallery
-            achievements={achievements}
-            userAchievements={userAchievementsState}
-            onAchievementClick={openAchievementModal}
-          />
-
-          {/* Action buttons (legacy) */}
-          <ActionButtons
-            onAction={handleAction}
-            isCooldownActive={cooldownActive}
-            gameState={state}
-          />
         </div>
       </div>
 

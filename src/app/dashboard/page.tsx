@@ -26,7 +26,7 @@ export default async function DashboardPage() {
   }
 
   // Process midnight reset: persists if needed + evaluates achievements
-  const { gameState, achievements } = await processMidnightReset(row.userId);
+  const { gameState } = await processMidnightReset(row.userId);
 
   const achievementSeeds = ACHIEVEMENT_SEEDS.map((seed) => ({
     ...seed,
@@ -37,7 +37,6 @@ export default async function DashboardPage() {
     <DashboardView
       gameState={gameState}
       achievements={achievementSeeds}
-      userAchievements={achievements.userAchievements}
     />
   );
 }
