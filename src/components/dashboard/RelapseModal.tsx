@@ -16,10 +16,11 @@ interface RelapseModalProps {
   onClose: () => void;
   gameState: GameState;
   userId: string;
+  onGameStateUpdate?: (newGameState: GameState) => void;
 }
 
 interface ActionConfig {
-  type: "breathing" | "meditation" | "music";
+  type: "breathing" | "meditation";
   icon: string;
   name: string;
   livesReward: number;
@@ -29,7 +30,6 @@ interface ActionConfig {
 const ACTIONS: ActionConfig[] = [
   { type: "breathing", icon: "🫁", name: "Respiración", livesReward: 0.5, durationLabel: "12 min" },
   { type: "meditation", icon: "🧘", name: "Meditación", livesReward: 0.5, durationLabel: "12 min" },
-  { type: "music", icon: "🎵", name: "Música Premium", livesReward: 0.25, durationLabel: "12 min" },
 ];
 
 export function RelapseModal({
@@ -37,13 +37,14 @@ export function RelapseModal({
   onClose,
   gameState,
   userId,
+  onGameStateUpdate,
 }: RelapseModalProps) {
   const [localGameState, setLocalGameState] = useState<GameState>(gameState);
   const [showTips, setShowTips] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
   const handleAction = useCallback(
-    async (actionType: "breathing" | "meditation" | "music") => {
+    async (actionType: "breathing" | "meditation") => {
       setLoadingAction(actionType);
       try {
         const result = await registerPositiveAction(userId, actionType);
@@ -52,6 +53,7 @@ export function RelapseModal({
           return;
         }
         setLocalGameState(result.gameState);
+        onGameStateUpdate?.(result.gameState);
         if (result.gameState.remainingLives > 0) {
           toast.success("¡Recuperaste vidas! Sigue así 💚");
           onClose();
@@ -62,7 +64,7 @@ export function RelapseModal({
         setLoadingAction(null);
       }
     },
-    [userId, onClose]
+    [userId, onClose, onGameStateUpdate]
   );
 
   const getCooldownMinutes = useCallback(
@@ -81,7 +83,7 @@ export function RelapseModal({
         <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-lg dark:border-border dark:bg-surface">
           {/* Header */}
           <div className="mb-4 text-center">
-            <h2 className="text-2xl font-bold text-danger dark:text-danger-soft">
+            <h2 className="text-2xl font-bold text-warning dark:text-warning">
               ⚠️ RECAÍDA DETECTADA
             </h2>
           </div>

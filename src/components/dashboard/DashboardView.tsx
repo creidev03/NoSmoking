@@ -60,8 +60,9 @@ export function DashboardView({
   const t = useTranslations("dashboard");
   const tAwareness = useTranslations("awareness");
   const [state, setState] = useState(() => {
-    const cached = loadCachedState();
-    return cached ?? gameState;
+    // Server data is always fresh from DB — use it as source of truth
+    // Cache is only a fallback for when server data isn't available yet (e.g. SSR)
+    return gameState ?? loadCachedState();
   });
 
   // Sync server state to cache on mount
@@ -194,14 +195,23 @@ export function DashboardView({
   // Auto-show relapse modal when user enters relapse state
   const [showRelapseModal, setShowRelapseModal] = useState(false);
 
-  // Track if we've shown the modal for this relapse session
+  // Track if we've shown the modal for this relapse session (persisted in localStorage)
+  const RELAPSE_SHOWN_KEY = "relapse-modal-shown";
   const relapseSessionKey = state.relapseStartedAt || "";
-  const [lastShownRelapse, setLastShownRelapse] = useState("");
+  const [lastShownRelapse, setLastShownRelapse] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem(RELAPSE_SHOWN_KEY) || "";
+  });
 
   useEffect(() => {
     if (isRelapsed && relapseSessionKey && relapseSessionKey !== lastShownRelapse) {
       setShowRelapseModal(true);
       setLastShownRelapse(relapseSessionKey);
+      try {
+        localStorage.setItem(RELAPSE_SHOWN_KEY, relapseSessionKey);
+      } catch {
+        // localStorage unavailable — silently skip
+      }
     }
   }, [isRelapsed, relapseSessionKey, lastShownRelapse]);
 
@@ -222,10 +232,16 @@ export function DashboardView({
 
         {/* Relapse banner */}
         {isRelapsed && (
-          <div className="mb-4 rounded-xl border border-danger-soft bg-danger-soft p-3 dark:border-danger dark:bg-danger/30">
-            <p className="text-sm font-medium text-danger dark:text-danger-soft">
+          <div className="mb-4 rounded-xl border border-warning/30 bg-warning/5 p-3 dark:border-warning/20 dark:bg-warning/5">
+            <p className="text-sm font-medium text-warning dark:text-warning">
               {t("relapseWarning")}
             </p>
+            <button
+              onClick={() => setShowRelapseModal(true)}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-warning/30 bg-warning/10 px-4 py-2 text-xs font-medium text-warning transition-all active:scale-[0.98] hover:bg-warning/15 dark:border-warning/20 dark:bg-warning/10 dark:text-warning"
+            >
+              🔄 Ver opciones de recuperación
+            </button>
           </div>
         )}
 
@@ -348,6 +364,10 @@ export function DashboardView({
         onClose={() => setShowRelapseModal(false)}
         gameState={state}
         userId={state.userId}
+        onGameStateUpdate={(newGameState) => {
+          setState(newGameState);
+          saveCachedState(newGameState);
+        }}
       />
     </div>
   );

@@ -52,8 +52,8 @@ export function RelapseCountdown({ startedAt, onExpired }: RelapseCountdownProps
       <p
         data-testid="countdown-display"
         className={cn(
-          "text-3xl font-bold tabular-nums text-danger dark:text-danger-soft",
-          isUrgent && "animate-pulse"
+          "text-3xl font-bold tabular-nums text-text dark:text-text",
+          isUrgent && "animate-pulse text-danger dark:text-danger-soft"
         )}
       >
         {timeString}
