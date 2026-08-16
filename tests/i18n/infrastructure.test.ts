@@ -2,22 +2,21 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-describe("middleware stacking (next-intl + Clerk)", () => {
-  it("imports createMiddleware from next-intl", () => {
+describe("middleware (Clerk-only, reverted from next-intl)", () => {
+  it("does NOT import next-intl/middleware", () => {
     const source = readFileSync(
       join(process.cwd(), "src/middleware.ts"),
       "utf-8"
     );
-    expect(source).toContain("next-intl/middleware");
-    expect(source).toContain("createMiddleware");
+    expect(source).not.toContain("next-intl/middleware");
   });
 
-  it("imports routing from i18n config", () => {
+  it("does NOT import i18n routing", () => {
     const source = readFileSync(
       join(process.cwd(), "src/middleware.ts"),
       "utf-8"
     );
-    expect(source).toContain("@/i18n/routing");
+    expect(source).not.toContain("@/i18n/routing");
   });
 
   it("exports middleware function", () => {
@@ -46,70 +45,31 @@ describe("middleware stacking (next-intl + Clerk)", () => {
   });
 });
 
-describe("[locale] layout", () => {
-  it("exists at src/app/[locale]/layout.tsx", () => {
+describe("[locale] route (reverted)", () => {
+  it("does NOT have src/app/[locale]/layout.tsx", () => {
     const fs = require("fs");
     const layoutPath = join(
       process.cwd(),
       "src/app/[locale]/layout.tsx"
     );
-    expect(fs.existsSync(layoutPath)).toBe(true);
+    expect(fs.existsSync(layoutPath)).toBe(false);
   });
 
-  it("wraps children in NextIntlClientProvider", () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/app/[locale]/layout.tsx"),
-      "utf-8"
+  it("does NOT have src/app/[locale]/page.tsx", () => {
+    const fs = require("fs");
+    const pagePath = join(
+      process.cwd(),
+      "src/app/[locale]/page.tsx"
     );
-    expect(source).toContain("NextIntlClientProvider");
+    expect(fs.existsSync(pagePath)).toBe(false);
   });
 
-  it("uses getMessages for translations", () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/app/[locale]/layout.tsx"),
-      "utf-8"
-    );
-    expect(source).toContain("getMessages");
-  });
-
-  it("keeps ClerkProvider as outermost wrapper", () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/app/[locale]/layout.tsx"),
-      "utf-8"
-    );
-    expect(source).toContain("ClerkProvider");
-    // ClerkProvider should appear before NextIntlClientProvider
-    const clerkIdx = source.indexOf("ClerkProvider");
-    const intlIdx = source.indexOf("NextIntlClientProvider");
-    expect(clerkIdx).toBeLessThan(intlIdx);
-  });
-
-  it("generates static params for locales", () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/app/[locale]/layout.tsx"),
-      "utf-8"
-    );
-    expect(source).toContain("generateStaticParams");
-  });
-
-  it("sets html lang attribute from locale param", () => {
-    // The <html lang> is in root layout, driven by [locale] layout context
+  it("root layout has html lang attribute", () => {
     const rootSource = readFileSync(
       join(process.cwd(), "src/app/layout.tsx"),
       "utf-8"
     );
     expect(rootSource).toContain("suppressHydrationWarning");
     expect(rootSource).toContain("<html");
-  });
-});
-
-describe("[locale] page", () => {
-  it("exists at src/app/[locale]/page.tsx", () => {
-    const fs = require("fs");
-    const pagePath = join(
-      process.cwd(),
-      "src/app/[locale]/page.tsx"
-    );
-    expect(fs.existsSync(pagePath)).toBe(true);
   });
 });

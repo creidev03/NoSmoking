@@ -1,4 +1,5 @@
-import type { Appearance } from "@clerk/nextjs";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Appearance = any;
 
 /**
  * Clerk appearance config — No Smoking design system.

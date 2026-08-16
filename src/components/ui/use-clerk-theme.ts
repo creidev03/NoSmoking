@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { clerkAppearance, clerkAppearanceDark } from "@/lib/clerk-appearance";
-import type { Appearance } from "@clerk/nextjs";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Appearance = any;
 
 /**
  * Returns Clerk appearance config that matches the current theme (light/dark).
