@@ -218,19 +218,21 @@ export async function registerCigarette(): Promise<CigaretteResult> {
       createdAt: now,
     });
 
-    // Evaluate achievements — degrade gracefully on failure
-    let unlocked: string[] = [];
-    try {
-      const result = await evaluateAchievements(userId);
-      unlocked = result.unlocked;
-    } catch (err) {
-      console.error("[actions] evaluateAchievements failed in registerCigarette:", err);
-    }
-
-    return { gameState, penaltyApplied, newCycle, unlockedAchievements: unlocked };
+    return { gameState, penaltyApplied, newCycle };
   });
 
-  return transactionResult;
+  // Evaluate achievements after the transaction commits — running it inside
+  // the transaction holds the Turso interactive-transaction baton open across
+  // ~66+ sequential round trips and causes it to expire (404 on commit).
+  let unlocked: string[] = [];
+  try {
+    const result = await evaluateAchievements(userId);
+    unlocked = result.unlocked;
+  } catch (err) {
+    console.error("[actions] evaluateAchievements failed in registerCigarette:", err);
+  }
+
+  return { ...transactionResult, unlockedAchievements: unlocked };
 }
 
 export async function registerPositiveAction(
@@ -322,24 +324,26 @@ export async function registerPositiveAction(
       updatedAt: nowISO,
     };
 
-    // Evaluate achievements — degrade gracefully on failure
-    let unlocked: string[] = [];
+    return {
+      gameState,
+      cooldownMinutes,
+      nextActionAvailableAt: nextAvailable,
+    };
+  });
+
+  // Evaluate achievements after the transaction commits — see comment in
+  // registerCigarette for why this can't run inside the transaction.
+  let unlocked: string[] = [];
+  if (!transactionResult.error) {
     try {
       const result = await evaluateAchievements(userId);
       unlocked = result.unlocked;
     } catch (err) {
       console.error("[actions] evaluateAchievements failed in registerPositiveAction:", err);
     }
+  }
 
-    return {
-      gameState,
-      cooldownMinutes,
-      nextActionAvailableAt: nextAvailable,
-      unlockedAchievements: unlocked,
-    };
-  });
-
-  return transactionResult;
+  return { ...transactionResult, unlockedAchievements: unlocked };
 }
 
 // DEV ONLY: Reset all lives to full
@@ -470,18 +474,19 @@ export async function processMidnightReset(): Promise<{
       await insertNewBadges(tx, gameState.id, resetResult.newBadges, now);
     }
 
-    // Evaluate achievements — degrade gracefully on failure
-    try {
-      await evaluateAchievements(userId);
-    } catch (err) {
-      console.error("[actions] evaluateAchievements failed in processMidnightReset:", err);
-    }
-
     return {
       gameState: resetResult.gameState,
       newBadges: resetResult.newBadges,
     };
   });
+
+  // Evaluate achievements after the transaction commits — see comment in
+  // registerCigarette for why this can't run inside the transaction.
+  try {
+    await evaluateAchievements(userId);
+  } catch (err) {
+    console.error("[actions] evaluateAchievements failed in processMidnightReset:", err);
+  }
 
   // Return fresh achievement data — degrade gracefully on failure
   let achievements: UserAchievementData = { userAchievements: [], progress: [] };
