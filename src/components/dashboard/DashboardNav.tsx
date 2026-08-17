@@ -42,6 +42,7 @@ export function DashboardNav() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={false}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
@@ -79,16 +80,17 @@ export function DashboardNav() {
                 : pathname.startsWith(item.href);
 
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1 flex-1 h-full text-xs font-medium transition-colors",
-                  isActive
-                    ? "text-primary"
-                    : "text-text-muted"
-                )}
-              >
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  prefetch={false}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1 flex-1 h-full text-xs font-medium transition-colors",
+                    isActive
+                      ? "text-primary"
+                      : "text-text-muted"
+                  )}
+                >
                 <item.icon className="h-5 w-5" />
                 <span>{item.label}</span>
               </Link>

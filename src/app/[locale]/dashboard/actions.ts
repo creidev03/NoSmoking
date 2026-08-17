@@ -12,6 +12,7 @@ import { normalizeEventWithPenalty, type TimelineEvent, type TimelineFilter, typ
 import type { Achievement } from "@/lib/achievements/types";
 import enMessages from "../../../../messages/en.json";
 import esMessages from "../../../../messages/es.json";
+import { unstable_cache, revalidateTag } from "next/cache";
 
 type ActionType = "breathing" | "meditation" | "music";
 
@@ -221,6 +222,9 @@ export async function registerCigarette(): Promise<CigaretteResult> {
     return { gameState, penaltyApplied, newCycle };
   });
 
+  // Invalidate timeline cache after new event is recorded
+  await invalidateTimelineCache();
+
   // Evaluate achievements after the transaction commits — running it inside
   // the transaction holds the Turso interactive-transaction baton open across
   // ~66+ sequential round trips and causes it to expire (404 on commit).
@@ -228,6 +232,9 @@ export async function registerCigarette(): Promise<CigaretteResult> {
   try {
     const result = await evaluateAchievements(userId);
     unlocked = result.unlocked;
+    if (unlocked.length > 0) {
+      await invalidateAchievementsCache();
+    }
   } catch (err) {
     console.error("[actions] evaluateAchievements failed in registerCigarette:", err);
   }
@@ -331,6 +338,11 @@ export async function registerPositiveAction(
     };
   });
 
+  // Invalidate timeline cache after new event is recorded
+  if (!transactionResult.error) {
+    await invalidateTimelineCache();
+  }
+
   // Evaluate achievements after the transaction commits — see comment in
   // registerCigarette for why this can't run inside the transaction.
   let unlocked: string[] = [];
@@ -338,6 +350,9 @@ export async function registerPositiveAction(
     try {
       const result = await evaluateAchievements(userId);
       unlocked = result.unlocked;
+      if (unlocked.length > 0) {
+        await invalidateAchievementsCache();
+      }
     } catch (err) {
       console.error("[actions] evaluateAchievements failed in registerPositiveAction:", err);
     }
@@ -483,7 +498,10 @@ export async function processMidnightReset(): Promise<{
   // Evaluate achievements after the transaction commits — see comment in
   // registerCigarette for why this can't run inside the transaction.
   try {
-    await evaluateAchievements(userId);
+    const result = await evaluateAchievements(userId);
+    if (result.unlocked.length > 0) {
+      await invalidateAchievementsCache();
+    }
   } catch (err) {
     console.error("[actions] evaluateAchievements failed in processMidnightReset:", err);
   }
@@ -499,42 +517,52 @@ export async function processMidnightReset(): Promise<{
   return { ...transactionResult, achievements };
 }
 
+const getUserAchievementsCached = unstable_cache(
+  async (userId: string): Promise<UserAchievementData> => {
+    const userAchievementRows = await db
+      .select()
+      .from(userAchievements)
+      .where(eq(userAchievements.userId, userId))
+      .all();
+
+    const progressRows = await db
+      .select()
+      .from(achievementProgress)
+      .where(eq(achievementProgress.userId, userId))
+      .all();
+
+    return {
+      userAchievements: userAchievementRows.map((row) => ({
+        achievementId: row.achievementId,
+        unlockedAt: row.unlockedAt,
+      })),
+      progress: progressRows.map((row) => ({
+        achievementId: row.achievementId,
+        currentValue: row.currentValue,
+      })),
+    };
+  },
+  ["user-achievements"],
+  { revalidate: 60, tags: ["achievements"] }
+);
+
 export async function getUserAchievements(): Promise<UserAchievementData> {
   const { userId } = await requireAuth();
-
-  const userAchievementRows = await db
-    .select()
-    .from(userAchievements)
-    .where(eq(userAchievements.userId, userId))
-    .all();
-
-  const progressRows = await db
-    .select()
-    .from(achievementProgress)
-    .where(eq(achievementProgress.userId, userId))
-    .all();
-
-  return {
-    userAchievements: userAchievementRows.map((row) => ({
-      achievementId: row.achievementId,
-      unlockedAt: row.unlockedAt,
-    })),
-    progress: progressRows.map((row) => ({
-      achievementId: row.achievementId,
-      currentValue: row.currentValue,
-    })),
-  };
+  return getUserAchievementsCached(userId);
 }
 
-export async function getTimelineEvents(
-  filter: TimelineFilter = "all",
-  page: number = 0,
-  limit: number = 20,
-  locale: string = "es",
+export async function invalidateAchievementsCache(): Promise<void> {
+  revalidateTag("achievements");
+}
+
+async function getTimelineEventsInternal(
+  userId: string,
+  filter: TimelineFilter,
+  page: number,
+  limit: number,
+  locale: string,
   timezoneOffset?: number
 ): Promise<{ events: TimelineEvent[]; hasMore: boolean; total: number }> {
-  const { userId } = await requireAuth();
-
   const gs = await db
     .select()
     .from(game_state)
@@ -606,6 +634,36 @@ export async function getTimelineEvents(
     hasMore: offset + limit < total,
     total,
   };
+}
+
+const getTimelineEventsCached = unstable_cache(
+  async (userId: string, filter: TimelineFilter, page: number, limit: number, locale: string, timezoneOffset?: number) => {
+    return getTimelineEventsInternal(userId, filter, page, limit, locale, timezoneOffset);
+  },
+  ["timeline-events"],
+  { revalidate: 30, tags: ["timeline"] }
+);
+
+export async function getTimelineEvents(
+  filter: TimelineFilter = "all",
+  page: number = 0,
+  limit: number = 20,
+  locale: string = "es",
+  timezoneOffset?: number
+): Promise<{ events: TimelineEvent[]; hasMore: boolean; total: number }> {
+  const { userId } = await requireAuth();
+
+  // Only cache the initial page load (page 0, "all" filter)
+  // Subsequent requests (pagination, filter changes) go directly to DB
+  if (page === 0 && filter === "all") {
+    return getTimelineEventsCached(userId, filter, page, limit, locale, timezoneOffset);
+  }
+
+  return getTimelineEventsInternal(userId, filter, page, limit, locale, timezoneOffset);
+}
+
+export async function invalidateTimelineCache(): Promise<void> {
+  revalidateTag("timeline");
 }
 
 /**
