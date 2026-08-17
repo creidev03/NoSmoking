@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { game_state, events, userAchievements } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { ACHIEVEMENT_SEEDS } from "./seed";
 import { getProgress, updateProgress, incrementProgress } from "./progress";
 import {

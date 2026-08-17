@@ -8,6 +8,7 @@ import { ACHIEVEMENT_SEEDS } from "@/lib/achievements/seed";
 import type { Achievement } from "@/lib/achievements/types";
 import { processMidnightReset } from "./actions";
 import { setRequestLocale } from "next-intl/server";
+import type { GameState } from "@/lib/game-state";
 
 export default async function DashboardPage({
   params,
@@ -34,7 +35,16 @@ export default async function DashboardPage({
   }
 
   // Process midnight reset: persists if needed + evaluates achievements
-  const { gameState } = await processMidnightReset();
+  // Wrap in try/catch — if this fails (DB timeout, auth issue), degrade gracefully
+  // instead of crashing the entire Server Component render.
+  let gameState: GameState = row as GameState;
+  try {
+    const reset = await processMidnightReset();
+    gameState = reset.gameState;
+  } catch (err) {
+    // Log for monitoring but don't crash the page — use the gameState we already fetched
+    console.error("processMidnightReset failed, using fallback gameState:", err);
+  }
 
   const achievementSeeds = ACHIEVEMENT_SEEDS.map((seed) => ({
     ...seed,
