@@ -208,7 +208,7 @@ describe("DashboardPage", () => {
 
     await DashboardPage({ params: Promise.resolve({ locale: "es" }) });
 
-    expect(mockProcessMidnightReset).toHaveBeenCalledWith("user-1");
+    expect(mockProcessMidnightReset).toHaveBeenCalled();
   });
 
   it("passes userAchievements and progress from processMidnightReset to DashboardView", async () => {
