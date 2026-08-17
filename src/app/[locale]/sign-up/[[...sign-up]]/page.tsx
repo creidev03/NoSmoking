@@ -13,7 +13,11 @@ export default function SignUpPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <SignUp appearance={appearance} routing="hash" />
+        <SignUp
+          appearance={appearance}
+          routing="hash"
+          forceRedirectUrl={`/${locale}/onboarding`}
+        />
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
           <Link

@@ -13,7 +13,11 @@ export default function SignInPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <SignIn appearance={appearance} routing="hash" />
+        <SignIn
+          appearance={appearance}
+          routing="hash"
+          forceRedirectUrl={`/${locale}/dashboard`}
+        />
 
         <p className="mt-4 text-center text-xs text-muted-foreground">
           <Link
