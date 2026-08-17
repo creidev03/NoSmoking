@@ -41,13 +41,19 @@ async function hasCompletedOnboarding(userId: string): Promise<boolean> {
 export default clerkMiddleware(async (auth, request) => {
   const isProtected = !isPublicRoute(request);
 
-  // Protect private routes
+  // Protect private routes — manually check auth and redirect with locale
+  // (Clerk v7's auth.protect() doesn't accept a redirectTo option, so we
+  // handle the redirect ourselves to avoid depending on NEXT_PUBLIC env vars)
   if (isProtected) {
-    await auth.protect();
+    const session = await auth();
+    if (!session.userId) {
+      const localeMatch = request.nextUrl.pathname.match(/^\/(es|en)/);
+      const locale = localeMatch ? localeMatch[1] : "es";
+      return NextResponse.redirect(new URL(`/${locale}/sign-in`, request.url));
+    }
   }
 
   // Smart redirect: check onboarding status for authenticated users
-  // After auth.protect(), call auth() to get the userId
   const authState = await auth();
   if (isProtected && authState.userId) {
     const pathname = request.nextUrl.pathname;
