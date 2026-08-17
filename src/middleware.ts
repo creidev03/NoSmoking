@@ -41,29 +41,33 @@ async function hasCompletedOnboarding(userId: string): Promise<boolean> {
 export default clerkMiddleware(async (auth, request) => {
   const isProtected = !isPublicRoute(request);
 
+  // Single auth() call — reused for both auth check and onboarding redirect
+  const session = await auth();
+
   // Protect private routes — manually check auth and redirect with locale
   // (Clerk v7's auth.protect() doesn't accept a redirectTo option, so we
   // handle the redirect ourselves to avoid depending on NEXT_PUBLIC env vars)
-  if (isProtected) {
-    const session = await auth();
-    if (!session.userId) {
-      const localeMatch = request.nextUrl.pathname.match(/^\/(es|en)/);
-      const locale = localeMatch ? localeMatch[1] : "es";
-      return NextResponse.redirect(new URL(`/${locale}/sign-in`, request.url));
-    }
+  if (isProtected && !session.userId) {
+    const localeMatch = request.nextUrl.pathname.match(/^\/(es|en)/);
+    const locale = localeMatch ? localeMatch[1] : "es";
+    return NextResponse.redirect(new URL(`/${locale}/sign-in`, request.url));
   }
 
   // Smart redirect: check onboarding status for authenticated users
-  const authState = await auth();
-  if (isProtected && authState.userId) {
+  if (isProtected && session.userId) {
     const pathname = request.nextUrl.pathname;
 
     // Extract locale from pathname (e.g., "/es/dashboard" → "es")
     const localeMatch = pathname.match(/^\/(es|en)/);
     const locale = localeMatch ? localeMatch[1] : "es";
 
-    // Check if user has completed onboarding
-    const completed = await hasCompletedOnboarding(authState.userId);
+    // Check if user has completed onboarding — degrade to "not completed" on DB failure
+    let completed = false;
+    try {
+      completed = await hasCompletedOnboarding(session.userId);
+    } catch (err) {
+      console.error("[middleware] hasCompletedOnboarding failed, defaulting to false:", err);
+    }
 
     // If navigating to dashboard but hasn't completed onboarding → redirect to onboarding
     if (pathname.includes("/dashboard") && !completed) {

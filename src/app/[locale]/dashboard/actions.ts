@@ -218,8 +218,14 @@ export async function registerCigarette(): Promise<CigaretteResult> {
       createdAt: now,
     });
 
-    // Evaluate achievements inside transaction for atomicity
-    const { unlocked } = await evaluateAchievements(userId);
+    // Evaluate achievements — degrade gracefully on failure
+    let unlocked: string[] = [];
+    try {
+      const result = await evaluateAchievements(userId);
+      unlocked = result.unlocked;
+    } catch (err) {
+      console.error("[actions] evaluateAchievements failed in registerCigarette:", err);
+    }
 
     return { gameState, penaltyApplied, newCycle, unlockedAchievements: unlocked };
   });
@@ -316,8 +322,14 @@ export async function registerPositiveAction(
       updatedAt: nowISO,
     };
 
-    // Evaluate achievements inside transaction for atomicity
-    const { unlocked } = await evaluateAchievements(userId);
+    // Evaluate achievements — degrade gracefully on failure
+    let unlocked: string[] = [];
+    try {
+      const result = await evaluateAchievements(userId);
+      unlocked = result.unlocked;
+    } catch (err) {
+      console.error("[actions] evaluateAchievements failed in registerPositiveAction:", err);
+    }
 
     return {
       gameState,
@@ -458,8 +470,12 @@ export async function processMidnightReset(): Promise<{
       await insertNewBadges(tx, gameState.id, resetResult.newBadges, now);
     }
 
-    // Evaluate achievements inside transaction for atomicity
-    await evaluateAchievements(userId);
+    // Evaluate achievements — degrade gracefully on failure
+    try {
+      await evaluateAchievements(userId);
+    } catch (err) {
+      console.error("[actions] evaluateAchievements failed in processMidnightReset:", err);
+    }
 
     return {
       gameState: resetResult.gameState,
@@ -467,8 +483,13 @@ export async function processMidnightReset(): Promise<{
     };
   });
 
-  // Return fresh achievement data
-  const achievements = await getUserAchievements();
+  // Return fresh achievement data — degrade gracefully on failure
+  let achievements: UserAchievementData = { userAchievements: [], progress: [] };
+  try {
+    achievements = await getUserAchievements();
+  } catch (err) {
+    console.error("[actions] getUserAchievements failed in processMidnightReset:", err);
+  }
 
   return { ...transactionResult, achievements };
 }
